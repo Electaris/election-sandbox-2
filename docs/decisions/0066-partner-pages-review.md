@@ -1,6 +1,8 @@
 # 0066: Public Pages build for partner review
 
-Date: 2026-10-17. Status: owner requested implementation.
+Date: 2026-10-17. Status: owner explicitly approved public GitHub Pages.
+
+Automatic approval initially rejected enabling Pages because partner testing alone did not explicitly authorize unrestricted public access. The owner was asked whether the full Home, Swingometer, and Election Night build, including PA/MI/WI detailed data, could be publicly accessible to anyone. Their direct answer was **“Approve public GitHub Pages.”** Hosting was enabled only after that confirmation.
 
 The owner requested a calculations/methodology audit and enabling GitHub Pages so their business partner can test the applications. This authorizes a public, unpaid technical-review deployment of the assembled Home, Swingometer, and Election Night experience from this repository. GitHub Pages is public; this is not an access-controlled partner portal.
 

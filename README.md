@@ -10,7 +10,7 @@ An interactive 3D laboratory for building United States presidential-election co
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-315f83" />
 </p>
 
-[Public demo](https://electaris.github.io/election-sandbox-demo/) · [Current release](docs/releases/v0.29d2-sturgis-source-review.md) · [Methodology](docs/methodology/ANALYTICS_CONSTITUTION.md) · [Architecture](#architecture)
+[Partner test site](https://electaris.github.io/election-sandbox-2/) · [National-only demo](https://electaris.github.io/election-sandbox-demo/) · [Current release](docs/releases/v0.29d2-sturgis-source-review.md) · [Methodology](https://electaris.github.io/election-sandbox-2/methodology.html) · [Architecture](#architecture)
 
 ![Pennsylvania 3D Swingometer laboratory](docs/review/v0.19.1-supervisor-review/screenshots/03-pennsylvania-3d-laboratory.png)
 
@@ -33,6 +33,12 @@ The product is local-first, deterministic, and designed to explain why an electi
 </table>
 
 ## Current release
+
+### v0.39: Calculation audit and public partner review
+
+The [calculation audit](docs/review/v0.39-calculation-audit/REVIEW.md) passes 302 existing model/runtime tests and 24 independent aggregate cases across PA/MI/WI. It corrects turnout/operation-basis wording and discloses bounded route search; no model formula or election data changed. A readable [methodology page](https://electaris.github.io/election-sandbox-2/methodology.html) ships with the applications.
+
+The owner explicitly approved the full public test build under [decision 0066](docs/decisions/0066-partner-pages-review.md). [GitHub Pages](https://electaris.github.io/election-sandbox-2/) now serves the reviewed static `pages-review` branch; see the [deployment identity and live checks](docs/review/v0.39-calculation-audit/PAGES.md). This hosting approval does not mark source-rights questions or deferred human acceptance resolved. Source pushes do not automatically replace the published review snapshot.
 
 ### v0.30: Local three-state release candidate
 

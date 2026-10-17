@@ -36,6 +36,7 @@ The Pages build passes its real `/election-sandbox-2/` subpath browser journey l
 - Group geography is aggregate composition. Authored candidate shares are assumptions, not measured individual preferences. Canonical group order resolves shared capacity competition.
 - Statewide turnout → group additions → preference → third-party exchange is a fixed sequence. Display rounding never drives arithmetic; integer requests use JavaScript `Math.round`, including its negative-half behavior.
 - Third-party geographic affinity and legacy allocation profiles are deterministic modeling rules. They do not establish actual voter migration.
+- Named minor-candidate baselines are separated in the supported detailed states. Unseparated votes outside those foundations remain in Aggregate other; national named minor-candidate displays must be interpreted with that coverage limitation.
 - PA/MI off-map ballots remain in totals without invented locations. Wisconsin's local ward values remain reconstructed estimates, and compatible group cells remain unavailable.
 - All-ballot H−T margin and top-two plurality margin are different metrics. Net margin votes are not the same as transferred ballots. A transfer changes H−T by two votes per ballot.
 - Maine/Nebraska certified allocations remain intact; route construction excludes their counterfactual district allocation. A tie is not an outright win. Unsupported states have mathematical requirements without a local behavior model.
