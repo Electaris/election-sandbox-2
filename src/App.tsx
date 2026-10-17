@@ -191,13 +191,15 @@ const compactFormat = new Intl.NumberFormat("en-US", {
 });
 const replayClockFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
-  weekday: "short",
-  month: "short",
-  day: "numeric",
   hour: "numeric",
   minute: "2-digit",
   second: "2-digit",
   timeZoneName: "short",
+});
+const replayDateFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "short",
+  day: "numeric",
 });
 const replayTimeShortFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -1978,7 +1980,6 @@ function ScenarioApp() {
     }, 140);
   }
 
-  const editorialMasthead = workspaceMode === "home" || experienceMode === "swingometer";
   const scenarioShareButton = <button className="share-button" disabled={!demographicFoundation || scenarioPending}
     onClick={copyScenarioLink} type="button">
     {shareStatus === "copied" ? "Scenario link copied" : shareStatus === "error" ? "Try copy" : "Copy scenario link"}
@@ -1992,8 +1993,8 @@ function ScenarioApp() {
         <button className="brand" onClick={() => navigateWorkspace("home")} type="button" aria-label="Sandbox 2.0 editorial home">
           <span className="brand-rule" aria-hidden="true"><i /><i /></span>
           <span>
-            <span className="overline">{editorialMasthead ? "THE ELECTION EXPLORATION STUDIO" : "American electorate laboratory"}</span>
-            <strong>{editorialMasthead ? "American Electorate" : "Sandbox 2.0"}</strong>
+            <span className="overline">THE ELECTION EXPLORATION STUDIO</span>
+            <strong>American Electorate</strong>
           </span>
         </button>
 
@@ -2025,7 +2026,7 @@ function ScenarioApp() {
       {workspaceMode === "laboratory" && <WorkspaceHeader inspectorOpen={dock.inspectorOpen} onToggleInspector={dock.toggleInspector}>
           <div className="map-toolbar">
             <div>
-              <span className="overline">{experienceMode === "swingometer" ? "SWINGOMETER / 2024 PRESIDENTIAL" : "Geographic scope"}</span>
+              <span className="overline">{experienceMode === "swingometer" ? "SWINGOMETER / 2024 PRESIDENTIAL" : "ELECTION NIGHT / 2024 REPLAY"}</span>
               <div className="breadcrumb">
                 {!selectedStateCode
                   ? <strong aria-current="location">United States</strong>
@@ -2231,8 +2232,22 @@ function ScenarioApp() {
         <AnalysisInspector open={workspaceMode === "laboratory" && dock.inspectorOpen} className={`control-column ${assumptionsOpen ? "open" : ""}`}>
           {experienceMode === "election-night" && (
             <section className="night-three-state-card" aria-label="Three-state election night desk">
-              <div className="card-heading"><div><span className="overline">Election night desk</span><strong>Detailed states only</strong></div><span className="year-chip">2024</span></div>
-              <p>Only jurisdictions with approved reporting-unit data enter this count.</p>
+              <div className="card-heading"><div><span className="overline">Historical scenario replay</span><strong>Returns desk</strong></div><span className="year-chip">2024</span></div>
+              <p>Pennsylvania, Michigan, and Wisconsin. Only published local returns enter this count.</p>
+              <div className="night-reported-total"><span>Ballots reported</span><strong data-testid="night-reported-total">{formatNumber(replayNational?.totalReportedVotes ?? 0)}</strong><small>{replay.current?.controller.status === "complete" ? "Count complete" : replay.current?.controller.status === "playing" ? "Replay running" : replay.phase === "ready" ? "Replay paused" : "Preparing the count"}</small></div>
+              <ol className="night-reported-candidates" aria-label="Three-state reported votes by candidate">
+                {electoralTargetCandidates.map(candidate => {
+                  const votes = replayCandidateVotes(replayNational, candidate === "residual_other" ? "other-residual" : candidate);
+                  const share = replayNational?.totalReportedVotes ? votes / replayNational.totalReportedVotes * 100 : null;
+                  return <li data-candidate={candidate} key={candidate}>
+                    <span>{candidateNames[candidate]}</span>
+                    <strong data-testid={`night-reported-${candidate}`}>{formatNumber(votes)}</strong>
+                    <small>{share == null ? "—" : `${share.toFixed(1)}%`}</small>
+                    <span className="night-candidate-share" aria-hidden="true"><i style={{ width: `${share ?? 0}%` }} /></span>
+                  </li>;
+                })}
+              </ol>
+              <h2 className="night-desk-subheading">Follow a state</h2>
               <div className="night-state-ledger">
                 {(["PA", "MI", "WI"] as const).map((stateCode) => {
                   const state = replayJurisdictions?.find((item) => item.jurisdictionId === stateCode);
@@ -2248,13 +2263,16 @@ function ScenarioApp() {
                         totalVotes: state.totalReportedVotes,
                       }
                     : undefined;
-                  return <div className="night-state-row" data-selected={selectedStateCode === stateCode} key={stateCode}>
-                    <span><strong>{stateCode}</strong><small>{getDetailedStateManifest(stateCode).geography.unitLabelPlural}</small></span>
-                    <span><b>{formatResultLead(reportedResult)}</b><small>{state?.returnsPublished ?? 0} / {state?.expectedReturns ?? 0}</small></span>
-                  </div>;
+                  const manifest = getDetailedStateManifest(stateCode);
+                  return <button className="night-state-row" data-selected={selectedStateCode === stateCode} aria-pressed={selectedStateCode === stateCode} aria-label={`View ${manifest.name} reported results`} key={stateCode} onClick={() => selectState(stateCode)} type="button">
+                    <span><strong>{manifest.name}</strong><small>{stateCode} · {manifest.geography.unitLabelPlural}</small></span>
+                    <span><b>{formatResultLead(reportedResult)}</b><small>{state ? `${formatNumber(state.returnsPublished)} / ${formatNumber(state.expectedReturns)} units` : "Preparing returns"}</small></span>
+                    <progress aria-label={`${manifest.name} reporting units published`} value={state?.returnsPublished ?? 0} max={state?.expectedReturns || 1} />
+                  </button>;
                 })}
               </div>
               <div className="night-exclusion-note"><span />48 other jurisdictions excluded. No statewide fallback returns.</div>
+              <p className="night-desk-disclosure">Shares describe ballots reported so far across these three states. They are not national results or projections.</p>
             </section>
           )}
           <section className="scenario-card">
@@ -2583,7 +2601,7 @@ function ScenarioApp() {
           >
             <div className="drawer-toolbar night-dock-toolbar">
               <div className="drawer-intent night-dock-clock">
-                <span className="overline">Run my election</span>
+                <span className="overline">Replay time{replay.current ? ` · ${replayDateFormat.format(new Date(replay.current.controller.logicalReplayTimeMs))}` : ""}</span>
                 <strong>{replay.current
                   ? replayClockFormat.format(new Date(replay.current.controller.logicalReplayTimeMs))
                   : "Preparing election night"}</strong>

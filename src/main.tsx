@@ -7,6 +7,7 @@ import "./components/workspace/design-system.css";
 import "./components/workspace/swingometer.css";
 import "./components/home/editorial-home.css";
 import "./components/workspace/editorial-swingometer.css";
+import "./components/workspace/editorial-night.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -331,6 +331,9 @@ export function AtlasMapScene({
 
   useEffect(() => {
     if (!activeStateCode || !activeStateFeature || framedStateCodeRef.current === activeStateCode) return;
+    // Compact analysis can hide the mounted map while a state is selected.
+    // Wait for a measurable viewport before framing; a zero-size fit collapses it.
+    if (!shellRef.current?.clientWidth || !shellRef.current.clientHeight) return;
     const next = destinationForBounds(featureBounds(activeStateFeature), {
       widthRatio: 0.72,
       heightRatio: 0.58,
@@ -342,7 +345,7 @@ export function AtlasMapScene({
     cameraRef.current = next;
     publishView(next);
     setViewState(next);
-  }, [activeStateCode, activeStateFeature, destinationForBounds, publishView]);
+  }, [activeStateCode, activeStateFeature, destinationForBounds, publishView, viewportSize.width, viewportSize.height]);
 
   const openState = useCallback((code: string) => {
     const fips = stateFipsByCode[code];
