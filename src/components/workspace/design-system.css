@@ -1,4 +1,87 @@
 /* Shared reading and control scale; election colors remain defined by the model. */
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) {
+  --ink-soft: #536c77;
+}
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) .workspace-layout .map-stage { background: none; }
+.premium-shell.application-shell.editorial-swingometer .workspace-layout .selected-readout { border-radius: 0; border-inline: 0; background: none; }
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) .behavior-tabs {
+  border: 0;
+  border-bottom: 1px solid #bdc9c0;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  gap: 0;
+}
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) .behavior-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) .behavior-tabs button[aria-pressed="true"] {
+  background: #e8ede5;
+  color: #204e5d;
+  border-bottom-color: #286573;
+  box-shadow: none;
+}
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) :is(.coverage-strip, .model-contract, .night-window-headlines > span) {
+  border-radius: 0;
+  box-shadow: none;
+}
+.premium-shell.application-shell:is(.editorial-swingometer, .editorial-night) .night-window-headlines > span {
+  padding: 12px 0;
+  border: 0;
+  border-top: 1px solid #bdc9c0;
+  background: none;
+}
+.premium-shell.application-shell .provenance-ledger {
+  border: 0; border-radius: 0; padding: 0; background: none;
+}
+.premium-shell.application-shell .evidence-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-left: 0; gap: 0 32px; margin-top: 20px;
+}
+.premium-shell.application-shell .evidence-grid article {
+  padding: 20px 0; border-right: 0; gap: 10px;
+}
+.premium-shell.application-shell .evidence-grid article > span {
+  font-family: var(--font-numeric); font-size: 11px; color: #536c77; letter-spacing: .04em;
+}
+.premium-shell.application-shell .evidence-grid article > strong { font-size: 22px; line-height: 1.25; font-weight: 500; }
+.premium-shell.application-shell .evidence-grid p { font-size: 13px; line-height: 1.7; }
+.premium-shell.application-shell .evidence-grid small { font-size: 11px; line-height: 1.7; color: #536c77; overflow-wrap: anywhere; }
+.premium-shell.application-shell :is(.evidence-grid, .evidence-actions) a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; text-underline-offset: 4px; }
+.premium-shell.application-shell .evidence-actions { align-items: baseline; font-size: 11px; line-height: 1.7; color: #536c77; }
+.premium-shell.application-shell .coverage-matrix { font-size: 12px; line-height: 1.6; border-left: 0; }
+.premium-shell.application-shell .coverage-matrix-head { font-size: 11px; }
+.premium-shell.application-shell :is(.coverage-matrix-head, .coverage-matrix-row) > * { padding: 12px; border-right: 0; overflow-wrap: anywhere; }
+.premium-shell.application-shell .evidence-note { font-size: 12px; line-height: 1.7; }
+.premium-shell.application-shell .ledger-card { border: 0; border-radius: 0; box-shadow: none; background: none; backdrop-filter: none; }
+.premium-shell.application-shell .ledger-card > .card-heading { padding-inline: 0; }
+.premium-shell.application-shell .ledger-line { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 16px; padding: 18px 0; }
+.premium-shell.application-shell .ledger-line.inactive { opacity: 1; }
+.premium-shell.application-shell .ledger-index { font-size: 11px; color: #796b3e; }
+.premium-shell.application-shell .ledger-line div strong { font-size: 14px; line-height: 1.5; font-weight: 500; }
+.premium-shell.application-shell .ledger-line div span { font-size: 12px; line-height: 1.7; color: #536c77; }
+.premium-shell.application-shell .ledger-line > b { font-size: 12px; }
+.premium-shell.application-shell .drawer-empty { display: grid; gap: 12px; align-content: start; max-width: 980px; margin: 0 auto; padding: 24px 0; text-align: left; align-items: start; border-top: 2px solid #315562; }
+.premium-shell.application-shell .drawer-empty > strong { font-family: var(--font-editorial); font-size: 26px; font-weight: 500; color: var(--ink); }
+.premium-shell.application-shell .drawer-empty > span { font-size: 14px; line-height: 1.7; max-width: 540px; color: #536c77; }
+.premium-shell.application-shell :is(.analytics-editorial-summary, .analytics-actual-scenario-delta, .analytics-causal-chain, .contribution-card) {
+  border-radius: 0; box-shadow: none; background: none; backdrop-filter: none;
+}
+.premium-shell.application-shell .analytics-editorial-summary { padding: 20px 0; border: 0; border-top: 2px solid #315562; }
+.premium-shell.application-shell .analytics-causal-chain { border-inline: 0; }
+.premium-shell.application-shell .contribution-card { border-inline: 0; }
+@media (max-width: 800px) {
+  .premium-shell.application-shell .evidence-grid { grid-template-columns: minmax(0, 1fr); }
+  .premium-shell.application-shell .evidence-actions { flex-direction: column; gap: 8px; }
+  .premium-shell.application-shell .coverage-matrix-head { display: none; }
+  .premium-shell.application-shell .coverage-matrix-row { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-block: 12px; border-bottom: 1px solid var(--line); }
+  .premium-shell.application-shell .coverage-matrix-row > * { border: 0; }
+  .premium-shell.application-shell .coverage-matrix-row > strong { grid-column: 1 / -1; }
+}
 .premium-shell {
   --font-editorial: "Newsreader", Georgia, serif;
   --font-interface: "Libre Franklin", Arial, sans-serif;

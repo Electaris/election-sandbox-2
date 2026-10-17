@@ -172,7 +172,7 @@ export function AtlasMapScene({
     ? precinctLoad.error
     : null;
 
-  const atlasView = useMemo(() => new OrbitView({ id: "sandbox-atlas", controller: true }), []);
+  const atlasView = useMemo(() => new OrbitView({ id: "sandbox-atlas", controller: true, orthographic: true }), []);
   const atlasEffects = useMemo(() => {
     const ambientLight = new AmbientLight({ color: [255, 250, 238], intensity: 0.72 });
     const keyLight = new DirectionalLight({ color: [255, 244, 222], intensity: 0.82, direction: [-3, -5, -8] });
@@ -325,7 +325,9 @@ export function AtlasMapScene({
     const containerHeight = shellRef.current?.clientHeight ?? window.innerHeight;
     const scale = Math.min(
       containerWidth * 0.92 / 975,
-      containerHeight * 0.72 / 610,
+      // Fit the projected footprint, including EV extrusion, rather than the
+      // unrotated geometry. The former fit left most of a short viewport empty.
+      containerHeight * 0.86 / (610 * Math.cos(NATIONAL_VIEW.rotationX * Math.PI / 180) + 64),
     );
     return {
       ...NATIONAL_VIEW,

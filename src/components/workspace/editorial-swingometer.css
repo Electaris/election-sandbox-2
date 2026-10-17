@@ -24,15 +24,16 @@
 .premium-shell.application-shell.editorial-swingometer .workspace-header { padding: 20px 28px; gap: 20px; align-items: center; }
 .editorial-swingometer .workspace-header .breadcrumb { font-size: 30px; line-height: 1.2; margin-top: 6px; letter-spacing: -.025em; }
 .editorial-swingometer .workspace-header .overline { color: #608489; font-size: 9px; letter-spacing: .08em; }
-.editorial-swingometer .workspace-header .segmented { padding: 3px; border-radius: 3px; background: #edf0e9; border-color: #cbd6cf; }
-.editorial-swingometer .workspace-header .segmented button { border-radius: 2px; min-height: 34px; font-size: 11px; }
+.editorial-swingometer .workspace-header .segmented { padding: 0; border-radius: 0; background: none; border: 0; border-bottom: 1px solid #b9c8bf; }
+.editorial-swingometer .workspace-header .segmented button { border-radius: 0; min-height: 38px; font-size: 11px; box-shadow: none; border-bottom: 2px solid transparent; }
+.editorial-swingometer .workspace-header .segmented button[aria-pressed="true"] { color: #204e5d; background: #e8ede5; border-bottom-color: #286573; box-shadow: none; }
 .premium-shell.application-shell.editorial-swingometer .workspace-header .laboratory-context { gap: 12px; }
 .editorial-swingometer .workspace-header .laboratory-context button,
 .editorial-swingometer .inspector-toggle { border-radius: 3px; min-height: 38px; font-size: 11px; }
 .editorial-swingometer .workspace-header .laboratory-context > div:not(.supported-state-links) { padding-right: 8px; border-right: 1px solid var(--line); }
 .premium-shell.application-shell.editorial-swingometer .workspace-layout { grid-template-columns: minmax(0, 1fr) 360px; }
 .premium-shell.application-shell.editorial-swingometer[data-inspector-open="false"] .workspace-layout { grid-template-columns: minmax(0, 1fr); }
-.premium-shell.application-shell.editorial-swingometer .workspace-layout .map-column { padding: 14px 24px 0; background: radial-gradient(ellipse at 50% 45%, #eef1e8, transparent 65%); }
+.premium-shell.application-shell.editorial-swingometer .workspace-layout .map-column { padding: 14px 24px 0; background: #f8f7f2; }
 .premium-shell.application-shell.editorial-swingometer .map-stage { border-radius: 0; border: 0; }
 .premium-shell.application-shell.editorial-swingometer .atlas-data-note { padding: 4px 0 12px; border-color: #d2d9d3; gap: 8px 12px; }
 .premium-shell.application-shell.editorial-swingometer .atlas-data-note strong { font-size: 19px; }

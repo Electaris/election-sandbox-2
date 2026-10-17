@@ -12,7 +12,7 @@ export function HomeIntroduction({ onEnter }: Pick<HomeActions, "onEnter">) {
       <button className="home-primary-action" onClick={onEnter} type="button">Enter the laboratory <span aria-hidden="true">↗</span></button>
       <a className="home-text-link" href="#explore-states">Explore the states <span aria-hidden="true">↓</span></a>
     </div>
-    <p className="home-hero-caption"><span>01 — THE NATIONAL RESULT</span>Built on official results.<br />A geography of what happened. A laboratory for what could change.</p>
+    <p className="home-hero-caption"><span>OFFICIAL RESULTS. EXPLICIT ASSUMPTIONS.</span>Explore the actual election, then build your counterfactual.</p>
   </section>;
 }
 
@@ -66,6 +66,7 @@ export function HomeSections({ onEnter, onState, onReplay }: HomeActions) {
           <p>Model turnout, two-party preference, and third-party support. Follow the consequences from local votes to the Electoral College.</p>
           <ol className="home-process"><li><span>01</span>Change an assumption</li><li><span>02</span>Inspect the local effect</li><li><span>03</span>Follow the electoral consequence</li></ol>
           <button className="home-primary-action" onClick={onEnter} type="button">Build a scenario<span aria-hidden="true">↗</span></button>
+          <small>Historical counterfactual · Exact, reproducible scenarios</small>
         </article>
         <article className="home-experience home-night-story">
           <span className="home-kicker">ELECTION NIGHT</span><h3>The same election.<br />A different night.</h3>

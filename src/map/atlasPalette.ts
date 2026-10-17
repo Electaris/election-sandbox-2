@@ -15,7 +15,7 @@ export const ATLAS_GREEN = "#4f815d";
 export const ATLAS_LIBERTARIAN = "#b78335";
 export const ATLAS_OTHER = "#77647d";
 
-const majorPartyBands = [
+export const majorPartyBands = [
   { max: 1, dem: "#dde9df", gop: "#f1e4bc" },
   { max: 3, dem: "#c9e2e1", gop: "#f2da9c" },
   { max: 5, dem: "#b2d9de", gop: "#f3ce82" },

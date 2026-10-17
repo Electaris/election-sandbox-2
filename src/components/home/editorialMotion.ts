@@ -16,13 +16,12 @@ export function useEditorialMotion(scope: RefObject<HTMLElement | null>, home: b
     if (!home || !scope.current) return;
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
-      const intro = gsap.timeline({ defaults: { duration: .65, ease: "power2.out", clearProps: "transform,opacity" } });
-      intro.from(".home-eyebrow", { opacity: .3, y: 8 })
-        .from(".home-headline-line", { yPercent: 24, opacity: .35, stagger: .08 }, .08)
-        .from(".home-deck, .home-hero-actions", { y: 12, opacity: .4, stagger: .07 }, .2)
-        .from(".home-baseline, .home-cartography-caption", { y: 10, opacity: .4, stagger: .08 }, .25);
-      // Translate the map's wrapper, leaving deck.gl as the sole camera owner.
-      intro.from(".map-stage", { y: 16, opacity: .55, duration: .9 }, .15);
+      // Treat headline and terrain as one composition; controls never wait to appear.
+      const intro = gsap.timeline({ defaults: { duration: .45, ease: "power2.out", clearProps: "transform,opacity" } });
+      intro.from(".home-eyebrow", { opacity: .7, y: 4 })
+        .from(".home-introduction h1", { y: 8, opacity: .8 }, 0)
+        .from(".home-baseline", { y: 6, opacity: .8 }, .04);
+      // No map translation: geography stays anchored while it becomes interactive.
     }, scope);
     return () => media.revert();
   }, { scope, dependencies: [home], revertOnUpdate: true });

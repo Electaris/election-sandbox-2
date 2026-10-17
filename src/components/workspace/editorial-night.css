@@ -27,7 +27,7 @@
 .editorial-night .workspace-header .laboratory-context b { font-size: 13px; font-variant-numeric: tabular-nums; }
 .premium-shell.application-shell.editorial-night .workspace-layout { grid-template-columns: minmax(0, 1fr) 360px; }
 .premium-shell.application-shell.editorial-night[data-inspector-open="false"] .workspace-layout { grid-template-columns: minmax(0, 1fr); }
-.premium-shell.application-shell.editorial-night .workspace-layout .map-column { padding: 14px 24px 0; background: radial-gradient(ellipse at 50% 45%, #eef1e8, transparent 65%); }
+.premium-shell.application-shell.editorial-night .workspace-layout .map-column { padding: 14px 24px 0; background: #f8f7f2; }
 .premium-shell.application-shell.editorial-night .map-stage { border: 0; border-radius: 0; }
 .premium-shell.application-shell.editorial-night .atlas-data-note { padding: 4px 0 12px; gap: 8px 12px; }
 .premium-shell.application-shell.editorial-night .atlas-data-note strong { font-size: 19px; }

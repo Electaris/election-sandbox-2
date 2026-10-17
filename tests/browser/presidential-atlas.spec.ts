@@ -29,7 +29,7 @@ for (const config of [
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "The result is only the beginning." })).toBeVisible();
     await expect(page.locator(".atlas-map-viewport canvas")).toBeVisible();
-    await expect(page.locator(".legend-row")).toContainText("height: electoral votes");
+    await expect(page.locator(".home-cartography-caption")).toContainText("Height: electoral votes");
     await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector(".home-headline-line")!).opacity)).toBe("1");
     const rows = page.locator(".geography-margin-row");
     await expect(rows).toHaveCount(7);
@@ -86,10 +86,23 @@ test("map camera motion yields to user zoom and reduced motion", async ({ page }
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/app/");
   await expect(page.getByRole("button", { name: "Copy scenario link" })).toBeEnabled({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Fit United States", exact: true }).click();
-  await expect.poll(() => page.evaluate(() => window.__sandboxDiagnostics?.().activeAnimationHandles)).toBeGreaterThan(0);
   const map = page.locator(".atlas-map-viewport canvas");
+  await expect(map).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__sandboxDiagnostics?.().activeAnimationHandles)).toBe(0);
   await map.hover();
+  // Observe the short tween in the browser, rather than missing its entire
+  // lifetime between two automation round trips on a loaded machine.
+  const began = await page.getByRole("button", { name: "Fit United States", exact: true }).evaluate(element => new Promise<boolean>(resolve => {
+    const deadline = performance.now() + 5000;
+    const observe = () => {
+      if ((window.__sandboxDiagnostics?.().activeAnimationHandles ?? 0) > 0) resolve(true);
+      else if (performance.now() >= deadline) resolve(false);
+      else requestAnimationFrame(observe);
+    };
+    requestAnimationFrame(observe);
+    (element as HTMLButtonElement).click();
+  }));
+  expect(began).toBe(true);
   await page.mouse.wheel(0, 180);
   await expect.poll(() => page.evaluate(() => window.__sandboxDiagnostics?.().activeAnimationHandles)).toBe(0);
   const afterInput = await page.evaluate(() => window.__sandboxDiagnostics?.().activeMapView);

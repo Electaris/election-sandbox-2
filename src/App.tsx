@@ -27,6 +27,7 @@ import {
 import { AppShell, AnalysisInspector, WorkspaceHeader, WorkspaceLayout } from "./components/workspace/AppShell";
 import { HomeIntroduction, HomeBaseline, HomeSections } from "./components/home/EditorialHome";
 import { EditorialNumber } from "./components/workspace/EditorialNumber";
+import { AtlasMarginLegend } from "./components/home/AtlasMarginLegend";
 import { GlobalHeader } from "./components/workspace/GlobalHeader";
 import { WorkspaceDock } from "./components/workspace/WorkspaceDock";
 import { useWorkspaceDock } from "./components/workspace/useWorkspaceDock";
@@ -2150,7 +2151,7 @@ function ScenarioApp() {
 
           </div>
 
-          {workspaceMode === "home" && <p className="home-cartography-caption"><span>THE UNITED STATES / 2024</span>Color shows the winning margin. Height represents electoral votes.<br />Drag to orbit · Scroll to zoom · Select a state to explore</p>}
+          {workspaceMode === "home" && <p className="home-cartography-caption"><span>THE UNITED STATES / 2024</span>Height: electoral votes · Drag to orbit · Scroll to zoom · Select a state</p>}
             {experienceMode === "swingometer" && <div className="selected-readout" data-drilled={Boolean(selectedStateCode)} aria-live="polite">
               <div>
                 <span className="overline">Selected</span>
@@ -2172,7 +2173,7 @@ function ScenarioApp() {
               </div>
             </div>}
           <div className="legend-row">
-            {workspaceMode !== "home" && experienceMode === "swingometer" && viewMode === "difference" ? <>
+            {workspaceMode === "home" ? <AtlasMarginLegend /> : experienceMode === "swingometer" && viewMode === "difference" ? <>
               <span>Toward Harris</span>
               <div className="margin-ramp" aria-hidden="true" />
               <span>Toward Trump</span>
@@ -2189,7 +2190,7 @@ function ScenarioApp() {
                 <span className="candidate-legend"><b className="candidate-ramp other" />Aggregate other margin</span>
               </>
               <i />
-              <span>{workspaceMode === "home" || !selectedStateCode
+              <span>{!selectedStateCode
                 ? "Color: winning margin · height: electoral votes"
                 : experienceMode === "election-night"
                 ? "Tile color: reported winning margin"
