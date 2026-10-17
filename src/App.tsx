@@ -26,6 +26,7 @@ import {
 } from "../packages/data-contracts/src/demographicEvidence.ts";
 import { AppShell, AnalysisInspector, WorkspaceHeader, WorkspaceLayout } from "./components/workspace/AppShell";
 import { HomeIntroduction, HomeBaseline, HomeSections } from "./components/home/EditorialHome";
+import { EditorialNumber } from "./components/workspace/EditorialNumber";
 import { GlobalHeader } from "./components/workspace/GlobalHeader";
 import { WorkspaceDock } from "./components/workspace/WorkspaceDock";
 import { useWorkspaceDock } from "./components/workspace/useWorkspaceDock";
@@ -2116,14 +2117,14 @@ function ScenarioApp() {
                 scenarioDetailedGeographies={displayedDetailedGeographies}
                 scenarioStates={displayedScenarioStates}
                 fitSelectionRequest={fitSelectionRequest}
-                viewMode={experienceMode === "election-night" ? "scenario" : viewMode}
+                viewMode={workspaceMode === "home" ? "actual" : experienceMode === "election-night" ? "scenario" : viewMode}
                 scenarioIsPartial={experienceMode === "election-night"}
-                highlightedReturn={experienceMode === "election-night" && replay.currentReturn ? {
+                highlightedReturn={workspaceMode === "laboratory" && experienceMode === "election-night" && replay.currentReturn ? {
                   stateCode: replay.currentReturn.jurisdictionId,
                   countyFips: replay.currentReturn.countyId,
                   precinctGeoid: replay.currentReturn.geometryId,
                 } : null}
-                routeIndicators={experienceMode === "election-night" ? [] : (routeConstructionPlan?.states ?? []).map((state, index) => ({
+                routeIndicators={workspaceMode === "home" || experienceMode === "election-night" ? [] : (routeConstructionPlan?.states ?? []).map((state, index) => ({
                   stateCode: state.stateCode,
                   status: state.status,
                   order: index + 1,
@@ -2149,6 +2150,7 @@ function ScenarioApp() {
 
           </div>
 
+          {workspaceMode === "home" && <p className="home-cartography-caption"><span>THE UNITED STATES / 2024</span>Color shows the winning margin. Height represents electoral votes.<br />Drag to orbit · Scroll to zoom · Select a state to explore</p>}
             {experienceMode === "swingometer" && <div className="selected-readout" data-drilled={Boolean(selectedStateCode)} aria-live="polite">
               <div>
                 <span className="overline">Selected</span>
@@ -2170,7 +2172,7 @@ function ScenarioApp() {
               </div>
             </div>}
           <div className="legend-row">
-            {experienceMode === "swingometer" && viewMode === "difference" ? <>
+            {workspaceMode !== "home" && experienceMode === "swingometer" && viewMode === "difference" ? <>
               <span>Toward Harris</span>
               <div className="margin-ramp" aria-hidden="true" />
               <span>Toward Trump</span>
@@ -2187,7 +2189,9 @@ function ScenarioApp() {
                 <span className="candidate-legend"><b className="candidate-ramp other" />Aggregate other margin</span>
               </>
               <i />
-              <span>{experienceMode === "election-night"
+              <span>{workspaceMode === "home" || !selectedStateCode
+                ? "Color: winning margin · height: electoral votes"
+                : experienceMode === "election-night"
                 ? "Tile color: reported winning margin"
                 : "Color: plurality winner · height: ballots"}</span>
             </>}
@@ -2301,7 +2305,7 @@ function ScenarioApp() {
               {electoralTargetCandidates.map((candidate) => (
                 <div data-candidate={candidate} data-testid={`candidate-electoral-votes-${candidate}`} key={candidate}>
                   <span>{candidateNames[candidate]}</span>
-                  <strong className={candidateScoreClass(candidate)}>{electoralConsequences.scenarioCandidateElectoralVotes[candidate]}</strong>
+                  <EditorialNumber className={candidateScoreClass(candidate)} value={electoralConsequences.scenarioCandidateElectoralVotes[candidate]} />
                 </div>
               ))}
             </div>

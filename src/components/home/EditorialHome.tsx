@@ -1,24 +1,26 @@
 import { states2024 } from "../../data/states";
+import { HomeGeographyStory } from "./HomeGeographyStory";
 
 type HomeActions = { onEnter: () => void; onState: (code: string) => void; onReplay: () => void };
 
 export function HomeIntroduction({ onEnter }: Pick<HomeActions, "onEnter">) {
   return <section className="home-introduction" aria-labelledby="page-heading">
-    <div className="home-eyebrow"><span className="home-status-dot" /> THE 2024 ELECTION, RECONSIDERED</div>
-    <h1 id="page-heading">The result is<br />only the <em>beginning.</em></h1>
+    <div className="home-eyebrow">THE PRESIDENTIAL ATLAS <span aria-hidden="true">/</span> 2024</div>
+    <h1 id="page-heading"><span className="home-headline-line">The result is</span>{" "}<span className="home-headline-line">only the</span>{" "}<span className="home-headline-line"><em>beginning.</em></span></h1>
     <p className="home-deck">Explore the geography behind the vote. Change the assumptions. See how a different election unfolds.</p>
     <div className="home-hero-actions">
       <button className="home-primary-action" onClick={onEnter} type="button">Enter the laboratory <span aria-hidden="true">↗</span></button>
       <a className="home-text-link" href="#explore-states">Explore the states <span aria-hidden="true">↓</span></a>
     </div>
-    <p className="home-hero-caption">A historical election laboratory.<br />Built on official results. Driven by your assumptions.</p>
+    <p className="home-hero-caption"><span>01 — THE NATIONAL RESULT</span>Built on official results.<br />A geography of what happened. A laboratory for what could change.</p>
   </section>;
 }
 
 export function HomeBaseline() {
+  const electoral = states2024.reduce((sum, state) => ({ harris: sum.harris + state.harrisElectoralVotes, trump: sum.trump + state.trumpElectoralVotes }), { harris: 0, trump: 0 });
   return <div className="home-baseline" aria-label="Certified 2024 Electoral College baseline">
     <div className="home-baseline-top"><span>2024 PRESIDENTIAL ELECTION</span><span>Certified baseline</span></div>
-    <div className="home-baseline-score"><span><i className="home-party-dot democratic" />Harris <strong>226</strong></span><small>270 TO WIN</small><span><strong>312</strong> Trump<i className="home-party-dot republican" /></span></div>
+    <div className="home-baseline-score"><span><i className="home-party-dot democratic" />Harris <strong>{electoral.harris}</strong></span><small>270 TO WIN</small><span><strong>{electoral.trump}</strong> Trump<i className="home-party-dot republican" /></span></div>
     <div className="home-electoral-bar" aria-hidden="true"><span /><span /><i /></div>
   </div>;
 }
@@ -33,8 +35,10 @@ export function HomeSections({ onEnter, onState, onReplay }: HomeActions) {
   return <div className="home-edition-body">
     <div className="home-edition-facts" aria-label="Laboratory coverage"><span><b>2024</b> Historical baseline</span><span><b>50 states + D.C.</b> National results</span><span><b>3 states</b> Detailed local models</span><a href="#methodology">Explore our sources <span aria-hidden="true">↗</span></a></div>
 
+    <HomeGeographyStory onState={onState} />
+
     <section className="home-foundation home-state-section" id="explore-states" aria-labelledby="home-foundation-heading">
-      <div className="home-section-rule"><span className="home-kicker">THE LOCAL PICTURE</span><span>01 / EXPLORE</span></div>
+      <div className="home-section-rule"><span className="home-kicker">THE LOCAL PICTURE</span><span>02 / EXPLORE</span></div>
       <div className="home-section-title"><h2 id="home-foundation-heading">Three states. Thousands of stories.</h2><p>Start with the actual result.<br />Find the places that could change it.</p></div>
       <div className="home-state-grid">
         {(["PA", "MI", "WI"] as const).map(code => {
@@ -54,19 +58,19 @@ export function HomeSections({ onEnter, onState, onReplay }: HomeActions) {
     </section>
 
     <section className="home-capabilities home-experiences" aria-labelledby="home-capabilities-heading">
-      <div className="home-section-rule"><span className="home-kicker">THE LABORATORY</span><span>02 / EXPERIMENT</span></div>
+      <div className="home-section-rule"><span className="home-kicker">THE LABORATORY</span><span>03 / EXPERIMENT</span></div>
       <h2 id="home-capabilities-heading">A different way to understand an election.</h2>
       <div className="home-experience-grid">
         <article className="home-experience home-swing-story">
           <span className="home-kicker">SWINGOMETER</span><h3>What would it take<br />to change the result?</h3>
           <p>Model turnout, two-party preference, and third-party support. Follow the consequences from local votes to the Electoral College.</p>
-          <div className="home-operation-diagram" aria-hidden="true"><div><span>Turnout</span><i /><b>+</b></div><div><span>Preference</span><i /><b>↔</b></div><div><span>Third party</span><i /><b>↗</b></div></div>
+          <ol className="home-process"><li><span>01</span>Change an assumption</li><li><span>02</span>Inspect the local effect</li><li><span>03</span>Follow the electoral consequence</li></ol>
           <button className="home-primary-action" onClick={onEnter} type="button">Build a scenario<span aria-hidden="true">↗</span></button>
         </article>
         <article className="home-experience home-night-story">
           <span className="home-kicker">ELECTION NIGHT</span><h3>The same election.<br />A different night.</h3>
           <p>Watch your scenario arrive through local returns. Direct the order, pace, and pauses as the statewide picture takes shape.</p>
-          <div className="home-replay-diagram" aria-hidden="true"><span>FIRST RETURN</span><div>{[18, 32, 24, 48, 37, 68, 52, 83, 63, 100, 76, 91, 67, 86, 100].map((height, i) => <i key={i} style={{ height: `${height}%` }} />)}</div><span>FINAL RESULT</span></div>
+          <ol className="home-process"><li><span>01</span>Lock your scenario</li><li><span>02</span>Watch local returns arrive</li><li><span>03</span>Reach the exact modeled result</li></ol>
           <button className="home-primary-action" onClick={onReplay} type="button">Run election night<span aria-hidden="true">↗</span></button>
           <small>Historical scenario replay · Your assumptions, deterministic returns</small>
         </article>

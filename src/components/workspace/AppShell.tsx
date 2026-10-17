@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
+import { useEditorialMotion } from "../home/editorialMotion";
 import type { DockSnap } from "./useWorkspaceDock";
 
 export function AppShell({ children, workspaceMode, experienceMode, geographyLevel, snap, dragHeight, inspectorOpen }: {
@@ -10,7 +11,9 @@ export function AppShell({ children, workspaceMode, experienceMode, geographyLev
   dragHeight: number | null;
   inspectorOpen: boolean;
 }) {
-  return <main className={`application-shell premium-shell${workspaceMode === "laboratory" ? experienceMode === "swingometer" ? " editorial-swingometer" : " editorial-night" : ""}`} data-workspace-mode={workspaceMode}
+  const root = useRef<HTMLElement>(null);
+  useEditorialMotion(root, workspaceMode === "home");
+  return <main ref={root} className={`application-shell premium-shell${workspaceMode === "laboratory" ? experienceMode === "swingometer" ? " editorial-swingometer" : " editorial-night" : ""}`} data-workspace-mode={workspaceMode}
     data-experience-mode={experienceMode} data-geography-level={geographyLevel}
     data-dock-snap={snap} data-inspector-open={inspectorOpen} data-dock-resizing={dragHeight != null}
     style={dragHeight == null ? undefined : { "--workspace-dock-size": `${dragHeight}px` } as CSSProperties}>

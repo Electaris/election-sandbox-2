@@ -10,6 +10,7 @@ import {
 import { GeoJsonLayer, TextLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import type { Feature } from "geojson";
+import { gsap } from "gsap";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   BehaviorScenarioUnit,
@@ -139,7 +140,8 @@ export function AtlasMapScene({
   const closeTimerRef = useRef<number | null>(null);
   const viewFrameRef = useRef<number | null>(null);
   const layoutFrameRef = useRef<number | null>(null);
-  const cameraAnimationRef = useRef<number | null>(null);
+  const cameraAnimationRef = useRef<gsap.core.Tween | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const pendingViewRef = useRef<AtlasViewState | null>(null);
   const cameraRef = useRef<AtlasViewState>(NATIONAL_VIEW);
   const framedStateCodeRef = useRef<string | null>(null);
@@ -253,40 +255,42 @@ export function AtlasMapScene({
   );
 
   const animateCamera = useCallback((destination: AtlasViewState, duration = 780) => {
-    if (cameraAnimationRef.current != null) {
-      window.cancelAnimationFrame(cameraAnimationRef.current);
-      setMapAnimation(diagnosticTokenRef.current, "camera", false);
-    }
-    const start = performance.now();
+    cameraAnimationRef.current?.kill();
+    setMapAnimation(diagnosticTokenRef.current, "camera", false);
     const origin = cameraRef.current;
-    const originTarget = [...origin.target] as [number, number, number];
-
-    const frame = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const next: AtlasViewState = {
-        target: [
-          originTarget[0] + (destination.target[0] - originTarget[0]) * eased,
-          originTarget[1] + (destination.target[1] - originTarget[1]) * eased,
-          originTarget[2] + (destination.target[2] - originTarget[2]) * eased,
-        ],
-        zoom: origin.zoom + (destination.zoom - origin.zoom) * eased,
-        rotationX: origin.rotationX + (destination.rotationX - origin.rotationX) * eased,
-        rotationOrbit: origin.rotationOrbit + (destination.rotationOrbit - origin.rotationOrbit) * eased,
-      };
-      cameraRef.current = next;
-      publishView(next);
-      setViewState(next);
-      if (progress < 1) cameraAnimationRef.current = window.requestAnimationFrame(frame);
-      else {
+    const position = { x: origin.target[0], y: origin.target[1], z: origin.target[2], zoom: origin.zoom, rotationX: origin.rotationX, rotationOrbit: origin.rotationOrbit };
+    const instant = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setMapAnimation(diagnosticTokenRef.current, "camera", true);
+    const tween = gsap.to(position, {
+      x: destination.target[0], y: destination.target[1], z: destination.target[2],
+      zoom: destination.zoom, rotationX: destination.rotationX, rotationOrbit: destination.rotationOrbit,
+      duration: instant ? 0 : duration / 1000, ease: "power2.out",
+      onUpdate: () => {
+        const next: AtlasViewState = {
+          target: [position.x, position.y, position.z], zoom: position.zoom,
+          rotationX: position.rotationX, rotationOrbit: position.rotationOrbit,
+        };
+        cameraRef.current = next;
+        publishView(next);
+        setViewState(next);
+      },
+      onComplete: () => {
         cameraAnimationRef.current = null;
         setMapAnimation(diagnosticTokenRef.current, "camera", false);
-      }
-    };
-
-    setMapAnimation(diagnosticTokenRef.current, "camera", true);
-    cameraAnimationRef.current = window.requestAnimationFrame(frame);
+      },
+    });
+    cameraAnimationRef.current = instant ? null : tween;
   }, [publishView]);
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => {
+      setReducedMotion(preference.matches);
+      if (preference.matches) cameraAnimationRef.current?.progress(1);
+    };
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const registration = registerMapMount(diagnosticTokenRef.current);
@@ -527,7 +531,7 @@ export function AtlasMapScene({
     if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
     if (viewFrameRef.current != null) window.cancelAnimationFrame(viewFrameRef.current);
     if (layoutFrameRef.current != null) window.cancelAnimationFrame(layoutFrameRef.current);
-    if (cameraAnimationRef.current != null) window.cancelAnimationFrame(cameraAnimationRef.current);
+    cameraAnimationRef.current?.kill();
     closeTimerRef.current = null;
     viewFrameRef.current = null;
     layoutFrameRef.current = null;
@@ -583,12 +587,12 @@ export function AtlasMapScene({
         const electoralVotes = (result?.harrisElectoralVotes ?? 0)
           + (result?.trumpElectoralVotes ?? 0)
           + (result?.otherElectoralVotes ?? 0);
-        return 12 + Math.max(3, electoralVotes) * 1.15;
+        return electoralVotes * 1.15;
       },
       material: { ambient: 0.72, diffuse: 0.52, shininess: 5, specularColor: [18, 20, 18] },
       transitions: {
-        getElevation: { duration: 520 },
-        getFillColor: { duration: 420 },
+        getElevation: { duration: reducedMotion ? 0 : 520 },
+        getFillColor: { duration: reducedMotion ? 0 : 420 },
       },
       updateTriggers: {
         getElevation: [activeStateCode],
@@ -686,8 +690,8 @@ export function AtlasMapScene({
       },
       material: { ambient: 0.74, diffuse: 0.5, shininess: 4, specularColor: [16, 18, 16] },
       transitions: {
-        getElevation: { duration: 700, enter: () => 0 },
-        getFillColor: { duration: 680 },
+        getElevation: { duration: reducedMotion ? 0 : 700, enter: () => 0 },
+        getFillColor: { duration: reducedMotion ? 0 : 680 },
       },
       updateTriggers: {
         getElevation: [heightMode, maxDetailedCountyVotes, scenarioDetailedCounties, viewMode],
@@ -757,8 +761,8 @@ export function AtlasMapScene({
         },
         material: { ambient: 0.76, diffuse: 0.48, shininess: 3, specularColor: [14, 17, 15] },
         transitions: {
-          getElevation: { duration: 680, enter: () => 0 },
-          getFillColor: { duration: 520 },
+          getElevation: { duration: reducedMotion ? 0 : 680, enter: () => 0 },
+          getFillColor: { duration: reducedMotion ? 0 : 520 },
         },
         updateTriggers: {
           getElevation: [heightMode, maxPrecinctVotes, precinctElevationUnit, scenarioIsPartial, scenarioPrecinctByGeoid, viewMode],
@@ -792,6 +796,7 @@ export function AtlasMapScene({
     actualByCode,
     countyRaised,
     heightMode,
+    reducedMotion,
     highlightedReturn,
     maxDetailedCountyVotes,
     maxPrecinctVotes,
@@ -859,7 +864,7 @@ export function AtlasMapScene({
         }}
         onViewStateChange={({ viewState: next, interactionState }) => {
           if (interactionState.isDragging || interactionState.isZooming) {
-            if (cameraAnimationRef.current != null) window.cancelAnimationFrame(cameraAnimationRef.current);
+            cameraAnimationRef.current?.kill();
             cameraAnimationRef.current = null;
             setMapAnimation(diagnosticTokenRef.current, "camera", false);
           }
@@ -881,7 +886,15 @@ export function AtlasMapScene({
       />
 
       {!activeStateCode && hoveredStateCode && (
-        <div className="atlas-hover-label">{actualByCode.get(hoveredStateCode)?.name ?? hoveredStateCode} · {resultLabel(hoveredStateResult)}</div>
+        <div className="atlas-hover-label">
+          <span>{viewMode === "actual" ? "Certified result" : scenarioIsPartial ? "Reported so far" : "Scenario result"}</span>
+          <div><strong>{actualByCode.get(hoveredStateCode)?.name ?? hoveredStateCode}</strong><b>{resultLabel(hoveredStateResult)}</b></div>
+          {hoveredStateResult && hoveredStateResult.totalVotes > 0 && <dl>
+            <div><dt>Harris</dt><dd>{hoveredStateResult.harrisVotes.toLocaleString("en-US")}</dd></div>
+            <div><dt>Trump</dt><dd>{hoveredStateResult.trumpVotes.toLocaleString("en-US")}</dd></div>
+            <div><dt>All ballots</dt><dd>{hoveredStateResult.totalVotes.toLocaleString("en-US")}</dd></div>
+          </dl>}
+        </div>
       )}
       </div>
 

@@ -8,6 +8,7 @@ import "./components/workspace/swingometer.css";
 import "./components/home/editorial-home.css";
 import "./components/workspace/editorial-swingometer.css";
 import "./components/workspace/editorial-night.css";
+import "./components/home/presidential-atlas.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
