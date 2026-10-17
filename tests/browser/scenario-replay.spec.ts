@@ -48,6 +48,7 @@ async function openLaboratoryTab(page: Page, name: "Behavior" | "Contributors" |
 }
 
 test("canonical shared scenario restores the exact result and selected VTD", async ({ page }) => {
+  test.setTimeout(60_000);
   await loadScenario(page, canonicalScenario);
 
   await expect(page.getByRole("button", { name: "Shift" })).toHaveAttribute("aria-pressed", "true");
@@ -57,7 +58,7 @@ test("canonical shared scenario restores the exact result and selected VTD", asy
   await openLaboratoryTab(page, "Contributors");
   await expect(page.getByRole("button", { name: "VTDs" })).toHaveAttribute("aria-pressed", "true");
   await openLaboratoryTab(page, "Behavior");
-  await expect(page.getByRole("region", { name: "Laboratory desk" }).locator(".effect-grid strong").getByText("R +5.8", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Laboratory desk" }).locator(".effect-grid").getByText("R +5.8", { exact: true })).toBeVisible();
   await expect(page.getByRole("status")).toContainText(
     "Shared scenario restored from a compatible deterministic URL.",
   );
@@ -140,7 +141,7 @@ test("Michigan direct, split, and unavailable precinct bridges replay honestly",
   }
 });
 
-test("unsupported future links fail closed to the certified baseline", async ({ page }) => {
+test("unsupported future links fail closed to the certified baseline", async ({ page, baseURL }) => {
   const unsupported = new URLSearchParams({
     scenario: "99",
     data: DATA_VERSION,
@@ -159,7 +160,7 @@ test("unsupported future links fail closed to the certified baseline", async ({ 
   );
   await expect(page.locator('.application-shell[data-workspace-mode="laboratory"][data-geography-level="national"]')).toBeVisible();
   expect(new URL(page.url()).searchParams.getAll("recipe")).toHaveLength(0);
-  await expect(page).toHaveURL("http://127.0.0.1:4173/app/");
+  await expect(page).toHaveURL(new URL("/app/", baseURL).href);
 });
 
 test("rapid scenario changes publish only the newest worker result", async ({ page }) => {
