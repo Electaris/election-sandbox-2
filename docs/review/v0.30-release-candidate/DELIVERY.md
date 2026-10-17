@@ -1,5 +1,7 @@
 # v0.30 delivery plan
 
+Later owner instruction: [decision 0066](../../decisions/0066-partner-pages-review.md) authorizes a separate public Pages build for partner review. The original local package and its gate values below remain historical; the hosting exception does not mark source rights or human acceptance passed. See the [Pages deployment record](../v0.39-calculation-audit/PAGES.md).
+
 Current supported path: **local owner review on this machine**, served on loopback. This package does not authorize public, paid, hosted-private, or broader participant delivery of detailed-state artifacts. Decisions 0025 and 0027 remain the recorded boundary; this document does not provide a new source-rights assessment.
 
 ## Build and verify

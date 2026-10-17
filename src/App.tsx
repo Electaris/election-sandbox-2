@@ -2591,7 +2591,7 @@ function ScenarioApp() {
               </div>
             )}
             <p className="route-disclosure">
-              Required means statewide mathematical movement still needed, not a forecast. Modeled means a detailed PA, MI, or WI recipe exists. Satisfied means that recipe changes the state&apos;s electoral winner. Maine and Nebraska are excluded until district allocation is supported.
+              Required means statewide mathematical movement still needed, not a forecast. Modeled means a detailed PA, MI, or WI recipe exists. Satisfied means that recipe changes the state&apos;s electoral winner. Routes come from a bounded search and are not guaranteed to include every optimal combination. Maine and Nebraska are excluded until district allocation is supported.
               {targetCandidate !== "harris" && targetCandidate !== "trump" && " Named candidate baselines are exact in supported detailed states; unseparated minor-candidate votes in unsupported states remain in Aggregate other."}
             </p>
           </section>
@@ -3833,7 +3833,7 @@ function ScenarioApp() {
           <a href="https://www.census.gov/programs-surveys/decennial-census/about/rdo/summary-files.html" rel="noreferrer" target="_blank">Census 2020 P.L. 94-171 P4</a>
         </div>
         <div><span className="overline">Actual national vote</span><strong>{formatNumber(actualNational.totalVotes)} ballots</strong></div>
-        <div><span className="overline">Product status</span><strong>Historical scenarios · not a forecast</strong></div>
+        <div><span className="overline">Product status</span><strong>Historical scenarios · not a forecast</strong><a href={`${import.meta.env.BASE_URL}methodology.html`}>Calculations &amp; methodology</a></div>
       </footer>
     </AppShell>
   );

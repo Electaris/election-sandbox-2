@@ -1,0 +1,128 @@
+{
+  "kind": "independent-aggregate-audit-v1",
+  "national": {
+    "ballots": 155238302,
+    "harrisEV": 226,
+    "trumpEV": 312
+  },
+  "casesPerState": 8,
+  "states": [
+    {
+      "state": "MI",
+      "modelUnits": 4413,
+      "baselineBallots": 5664186,
+      "results": {
+        "baseline": {
+          "ballots": 5664186,
+          "harrisMinusTrump": -80103
+        },
+        "turnout": {
+          "ballots": 5711349,
+          "harrisMinusTrump": -67840
+        },
+        "preference": {
+          "ballots": 5664186,
+          "harrisMinusTrump": 61501
+        },
+        "reverse-preference": {
+          "ballots": 5664186,
+          "harrisMinusTrump": -346319
+        },
+        "saturated-Harris": {
+          "ballots": 5664186,
+          "harrisMinusTrump": 5553169
+        },
+        "saturated-Trump": {
+          "ballots": 5664186,
+          "harrisMinusTrump": -5553169
+        },
+        "withdraw-Stein": {
+          "ballots": 5664186,
+          "harrisMinusTrump": -80102
+        },
+        "combined": {
+          "ballots": 5734931,
+          "harrisMinusTrump": -331253
+        }
+      }
+    },
+    {
+      "state": "PA",
+      "modelUnits": 9140,
+      "baselineBallots": 7058732,
+      "results": {
+        "baseline": {
+          "ballots": 7058732,
+          "harrisMinusTrump": -120266
+        },
+        "turnout": {
+          "ballots": 7138997,
+          "harrisMinusTrump": -99397
+        },
+        "preference": {
+          "ballots": 7058732,
+          "harrisMinusTrump": 56202
+        },
+        "reverse-preference": {
+          "ballots": 7058732,
+          "harrisMinusTrump": -452026
+        },
+        "saturated-Harris": {
+          "ballots": 7058732,
+          "harrisMinusTrump": 6966350
+        },
+        "saturated-Trump": {
+          "ballots": 7058732,
+          "harrisMinusTrump": -6966350
+        },
+        "withdraw-Stein": {
+          "ballots": 7058732,
+          "harrisMinusTrump": -120266
+        },
+        "combined": {
+          "ballots": 7179130,
+          "harrisMinusTrump": -426383
+        }
+      }
+    },
+    {
+      "state": "WI",
+      "modelUnits": 6946,
+      "baselineBallots": 3422918,
+      "results": {
+        "baseline": {
+          "ballots": 3422918,
+          "harrisMinusTrump": -29397
+        },
+        "turnout": {
+          "ballots": 3459051,
+          "harrisMinusTrump": -20002
+        },
+        "preference": {
+          "ballots": 3422918,
+          "harrisMinusTrump": 56175
+        },
+        "reverse-preference": {
+          "ballots": 3422918,
+          "harrisMinusTrump": -190275
+        },
+        "saturated-Harris": {
+          "ballots": 3422918,
+          "harrisMinusTrump": 3365855
+        },
+        "saturated-Trump": {
+          "ballots": 3422918,
+          "harrisMinusTrump": -3365855
+        },
+        "withdraw-Stein": {
+          "ballots": 3422918,
+          "harrisMinusTrump": -29396
+        },
+        "combined": {
+          "ballots": 3477117,
+          "harrisMinusTrump": -178731
+        }
+      }
+    }
+  ]
+}

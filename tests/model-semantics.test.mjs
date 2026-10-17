@@ -41,3 +41,13 @@ test("preference and third-party contracts state the ballot invariants plainly",
   assert.match(semantics.operations.preference.boundary, /full feasible statewide transfer/);
   assert.match(semantics.operations["third-party"].boundary, /zero candidate votes/);
 });
+
+test("turnout wording distinguishes statewide additions from candidate-complete group choices", () => {
+  for (const stateCode of supportedStates) {
+    const operations = getStateModelSemantics(stateCode).operations;
+    assert.match(operations.turnout.changes, /Optional group settings/);
+    assert.match(operations.turnout.preserves, /custom group choices may add third-party ballots/);
+    assert.match(operations.preference.populationBasis, /after turnout/);
+    assert.match(operations["third-party"].populationBasis, /after turnout and preference/);
+  }
+});
