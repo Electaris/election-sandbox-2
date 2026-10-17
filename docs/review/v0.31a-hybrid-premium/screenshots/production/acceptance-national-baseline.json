@@ -1,0 +1,8 @@
+{
+  "url": "http://127.0.0.1:4173/app/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "text": "AMERICAN ELECTORATE LABORATORY\nSandbox 2.0\nSwingometer\nElection Night\nHome\n2024 ELECTION LABORATORY\nGEOGRAPHIC SCOPE\nUnited States\nActual\nScenario\nShift\nPennsylvania\nMichigan\nWisconsin\nFit United States\nCopy scenario link\nHide analysis\nSELECTED\nUnited States\nACTUAL H-T\nR +1.7\n→\nSCENARIO H-T\nR +1.7\nNO CHANGE\nDEMOCRATIC\nREPUBLICAN\nSTEIN MARGIN\nOLIVER MARGIN\nAGGREGATE OTHER MARGIN\nCOLOR: PLURALITY WINNER · HEIGHT: BALLOTS\n0 active detailed states\n→\n226 Harris · 312 Trump\nYOUR SCENARIO\nElectoral College\n2024\nEXPLAIN FOR\nHARRIS\nTRUMP\nSTEIN\nOLIVER\nAGGREGATE OTHER\nHARRIS\n226\nTRUMP\n312\nSTEIN\n0\nOLIVER\n0\nAGGREGATE OTHER\n0\n270 EV NEEDED FOR A MAJORITY\n44 EV NEEDED FOR HARRIS\n\n44 additional EV required to reach the 270-vote majority threshold.\n\nThe scenario matches the certified Electoral College baseline.\n\nNAMED SCENARIO VOTE SHARE\nHARRIS\n48.3%\nTRUMP\n49.8%\nSTEIN\n0.0%\nOLIVER\n0.0%\nAGGREGATE OTHER\n1.9%\n\nUnsupported states retain their unseparated minor-candidate ballots in Aggregate other.\n\nREPLAY URL V4\nDATA V2 · ENGINE V2\nPATH TO 270\nClosest mathematical routes\n44 EV NEEDED\nCOMPARE ALTERNATIVE ROUTES\nCHANGE UNITED STATES\nUnited States\nOPEN CONTROLS\nBehavior\nContributors\nInspector\nAssumptions\nData\nCollapsed\nWorking\nExpanded\nDetailed-state operations\nChoose a supported state to edit audited local behavior. Active recipes continue to aggregate nationally.\nOpen Pennsylvania\nOpen Michigan\nOpen Wisconsin"
+}

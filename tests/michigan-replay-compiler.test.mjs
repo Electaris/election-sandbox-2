@@ -84,24 +84,32 @@ function scenario(units, settings) {
 
 function michiganEndpointInput(fixture, createdAt = fixture.createdAt) {
   const result = scenario(michiganBaselineUnits, fixture.settings);
-  const recipe = createStateScenarioRecipe("MI", recipeSettings(fixture.settings));
+  const recipe = {
+    ...createStateScenarioRecipe("MI", recipeSettings(fixture.settings)),
+    engineVersion: fixture.engineVersion,
+  };
   return buildMichiganElectionEndpointInput({
     foundation: michiganFoundation,
     scenario: result,
     scenarioId: fixture.scenarioId,
     scenarioFingerprint: stateScenarioRecipeFingerprint(recipe),
+    scenarioEngineVersion: fixture.engineVersion,
     createdAt,
   });
 }
 
 function pennsylvaniaEndpointInput(fixture) {
   const result = scenario(pennsylvaniaBaselineUnits, fixture.settings);
-  const recipe = createStateScenarioRecipe("PA", recipeSettings(fixture.settings));
+  const recipe = {
+    ...createStateScenarioRecipe("PA", recipeSettings(fixture.settings)),
+    engineVersion: fixture.engineVersion,
+  };
   return buildPennsylvaniaElectionEndpointInput({
     foundation: pennsylvaniaFoundation,
     scenario: result,
     scenarioId: fixture.scenarioId,
     scenarioFingerprint: stateScenarioRecipeFingerprint(recipe),
+    scenarioEngineVersion: fixture.engineVersion,
     createdAt: fixture.createdAt,
   });
 }
@@ -397,6 +405,7 @@ test("Michigan and Pennsylvania identities and random streams are jurisdiction-i
     scenarioId: "pa-mi-equal-local-id-v1",
     scenarioFingerprint: "pa-mi-equal-local-id-fixture-v1",
     createdAt: "2026-08-21T00:03:30.000Z",
+    scenarioEngineVersion: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.engineVersion,
   });
   combinedInput.content.jurisdictions.find(
     (item) => item.jurisdictionId === "MI",
@@ -427,6 +436,7 @@ test("detailed Pennsylvania and Michigan compose deterministically without chang
     scenarioId: "pa-mi-detailed-composition-v1",
     scenarioFingerprint: "pa-mi-detailed-composition-fixture-v1",
     createdAt: "2026-08-21T00:04:00.000Z",
+    scenarioEngineVersion: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.engineVersion,
   }));
   const [paStream, miStream] = await Promise.all([
     compilePennsylvaniaEventStream(endpoint, PENNSYLVANIA_REPLAY_DEFINITION),

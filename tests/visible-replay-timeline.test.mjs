@@ -61,12 +61,25 @@ test("visible margin timeline exactly reconstructs the observed prefix", () => {
   const latest = timeline.points.at(-1);
   const nationalHarris = observed.reduce((sum, event) => sum + event.harrisVotes, 0);
   const nationalTrump = observed.reduce((sum, event) => sum + event.trumpVotes, 0);
+  const nationalStein = observed.reduce((sum, event) => sum + event.steinVotes, 0);
   const nationalTotal = observed.reduce((sum, event) => sum + event.totalVotes, 0);
   assert.equal(timeline.points.length, observedReturnCount);
   assert.equal(latest.eventId, observed.at(-1).eventId);
   assert.equal(
     latest.nationalMarginPartsPerMillion,
     Math.round((nationalHarris - nationalTrump) * 1_000_000 / nationalTotal),
+  );
+  assert.equal(
+    latest.nationalCandidateSharePartsPerMillion.stein,
+    Math.round(nationalStein * 1_000_000 / nationalTotal),
+  );
+  const observedPa = observed.filter((event) => event.stateCode === "PA");
+  const paTotal = observedPa.reduce((sum, event) => sum + event.totalVotes, 0);
+  assert.equal(
+    latest.jurisdictionCandidateSharePartsPerMillion.PA.harris,
+    paTotal === 0
+      ? null
+      : Math.round(observedPa.reduce((sum, event) => sum + event.harrisVotes, 0) * 1_000_000 / paTotal),
   );
   assert.equal(JSON.stringify(timeline).includes(replay.events[observedReturnCount].eventId), false);
 });

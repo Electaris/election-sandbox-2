@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const DATA_VERSION = "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1";
-const ENGINE_VERSION = "pa-behavior-v1";
+const ENGINE_VERSION = "electaris-behavior-v2";
 
 const canonicalScenario = new URLSearchParams({
   scenario: "1",
@@ -57,7 +57,7 @@ test("canonical shared scenario restores the exact result and selected VTD", asy
   await openLaboratoryTab(page, "Contributors");
   await expect(page.getByRole("button", { name: "VTDs" })).toHaveAttribute("aria-pressed", "true");
   await openLaboratoryTab(page, "Behavior");
-  await expect(page.getByRole("complementary", { name: "Scenario editor" }).locator(".effect-grid strong").getByText("R +5.8", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Laboratory desk" }).locator(".effect-grid strong").getByText("R +5.8", { exact: true })).toBeVisible();
   await expect(page.getByRole("status")).toContainText(
     "Shared scenario restored from a compatible deterministic URL.",
   );
@@ -189,8 +189,8 @@ test("rapid scenario changes publish only the newest worker result", async ({ pa
   await expect(page.getByRole("button", { name: "Copy scenario link" })).toBeEnabled();
   await expect(preference).toHaveValue("6.2");
   await expect(page.getByRole("complementary", { name: "Scenario editor" })).toContainText("Harris gains 19 electoral votes");
-  await expect(page.getByRole("complementary", { name: "Scenario editor" }).locator(".effect-grid strong").getByText("D +4.5", { exact: true })).toBeVisible();
-  await expect.poll(() => new URL(page.url()).searchParams.get("scenario")).toBe("2");
+  await expect(page.getByRole("region", { name: "Laboratory desk" }).locator(".effect-grid strong").getByText("D +4.5", { exact: true })).toBeVisible();
+  await expect.poll(() => new URL(page.url()).searchParams.get("scenario")).toBe("4");
   await expect.poll(() => (
     new URL(page.url()).searchParams.getAll("recipe").find((recipe) => recipe.startsWith("PA|"))
   )).toContain("|6.2|");

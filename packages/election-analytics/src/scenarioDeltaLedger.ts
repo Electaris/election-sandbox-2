@@ -100,6 +100,18 @@ function totalsVector(totals: BehaviorScenarioResult["totals"]): ScenarioCandida
   return { ...totals };
 }
 
+function pluralityWinner(vector: ScenarioCandidateVector) {
+  const ranked = [
+    ["harris", vector.harrisVotes],
+    ["trump", vector.trumpVotes],
+    ["stein", vector.steinVotes],
+    ["oliver", vector.oliverVotes],
+    ["residual_other", vector.residualOtherVotes],
+  ] as const;
+  const ordered = [...ranked].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+  return ordered[0][1] === ordered[1][1] ? "tie" : ordered[0][0];
+}
+
 function addVectors<T extends ScenarioCandidateVector>(left: T, right: ScenarioCandidateVector): T {
   const sum = { ...left };
   for (const field of vectorFields) sum[field] += right[field];
@@ -162,6 +174,10 @@ function unitOperationDeltas(
   const turnout = zeroDelta();
   turnout.harrisVotes = scenario.turnoutHarrisVotes;
   turnout.trumpVotes = scenario.turnoutTrumpVotes;
+  turnout.steinVotes = scenario.turnoutSteinVotes ?? 0;
+  turnout.oliverVotes = scenario.turnoutOliverVotes ?? 0;
+  turnout.residualOtherVotes = scenario.turnoutResidualOtherVotes ?? 0;
+  turnout.otherVotes = turnout.steinVotes + turnout.oliverVotes + turnout.residualOtherVotes;
   turnout.totalVotes = scenario.turnoutAddedVotes;
   turnout.harrisTrumpMarginVotes = turnout.harrisVotes - turnout.trumpVotes;
 
@@ -356,6 +372,19 @@ function validateStateEndpoint(
   }
   requireSafeInteger(endpoint.harrisElectoralVotes, `${label} Harris electoral votes`, true);
   requireSafeInteger(endpoint.trumpElectoralVotes, `${label} Trump electoral votes`, true);
+  requireSafeInteger(endpoint.otherElectoralVotes ?? 0, `${label} other electoral votes`, true);
+  const electoralVotes = endpoint.harrisElectoralVotes
+    + endpoint.trumpElectoralVotes
+    + (endpoint.otherElectoralVotes ?? 0);
+  const winner = pluralityWinner(vector);
+  const expectedHarris = winner === "harris" ? electoralVotes : 0;
+  const expectedTrump = winner === "trump" ? electoralVotes : 0;
+  const expectedOther = winner !== "harris" && winner !== "trump" ? electoralVotes : 0;
+  if (endpoint.harrisElectoralVotes !== expectedHarris
+    || endpoint.trumpElectoralVotes !== expectedTrump
+    || (endpoint.otherElectoralVotes ?? 0) !== expectedOther) {
+    throw new Error(`${label} Electoral College allocation does not match its five-candidate plurality`);
+  }
 }
 
 export function createScenarioDeltaLedger(input: CreateScenarioDeltaLedgerInput): ScenarioDeltaLedger {
@@ -463,22 +492,31 @@ export function createScenarioDeltaLedger(input: CreateScenarioDeltaLedgerInput)
     partition("off-map", offMapUnits),
     partition("statewide-residual", statewideResidualUnits),
   ]);
-  const totalElectoralVotes = input.actualState.harrisElectoralVotes + input.actualState.trumpElectoralVotes;
-  if (input.scenarioState.harrisElectoralVotes + input.scenarioState.trumpElectoralVotes !== totalElectoralVotes) {
+  const totalElectoralVotes = input.actualState.harrisElectoralVotes
+    + input.actualState.trumpElectoralVotes
+    + (input.actualState.otherElectoralVotes ?? 0);
+  if (input.scenarioState.harrisElectoralVotes
+    + input.scenarioState.trumpElectoralVotes
+    + (input.scenarioState.otherElectoralVotes ?? 0) !== totalElectoralVotes) {
     throw new Error("Scenario Electoral College allocation does not reconcile");
   }
-  const candidateElectoralVotes = (state: StatewidePresidentialResult) => (
-    input.targetCandidate === "harris" ? state.harrisElectoralVotes : state.trumpElectoralVotes
-  );
+  const candidateElectoralVotes = (
+    state: StatewidePresidentialResult,
+    vector: ScenarioCandidateVector,
+  ) => pluralityWinner(vector) === input.targetCandidate
+    ? state.harrisElectoralVotes + state.trumpElectoralVotes + (state.otherElectoralVotes ?? 0)
+    : 0;
   const electoral = deepFreeze({
     targetCandidate: input.targetCandidate,
     actualHarrisElectoralVotes: input.actualState.harrisElectoralVotes,
     actualTrumpElectoralVotes: input.actualState.trumpElectoralVotes,
+    actualOtherElectoralVotes: input.actualState.otherElectoralVotes ?? 0,
     scenarioHarrisElectoralVotes: input.scenarioState.harrisElectoralVotes,
     scenarioTrumpElectoralVotes: input.scenarioState.trumpElectoralVotes,
-    targetElectoralDelta: candidateElectoralVotes(input.scenarioState) - candidateElectoralVotes(input.actualState),
-    winnerChanged: (input.actualState.harrisVotes > input.actualState.trumpVotes)
-      !== (input.scenarioState.harrisVotes > input.scenarioState.trumpVotes),
+    scenarioOtherElectoralVotes: input.scenarioState.otherElectoralVotes ?? 0,
+    targetElectoralDelta: candidateElectoralVotes(input.scenarioState, scenario)
+      - candidateElectoralVotes(input.actualState, certified),
+    winnerChanged: pluralityWinner(certified) !== pluralityWinner(scenario),
   });
   const sourceIds = Object.freeze([...new Set(input.sourceIds.map((source) => requireText(source, "Source identity")))]
     .sort(canonicalStringCompare));
@@ -696,27 +734,50 @@ export function validateScenarioDeltaLedger(candidate: ScenarioDeltaLedger): Sce
     targetCandidate: candidate.electoral.targetCandidate,
     actualHarrisElectoralVotes: requireSafeInteger(candidate.electoral.actualHarrisElectoralVotes, "Actual Harris EV", true),
     actualTrumpElectoralVotes: requireSafeInteger(candidate.electoral.actualTrumpElectoralVotes, "Actual Trump EV", true),
+    actualOtherElectoralVotes: requireSafeInteger(candidate.electoral.actualOtherElectoralVotes ?? 0, "Actual other EV", true),
     scenarioHarrisElectoralVotes: requireSafeInteger(candidate.electoral.scenarioHarrisElectoralVotes, "Scenario Harris EV", true),
     scenarioTrumpElectoralVotes: requireSafeInteger(candidate.electoral.scenarioTrumpElectoralVotes, "Scenario Trump EV", true),
+    scenarioOtherElectoralVotes: requireSafeInteger(candidate.electoral.scenarioOtherElectoralVotes ?? 0, "Scenario other EV", true),
     targetElectoralDelta: requireSafeInteger(candidate.electoral.targetElectoralDelta, "Target EV delta"),
     winnerChanged: candidate.electoral.winnerChanged,
   });
-  if (!(electoral.targetCandidate === "harris" || electoral.targetCandidate === "trump")) {
+  if (!(electoral.targetCandidate === "harris"
+    || electoral.targetCandidate === "trump"
+    || electoral.targetCandidate === "stein"
+    || electoral.targetCandidate === "oliver"
+    || electoral.targetCandidate === "residual_other")) {
     throw new Error("Electoral target candidate is invalid");
   }
   if (typeof electoral.winnerChanged !== "boolean") throw new Error("Winner-change flag is invalid");
-  if (electoral.actualHarrisElectoralVotes + electoral.actualTrumpElectoralVotes
-    !== electoral.scenarioHarrisElectoralVotes + electoral.scenarioTrumpElectoralVotes) {
+  if (electoral.actualHarrisElectoralVotes + electoral.actualTrumpElectoralVotes + electoral.actualOtherElectoralVotes
+    !== electoral.scenarioHarrisElectoralVotes + electoral.scenarioTrumpElectoralVotes + electoral.scenarioOtherElectoralVotes) {
     throw new Error("Scenario Electoral College allocation does not reconcile");
   }
-  const expectedTargetDelta = electoral.targetCandidate === "harris"
-    ? electoral.scenarioHarrisElectoralVotes - electoral.actualHarrisElectoralVotes
-    : electoral.scenarioTrumpElectoralVotes - electoral.actualTrumpElectoralVotes;
+  const targetElectoralVotes = (
+    vector: ScenarioCandidateVector,
+    harrisElectoralVotes: number,
+    trumpElectoralVotes: number,
+    otherElectoralVotes: number,
+  ) => {
+    if (electoral.targetCandidate === "harris") return harrisElectoralVotes;
+    if (electoral.targetCandidate === "trump") return trumpElectoralVotes;
+    return pluralityWinner(vector) === electoral.targetCandidate ? otherElectoralVotes : 0;
+  };
+  const expectedTargetDelta = targetElectoralVotes(
+    scenario,
+    electoral.scenarioHarrisElectoralVotes,
+    electoral.scenarioTrumpElectoralVotes,
+    electoral.scenarioOtherElectoralVotes,
+  ) - targetElectoralVotes(
+    certified,
+    electoral.actualHarrisElectoralVotes,
+    electoral.actualTrumpElectoralVotes,
+    electoral.actualOtherElectoralVotes,
+  );
   if (electoral.targetElectoralDelta !== expectedTargetDelta) {
     throw new Error("Target Electoral College consequence does not reconcile");
   }
-  const expectedWinnerChanged = (certified.harrisVotes > certified.trumpVotes)
-    !== (scenario.harrisVotes > scenario.trumpVotes);
+  const expectedWinnerChanged = pluralityWinner(certified) !== pluralityWinner(scenario);
   if (electoral.winnerChanged !== expectedWinnerChanged) {
     throw new Error("Winner-change consequence does not reconcile");
   }

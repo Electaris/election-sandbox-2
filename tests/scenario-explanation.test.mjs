@@ -5,7 +5,7 @@ import {
   buildScenarioExplanation,
   createScenarioDeltaLedger,
 } from "../packages/election-analytics/src/index.ts";
-import { applyBehaviorScenario } from "../packages/election-model/src/scenario.ts";
+import { applyBehaviorScenario, electoralAllocationForResult } from "../packages/election-model/src/scenario.ts";
 
 const units = [
   {
@@ -42,15 +42,16 @@ function endpointFromUnits(sourceUnits, electoralVotes = 10) {
   const totals = sourceUnits.reduce((sum, unit) => ({
     harrisVotes: sum.harrisVotes + unit.harrisVotes,
     trumpVotes: sum.trumpVotes + unit.trumpVotes,
+    steinVotes: sum.steinVotes + unit.steinVotes,
+    oliverVotes: sum.oliverVotes + unit.oliverVotes,
+    residualOtherVotes: sum.residualOtherVotes + unit.residualOtherVotes,
     otherVotes: sum.otherVotes + unit.otherVotes,
     totalVotes: sum.totalVotes + unit.totalVotes,
-  }), { harrisVotes: 0, trumpVotes: 0, otherVotes: 0, totalVotes: 0 });
-  const harrisWins = totals.harrisVotes > totals.trumpVotes;
+  }), { harrisVotes: 0, trumpVotes: 0, steinVotes: 0, oliverVotes: 0, residualOtherVotes: 0, otherVotes: 0, totalVotes: 0 });
   return {
     code: "TS",
     ...totals,
-    harrisElectoralVotes: harrisWins ? electoralVotes : 0,
-    trumpElectoralVotes: harrisWins ? 0 : electoralVotes,
+    ...electoralAllocationForResult(totals, electoralVotes),
   };
 }
 
@@ -88,6 +89,8 @@ test("scenario explanation connects the dominant operation, geography, and elect
   assert.deepEqual(explanation.dominantOperation, {
     operationId: "preference",
     marginVotes: ledger.operations[1].delta.harrisTrumpMarginVotes,
+    decisiveVotes: ledger.operations[1].delta.harrisTrumpMarginVotes,
+    basis: "harris-trump-margin",
     grossShareMillionths: 1_000_000,
   });
   assert.equal(explanation.largestSupportingCounty.name, "Beta County");
@@ -118,6 +121,30 @@ test("scenario explanation identifies local offsets without changing the statewi
   assert.equal(explanation.largestOpposingCounty?.name, "Beta County");
   assert.ok(explanation.largestSupportingCounty.marginVotes < 0);
   assert.ok(explanation.largestOpposingCounty.marginVotes > 0);
+});
+
+test("a balanced third-party state flip names the decisive operation even when Harris-Trump is unchanged", () => {
+  const ledger = buildLedger({
+    turnoutIncreasePoints: 0,
+    addedVoterHarrisShare: 0.5,
+    preferenceShiftPoints: 0,
+    thirdPartyCandidate: "stein",
+    thirdPartyShiftPoints: 50,
+    thirdPartyHarrisExchangeShare: 0.5,
+  });
+  const explanation = buildScenarioExplanation({ ledger });
+
+  assert.equal(explanation.marginVotes, 0);
+  assert.equal(explanation.electoral.actualWinner, "trump");
+  assert.equal(explanation.electoral.scenarioWinner, "stein");
+  assert.equal(explanation.electoral.winnerChanged, true);
+  assert.equal(explanation.dominantOperation.operationId, "third-party");
+  assert.equal(explanation.dominantOperation.basis, "plurality-winner-votes");
+  assert.equal(explanation.dominantOperation.decisiveVotes, 110);
+  assert.equal(explanation.largestSupportingCounty.basis, "plurality-winner-votes");
+  assert.ok(explanation.largestSupportingCounty.decisiveVotes > 0);
+  assert.equal(explanation.largestSupportingUnit.basis, "plurality-winner-votes");
+  assert.ok(explanation.largestSupportingUnit.decisiveVotes > 0);
 });
 
 test("zero movement produces an explicit baseline explanation without invented geography", () => {

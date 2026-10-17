@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 
 const DATA_VERSION = "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1";
-const ENGINE_VERSION = "pa-behavior-v1";
+const ENGINE_VERSION = "electaris-behavior-v2";
 const screenshotDirectory = resolve(import.meta.dirname, "../../docs/review/v0.27a-scenario-explanation/screenshots");
 
 function pennsylvaniaScenarioPath() {

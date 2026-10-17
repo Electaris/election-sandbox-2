@@ -61,6 +61,7 @@ function endpointInput(nationalFixture, paFixture, miFixture) {
     scenarioId: nationalFixture.scenarioId,
     scenarioFingerprint: nationalFixture.scenarioFingerprint,
     createdAt: nationalFixture.createdAt,
+    scenarioEngineVersion: paFixture.engineVersion,
   });
 }
 
@@ -137,6 +138,7 @@ test("accepted Pennsylvania and Michigan standalone golden streams remain unchan
     scenario: applyBehaviorScenario(paUnits, PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.settings),
     scenarioId: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.scenarioId,
     scenarioFingerprint: "standalone-pa-regression",
+    scenarioEngineVersion: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.engineVersion,
     createdAt: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.createdAt,
   }));
   const miEndpoint = await lockElectionEndpoint(buildMichiganElectionEndpointInput({
@@ -144,6 +146,7 @@ test("accepted Pennsylvania and Michigan standalone golden streams remain unchan
     scenario: applyBehaviorScenario(miUnits, MICHIGAN_BASELINE_REPLAY_FIXTURE.settings),
     scenarioId: MICHIGAN_BASELINE_REPLAY_FIXTURE.scenarioId,
     scenarioFingerprint: "standalone-mi-regression",
+    scenarioEngineVersion: MICHIGAN_BASELINE_REPLAY_FIXTURE.engineVersion,
     createdAt: MICHIGAN_BASELINE_REPLAY_FIXTURE.createdAt,
   }));
   const [pa, mi] = await Promise.all([

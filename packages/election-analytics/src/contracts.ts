@@ -116,9 +116,15 @@ function validateCandidateScope(policy: CandidateScopePolicy, scope: readonly st
     throw new Error("Analytic requires the Harris-Trump candidate scope");
   }
   if (policy === "target-candidate" && (
-    scope.length !== 1 || (scope[0] !== "harris" && scope[0] !== "trump")
+    scope.length !== 1 || ![
+      "harris",
+      "trump",
+      "stein",
+      "oliver",
+      "residual_other",
+    ].includes(scope[0])
   )) {
-    throw new Error("Analytic requires one major-party target candidate");
+    throw new Error("Analytic requires one named target candidate");
   }
   if (policy === "explicit" && (scope.length === 0 || scope.includes("all-candidates"))) {
     throw new Error("Analytic requires an explicit candidate scope");

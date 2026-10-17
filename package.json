@@ -1,6 +1,6 @@
 {
   "name": "election-sandbox-2",
-  "version": "0.27.0",
+  "version": "0.30.0-rc.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -16,6 +16,7 @@
     "data:mi:geometry": "node scripts/build-michigan-2024-precinct-geometry.mjs",
     "data:mi:demographics": "node scripts/import-michigan-2020-pl94-demographics.mjs",
     "data:wi": "node scripts/import-wisconsin-2024-ltsb.mjs",
+    "data:v029b:reference": "node --experimental-strip-types scripts/compile-v029b-reference-fixture.mjs",
     "profile:pa": "node --experimental-strip-types --expose-gc scripts/profile-pennsylvania-runtime.mjs",
     "profile:runtime": "node scripts/run-runtime-profile.mjs",
     "benchmark:reducer": "node --experimental-strip-types scripts/benchmark-replay-reducer.mjs",
@@ -32,7 +33,23 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:browser": "playwright test",
     "test:browser:install": "playwright install chromium",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "data:v029c:prepare": "node scripts/prepare-v029c-pennsylvania-candidate.mjs",
+    "data:v029c:pa": "node --experimental-strip-types scripts/compile-v029c-pennsylvania-candidate.mjs",
+    "data:v029d:mi": "node scripts/run-v029d-michigan-candidate.mjs",
+    "test:v029d:geometry": "node scripts/run-v029d-michigan-candidate.mjs --test",
+    "data:v029d1:mi": "node scripts/run-v029d-michigan-candidate.mjs --normalized",
+    "test:v029d1:geometry": "node scripts/run-v029d-michigan-candidate.mjs --test --normalized",
+    "data:v029d2:review": "node scripts/run-v029d-michigan-candidate.mjs --sturgis-review",
+    "test:v029d2:review": "node scripts/run-v029d-michigan-candidate.mjs --sturgis-review --test",
+    "data:v029d3:review": "node scripts/run-v029d-michigan-candidate.mjs --evidence-review",
+    "test:v029d3:review": "node scripts/run-v029d-michigan-candidate.mjs --evidence-review --test",
+    "data:v029e:review": "node --experimental-strip-types scripts/check-v029e-foundations.mjs",
+    "verify:foundations": "node --experimental-strip-types scripts/check-v029e-foundations.mjs --verify",
+    "prebuild": "npm run verify:foundations",
+    "prebuild:pages": "npm run verify:foundations",
+    "release:package": "node scripts/package-v030-candidate.mjs",
+    "release:verify": "node scripts/package-v030-candidate.mjs --verify"
   },
   "dependencies": {
     "@deck.gl/core": "^9.1.14",

@@ -52,6 +52,7 @@ import {
 import {
   buildScenarioUrl,
   decodeScenarioSearch,
+  DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION,
   DEFAULT_SCENARIO_URL_STATE,
   LEGACY_SCENARIO_URL_SCHEMA_VERSION,
   SCENARIO_DATA_VERSION,
@@ -404,9 +405,13 @@ test("official state baselines reconcile to the national FEC totals", () => {
     totalVotes: 155_238_302,
     harrisVotes: 75_017_613,
     trumpVotes: 77_302_580,
+    steinVotes: 0,
+    oliverVotes: 0,
+    residualOtherVotes: 2_918_109,
     otherVotes: 2_918_109,
     harrisElectoralVotes: 226,
     trumpElectoralVotes: 312,
+    otherElectoralVotes: 0,
   });
 });
 
@@ -615,6 +620,10 @@ test("turnout additions and preference transfers remain separate and exact", () 
     addedVotes: 20,
     harrisVotes: 12,
     trumpVotes: 8,
+    steinVotes: 0,
+    oliverVotes: 0,
+    residualOtherVotes: 0,
+    otherVotes: 0,
     denominator: 200,
     capacity: 80,
   });
@@ -1139,6 +1148,8 @@ test("versioned scenario URLs round-trip every assumption and selected geography
     selectedRouteStateCodes: [],
     turnoutIncreasePoints: 1.2,
     addedVoterHarrisShare: 63,
+    demographicTurnoutIncreasePoints: { ...DEFAULT_SCENARIO_URL_STATE.demographicTurnoutIncreasePoints },
+    demographicCandidateShares: { ...DEFAULT_SCENARIO_URL_STATE.demographicCandidateShares },
     preferenceShiftPoints: -4.7,
     thirdPartyCandidate: "oliver",
     thirdPartyShiftPoints: 0.8,
@@ -1246,6 +1257,74 @@ test("Electoral ledger retains an active state whose margin changes without an E
   assert.equal(model.activeRows[0].winnerChanged, false);
   assert.equal(model.consequentialRows.length, 0);
   assert.match(electoralCausalSummary(model), /changed in the model, but no state changed/);
+});
+
+test("third-party state pluralities retain their EV and set target paths against the true leader", () => {
+  const scenarioStates = states2024.map((state) => state.code === "PA" ? {
+    ...state,
+    harrisVotes: 2_000_000,
+    trumpVotes: 1_900_000,
+    steinVotes: 3_000_000,
+    oliverVotes: 100_000,
+    residualOtherVotes: 58_732,
+    otherVotes: 3_158_732,
+    harrisElectoralVotes: 0,
+    trumpElectoralVotes: 0,
+    otherElectoralVotes: 19,
+  } : state);
+  const consequences = buildElectoralConsequenceModel(
+    states2024,
+    scenarioStates,
+    ["PA"],
+    "harris",
+  );
+  assert.equal(consequences.scenarioNational.harrisElectoralVotes, 226);
+  assert.equal(consequences.scenarioNational.trumpElectoralVotes, 293);
+  assert.equal(consequences.scenarioNational.otherElectoralVotes, 19);
+  assert.equal(consequences.activeRows[0].scenarioWinner, "stein");
+  assert.equal(consequences.activeRows[0].targetElectoralDelta, 0);
+
+  const requirement = buildStateFlipRequirement(
+    states2024.find((state) => state.code === "PA"),
+    scenarioStates.find((state) => state.code === "PA"),
+    "harris",
+  );
+  assert.equal(requirement.scenarioTargetMarginVotes, -1_000_000);
+  assert.equal(requirement.remainingNetMarginVotes, 1_000_001);
+
+  const steinConsequences = buildElectoralConsequenceModel(
+    states2024,
+    scenarioStates,
+    ["PA"],
+    "stein",
+  );
+  assert.equal(steinConsequences.targetActualElectoralVotes, 0);
+  assert.equal(steinConsequences.targetScenarioElectoralVotes, 19);
+  assert.equal(steinConsequences.targetElectoralDelta, 19);
+  assert.equal(steinConsequences.scenarioCandidateElectoralVotes.stein, 19);
+  assert.equal(steinConsequences.electoralVotesToMajority, 251);
+  assert.match(electoralCausalSummary(steinConsequences), /Stein gains 19 electoral votes/);
+
+  const steinRequirement = buildStateFlipRequirement(
+    states2024.find((state) => state.code === "PA"),
+    scenarioStates.find((state) => state.code === "PA"),
+    "stein",
+  );
+  assert.equal(steinRequirement.satisfied, true);
+  assert.equal(steinRequirement.scenarioTargetMarginVotes, 1_000_000);
+  assert.equal(steinRequirement.remainingNetMarginVotes, 0);
+
+  const steinPath = buildPathTo270Model(
+    scenarioStates,
+    ["PA"],
+    ["PA", "MI", "WI"],
+    ["PA"],
+    "stein",
+    "fewest-states",
+  );
+  assert.equal(steinPath.targetElectoralVotes, 19);
+  assert.equal(steinPath.electoralVotesNeeded, 251);
+  assert.ok(steinPath.routes.length > 0);
 });
 
 test("Electoral consequence aggregation rejects a lost or duplicated electoral allocation", () => {
@@ -1419,6 +1498,21 @@ test("multi-state portfolio URLs replay authoritative Pennsylvania and Michigan 
   const paRecipe = createStateScenarioRecipe("PA", {
     turnoutIncreasePoints: 0.4,
     addedVoterHarrisShare: 61,
+    demographicTurnoutIncreasePoints: {
+      ...DEFAULT_SCENARIO_URL_STATE.demographicTurnoutIncreasePoints,
+      non_hispanic_black: 2.4,
+      hispanic_any_race: 0.7,
+    },
+    demographicCandidateShares: {
+      ...DEFAULT_SCENARIO_URL_STATE.demographicCandidateShares,
+      non_hispanic_black: {
+        harris: 52,
+        trump: 35,
+        stein: 8,
+        oliver: 2,
+        residualOther: 3,
+      },
+    },
     preferenceShiftPoints: 1,
     thirdPartyCandidate: "stein",
     thirdPartyShiftPoints: 0,
@@ -1435,7 +1529,7 @@ test("multi-state portfolio URLs replay authoritative Pennsylvania and Michigan 
   const state = {
     ...DEFAULT_SCENARIO_URL_STATE,
     ...miRecipe.settings,
-    targetCandidate: "trump",
+    targetCandidate: "stein",
     selectedRouteStateCodes: ["FL", "MI"],
     selectedStateCode: "MI",
     activeDetailedStateCode: "MI",
@@ -1453,6 +1547,87 @@ test("multi-state portfolio URLs replay authoritative Pennsylvania and Michigan 
     portfolioRecipes: [miRecipe, paRecipe].sort((left, right) => left.stateCode.localeCompare(right.stateCode)),
   });
   assert.deepEqual(Object.keys(recipesAsRecord(decoded.state.portfolioRecipes)).sort(), ["MI", "PA"]);
+});
+
+test("schema 2 portfolio links remain compatible with zero demographic assumptions", () => {
+  const params = new URLSearchParams({
+    scenario: "2",
+    data: SCENARIO_DATA_VERSION,
+    engine: SCENARIO_ENGINE_VERSION,
+    activeState: "MI",
+    target: "harris",
+    route: "fewest-states",
+    view: "scenario",
+    editor: "turnout",
+    rank: "county",
+  });
+  params.append(
+    "recipe",
+    `MI|2024-president|${SCENARIO_DATA_VERSION}|${SCENARIO_ENGINE_VERSION}|0.3|57|stein|-0.4|0,50`,
+  );
+
+  const decoded = decodeScenarioSearch(`?${params.toString()}`);
+
+  assert.equal(decoded.status, "valid");
+  assert.deepEqual(
+    decoded.state.portfolioRecipes?.[0]?.settings.demographicTurnoutIncreasePoints,
+    DEFAULT_SCENARIO_URL_STATE.demographicTurnoutIncreasePoints,
+  );
+  assert.deepEqual(
+    decoded.state.portfolioRecipes?.[0]?.settings.demographicCandidateShares,
+    DEFAULT_SCENARIO_URL_STATE.demographicCandidateShares,
+  );
+});
+
+test("schema 3 turnout links remain compatible with inherited demographic preference", () => {
+  const params = new URLSearchParams({
+    scenario: DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION,
+    data: SCENARIO_DATA_VERSION,
+    engine: SCENARIO_ENGINE_VERSION,
+    activeState: "PA",
+  });
+  params.append(
+    "recipe",
+    `PA|2024-president|${SCENARIO_DATA_VERSION}|${SCENARIO_ENGINE_VERSION}|0|55|stein|0|0,50|0,0,2.5,0,0`,
+  );
+  const decoded = decodeScenarioSearch(`?${params.toString()}`);
+  assert.equal(decoded.status, "valid");
+  assert.equal(
+    decoded.state.portfolioRecipes?.[0]?.settings.demographicTurnoutIncreasePoints.non_hispanic_black,
+    2.5,
+  );
+  assert.deepEqual(
+    decoded.state.portfolioRecipes?.[0]?.settings.demographicCandidateShares,
+    DEFAULT_SCENARIO_URL_STATE.demographicCandidateShares,
+  );
+});
+
+test("schema 4 rejects malformed or unsupported demographic behavior recipes", () => {
+  const baseParams = new URLSearchParams({
+    scenario: SCENARIO_URL_SCHEMA_VERSION,
+    data: SCENARIO_DATA_VERSION,
+    engine: SCENARIO_ENGINE_VERSION,
+    activeState: "PA",
+  });
+  baseParams.append(
+    "recipe",
+    `PA|2024-president|${SCENARIO_DATA_VERSION}|${SCENARIO_ENGINE_VERSION}|0|55|stein|0|0,50|0,0,1,0,0|inherit;inherit;60,30,0,0,0;inherit;inherit`,
+  );
+  assert.equal(decodeScenarioSearch(`?${baseParams.toString()}`).status, "invalid");
+
+  const wisconsinParams = new URLSearchParams({
+    scenario: SCENARIO_URL_SCHEMA_VERSION,
+    data: SCENARIO_DATA_VERSION,
+    engine: SCENARIO_ENGINE_VERSION,
+    activeState: "WI",
+  });
+  wisconsinParams.append(
+    "recipe",
+    `WI|2024-president|${SCENARIO_DATA_VERSION}|${SCENARIO_ENGINE_VERSION}|0|55|stein|0|0,50|0,0,0,0,0|inherit;inherit;55,45,0,0,0;inherit;inherit`,
+  );
+  const decodedWisconsin = decodeScenarioSearch(`?${wisconsinParams.toString()}`);
+  assert.equal(decodedWisconsin.status, "invalid");
+  assert.match(decodedWisconsin.message ?? "", /WI demographic turnout is unavailable/);
 });
 
 test("state scenario summaries are deterministic derived caches, not recipe authority", () => {

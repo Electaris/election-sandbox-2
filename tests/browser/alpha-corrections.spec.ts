@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const DATA_VERSION = "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1";
-const ENGINE_VERSION = "pa-behavior-v1";
+const ENGINE_VERSION = "electaris-behavior-v2";
 
 function paScenario(preference = 1) {
   const params = new URLSearchParams({
@@ -27,6 +27,7 @@ test("collapsed state drawer exposes an intent-first model action", async ({ pag
   await page.goto(paScenario(0));
   await waitForScenario(page);
   const drawer = page.getByRole("region", { name: "Laboratory desk" });
+  await page.getByRole("button", { name: "collapsed", exact: true }).click();
   await expect(drawer).toHaveAttribute("data-snap", "collapsed");
   await expect(drawer).toContainText("Change Pennsylvania");
   await expect(drawer).toContainText("Turnout · Preference · Third party");
@@ -40,7 +41,7 @@ test("state threshold is visible without a route and reuses the canonical route 
   await waitForScenario(page);
   const stateFact = page.getByRole("region", { name: "Flip requirement for Pennsylvania" });
   await expect(stateFact).toContainText("49,679 net margin votes");
-  await expect(stateFact).toContainText("70,588 D");
+  await expect(stateFact).toContainText("70,588 toward Harris");
   await expect(page.locator(".route-construction")).toHaveCount(0);
 
   await page.getByRole("button", { name: "Compare alternative routes" }).click();
@@ -56,7 +57,7 @@ test("preference numbers teach transfer arithmetic at the values", async ({ page
   await waitForScenario(page);
   await page.getByRole("button", { name: "Open controls" }).click();
   const explainer = page.locator(".transfer-explainer");
-  await expect(explainer).toContainText("35,294 ballots transferred");
+  await expect(explainer).toContainText("35,294 of 35,294 requested ballots transferred");
   await expect(explainer).toContainText("70,588 votes of Harris−Trump margin movement");
   await expect(explainer).toContainText("changes the two-candidate margin by 2 votes");
 });

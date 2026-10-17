@@ -211,7 +211,7 @@ function baselineJurisdiction(
   return {
     jurisdictionId: state.code,
     name: state.name,
-    electoralVotes: state.harrisElectoralVotes + state.trumpElectoralVotes,
+    electoralVotes: state.harrisElectoralVotes + state.trumpElectoralVotes + (state.otherElectoralVotes ?? 0),
     candidateVotes: votes,
     totalVotes: state.totalVotes,
     counties: [],
@@ -234,17 +234,15 @@ function electoralAllocation(jurisdictions: readonly LockedJurisdictionEndpointI
   const allocations: ElectoralAllocationEntry[] = [];
   for (const jurisdiction of jurisdictions) {
     if (jurisdiction.jurisdictionId === "MI") {
-      const byCandidate = new Map(
-        jurisdiction.candidateVotes.map((candidate) => [candidate.candidateId, candidate.votes]),
-      );
-      const harrisVotes = byCandidate.get(HARRIS_ID) ?? 0;
-      const trumpVotes = byCandidate.get(TRUMP_ID) ?? 0;
-      if (harrisVotes === trumpVotes) {
+      const ranked = [...jurisdiction.candidateVotes].sort((left, right) => (
+        right.votes - left.votes || left.candidateId.localeCompare(right.candidateId)
+      ));
+      if (ranked[0].votes === ranked[1].votes) {
         throw new Error("Michigan electoral allocation is undefined for a tied endpoint");
       }
       allocations.push({
         jurisdictionId: "MI",
-        candidateId: harrisVotes > trumpVotes ? HARRIS_ID : TRUMP_ID,
+        candidateId: ranked[0].candidateId,
         electoralVotes: jurisdiction.electoralVotes,
         allocationDistrict: null,
       });
@@ -278,6 +276,7 @@ export interface MichiganEndpointOptions {
   scenarioId: string;
   scenarioFingerprint: string;
   createdAt: string;
+  scenarioEngineVersion?: string;
 }
 
 export function buildMichiganElectionEndpointInput(
@@ -298,7 +297,8 @@ export function buildMichiganElectionEndpointInput(
     content: {
       electionId: "us-president-2024",
       dataCompatibilityVersion: michiganDetailedStateManifest.compatibility.dataVersion,
-      scenarioEngineVersion: michiganDetailedStateManifest.compatibility.engineVersion,
+      scenarioEngineVersion: options.scenarioEngineVersion
+        ?? michiganDetailedStateManifest.compatibility.engineVersion,
       candidates: replayCandidateDefinitions,
       evidence: evidenceFromMichigan(),
       jurisdictions,

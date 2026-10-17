@@ -172,24 +172,54 @@ export function buildDetailedScenarioCounties(
     return counties.map((county) => ({ ...county, netHarrisGain: 0 }));
   }
   const baselineById = new Map(baselineUnits.map((unit) => [unit.id, unit]));
-  const deltas = new Map<string, { harris: number; trump: number; other: number; total: number }>();
+  const deltas = new Map<string, {
+    harris: number;
+    trump: number;
+    stein: number;
+    oliver: number;
+    residualOther: number;
+    other: number;
+    total: number;
+  }>();
   for (const unit of scenarioUnits) {
     if (!unit.countyFips) continue;
     const baseline = baselineById.get(unit.id);
     if (!baseline) throw new Error(`Scenario unit ${unit.id} is missing its baseline`);
-    const delta = deltas.get(unit.countyFips) ?? { harris: 0, trump: 0, other: 0, total: 0 };
+    const delta = deltas.get(unit.countyFips) ?? {
+      harris: 0,
+      trump: 0,
+      stein: 0,
+      oliver: 0,
+      residualOther: 0,
+      other: 0,
+      total: 0,
+    };
     delta.harris += unit.harrisVotes - baseline.harrisVotes;
     delta.trump += unit.trumpVotes - baseline.trumpVotes;
+    delta.stein += unit.steinVotes - baseline.steinVotes;
+    delta.oliver += unit.oliverVotes - baseline.oliverVotes;
+    delta.residualOther += unit.residualOtherVotes - baseline.residualOtherVotes;
     delta.other += unit.otherVotes - baseline.otherVotes;
     delta.total += unit.totalVotes - baseline.totalVotes;
     deltas.set(unit.countyFips, delta);
   }
   return counties.map((county) => {
-    const delta = deltas.get(county.fips) ?? { harris: 0, trump: 0, other: 0, total: 0 };
+    const delta = deltas.get(county.fips) ?? {
+      harris: 0,
+      trump: 0,
+      stein: 0,
+      oliver: 0,
+      residualOther: 0,
+      other: 0,
+      total: 0,
+    };
     return {
       ...county,
       harrisVotes: county.harrisVotes + delta.harris,
       trumpVotes: county.trumpVotes + delta.trump,
+      steinVotes: county.steinVotes + delta.stein,
+      oliverVotes: county.oliverVotes + delta.oliver,
+      residualOtherVotes: county.residualOtherVotes + delta.residualOther,
       otherVotes: county.otherVotes + delta.other,
       totalVotes: county.totalVotes + delta.total,
       netHarrisGain: delta.harris,

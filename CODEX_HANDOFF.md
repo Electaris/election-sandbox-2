@@ -1,6 +1,6 @@
 # Codex handoff: Sandbox 2.0
 
-Last updated: 2026-08-23
+Last updated: 2026-10-12
 
 ## 1. Product boundary
 
@@ -21,7 +21,7 @@ The unchanged scenario must always reproduce the official baseline exactly.
 
 - Root: `C:\Users\kilom\OneDrive\Desktop\Sandbox\election-sandbox-2`
 - Branch: `main`
-- Release: `0.27.0`, v0.27A Scenario Explanation Hierarchy candidate
+- Release: `0.30.0-rc.1`, local three-state release-candidate packaging
 - Frozen candidate: `v0.19.1-supervisor-review`
 - Review entry: `SUPERVISOR_REVIEW.md`
 - Remote: `https://github.com/Electaris/election-sandbox-2.git`
@@ -892,6 +892,124 @@ v0.17 additionally adds or changes:
 - Three headless contract tests and two focused browser journeys pass. The aggregate passes 215 of 215 tests in 760.945 seconds.
 - Decision 0050, `docs/plans/v0.27-swingometer-explanation.md`, `docs/releases/v0.27a-scenario-explanation.md`, and `docs/review/v0.27a-scenario-explanation/VERIFICATION.md` define the release boundary.
 
+### v0.27B geographic third-party behavior
+
+- The interactive Swingometer now defaults to `certified-local-support-affinity-v1` for positive third-party exchanges. Certified selected-candidate local share is smoothed with a 25-ballot statewide prior, squared for geographic concentration, multiplied by local major-party capacity, and allocated with exact capped largest-remainder arithmetic.
+- Positive and negative candidate exchanges resolve integer remainders in canonical reporting-unit ID order. Reordering input collections cannot change local or statewide results.
+- `buildDetailedScenarioCounties` now carries exact Stein, Oliver, and residual Other deltas instead of retaining only the aggregate Other delta.
+- County and reporting-unit tiles use strict five-bucket plurality colors: Stein green, Oliver amber, and aggregate Other purple. Aggregate Other is never named as one candidate. Ties are neutral.
+- State tiles, statewide readouts, and Electoral College allocation use the true five-bucket plurality. Stein, Oliver, and aggregate Other have separate margin ramps. Shift remains the signed Harris-versus-Trump margin difference.
+- County and reporting-unit readouts name a genuine local Stein, Oliver, or aggregate Other lead. The plurality legend disappears in Shift mode and is replaced by the two-party shift legend.
+- New scenario links use `electaris-behavior-v2`. Prior incompatible links fail the existing version gate instead of silently rebuilding different local geography.
+- Accepted replay research fixtures preserve their exact v0.21/v0.22 fingerprints by explicitly retaining `pa-behavior-v1` and `statewide-party-proportional-v1`. That compatibility path is not selected by the interactive Swingometer.
+- Ten focused headless tests cover allocation identity, local plurality, positive and negative order independence, exact local/county/state conservation, off-map integrity, duplicate/profile rejection, and false-color prevention.
+- One focused browser journey restores an extreme Pennsylvania scenario, confirms an honest Philadelphia Stein plurality and named legend, then confirms Shift remains Harris-versus-Trump.
+- The full aggregate passes 228 of 228 tests in 715.307 seconds. ESLint, TypeScript/Vite production build, and 2 of 2 focused local/statewide third-party browser journeys pass.
+- Decision 0051, `docs/releases/v0.27b-geographic-third-party.md`, and `docs/review/v0.27b-geographic-third-party/VERIFICATION.md` define the release boundary.
+
+### v0.27B.1 five-candidate dock semantics
+
+- Every primary Swingometer and Election Night result surface now uses the same five-candidate plurality law as the map.
+- The Electoral College target, EV scoreboard, national candidate shares, state-flip requirement, consequence ledger, shared URL, and Path to 270 now support Harris, Trump, Stein, Oliver, and aggregate Other independently.
+- Third-party route searches use a deterministic bounded frontier so a near-zero-EV target does not freeze the browser while exploring a national path.
+- Contributors switches its decisive metric to the modeled winner's vote change when Stein, Oliver, or aggregate Other flips the state. Its headline, causal chain, waterfall, county ranking, and reporting-unit ranking no longer expose an incidental H-T difference as the explanation for a third-party win.
+- The primary Election Night timeline now plots reported candidate share for Harris, Trump, Stein, Oliver, and Other/write-in. The visible-prefix state cards retain true leader-over-runner-up readouts.
+- `NightCurrentReturn` carries all five candidate buckets. The local return tape leads with the return's true plurality and places signed H-T movement in explicit secondary text.
+- Live windows and Returns rows show plurality first. Retained H-T movement windows and mover rankings are explicitly labeled H-T.
+- Election Night plurality-path text compares the leading candidate with the runner-up. Reporting velocity, progress, and chronology remain candidate-neutral.
+- The Election Night legend includes Stein, Oliver, and aggregate Other ramps.
+- `formatResultLead`, H-T margin formatting, and plurality formatting treat a displayed one-decimal value below 0.05 points as even instead of emitting `D +0.0` or `R +0.0`.
+- The full aggregate passes 228 of 228 tests in 555.726 seconds. The Stein-leading dock journey and full integrated Election Night journey pass. ESLint and the production build pass.
+- `docs/releases/v0.27b.1-plurality-semantics.md` and `docs/review/v0.27b.1-plurality-semantics/VERIFICATION.md` define the patch.
+
+### v0.27C comparison and polish
+
+- `packages/election-analytics/src/scenarioContributionComparison.ts` deterministically builds certified and scenario plurality-contribution structures from the accepted delta ledger.
+- Each endpoint identifies its true five-candidate winner and runner-up, then ranks the geography-level winner-minus-runner-up contributions that exactly reconcile to the statewide plurality margin.
+- Changing winners are compared against their own runner-up. A Trump-to-Stein scenario is never forced into a Harris-Trump contribution proxy.
+- Tied endpoints expose no invented winner hierarchy. Aggregate Other/write-in remains an aggregate bucket.
+- Contributors keeps the existing movement ledger and adds a bounded Result structure view inside the same card. County and reporting-unit rows open the existing Inspector.
+- Ranked lists support Up, Down, Home, and End keyboard movement. Inspector focus handoff is explicit and the Inspector provides a return-to-Contributors control.
+- Inspector copy is plurality-first and labels retained H-T movement as a diagnostic.
+- The comparison stacks to one column at 390 px without horizontal overflow. The narrow legend is more compact without dropping candidate meaning.
+- Three new headless comparison tests pass. Five focused browser journeys cover third-party geography, statewide EV semantics, Election Night, result comparison, inspector handoff, keyboard movement, and mobile layout.
+- The aggregate passes 231 of 231 tests in 1,117,919.578 ms. ESLint and the production build pass.
+- `docs/releases/v0.27c-comparison-polish.md` and `docs/review/v0.27c-comparison-polish/VERIFICATION.md` define the release.
+
+### v0.28A demographic evidence and model contract
+
+- `packages/data-contracts/src/demographicEvidence.ts` defines the deterministic, fail-closed schema and admitted PA, MI, and WI inventory.
+- `src/data/demographicEvidence.ts` adapts the three already-decoded foundations without weakening their state-specific evidence semantics.
+- Pennsylvania is direct 2020 Census P4 VAP on VTD terrain and has five-category aggregate composition.
+- Michigan retains 4,050 direct VTD bridges, 218 registered-voter-weighted split polygons, 72 unavailable bridges, and five-category aggregate composition where bridged.
+- Wisconsin retains its LTSB `PERSONS18` total VAP estimate on 2025 wards but has no group-composition cells in the current runtime artifact. It is not eligible for group-specific behavior.
+- The contract distinguishes VAP from CVAP and election-year eligibility, aggregate composition from individual behavior, and evidence from future user-authored assumptions.
+- Ecological inference, observed individual preference claims, and vote mutation are prohibited by the v0.28A contract.
+- Six focused contract tests cover exact inventory values, demographic reconciliation, deterministic serialization, assumption boundaries, invalid claims, arithmetic tampering, partial inventories, duplicate states, and unknown fields.
+- The aggregate passes 237 of 237 tests in 683,282.9417 ms. The six focused demographic tests, ESLint, production build, and diff integrity gate pass.
+- Decision 0052, `docs/plans/v0.28-demographic-behavior.md`, `docs/releases/v0.28a-demographic-contract.md`, and `docs/review/v0.28a-demographic-contract/VERIFICATION.md` define the release.
+
+### v0.28B group-specific turnout
+
+- The behavior engine accepts five explicit group turnout increases for Hispanic of any race, non-Hispanic White, non-Hispanic Black, non-Hispanic Asian, and non-Hispanic Other.
+- Pennsylvania VTD and Michigan bridged precinct units carry admitted local aggregate group composition into the behavior worker. Michigan unavailable bridges and off-map units remain null and receive no invented group turnout.
+- Existing statewide turnout runs first. Group additions then allocate through the same remaining local VAP capacity with exact integer conservation and canonical group ordering.
+- Candidate allocation remains the independent Harris share of added ballots. Aggregate composition never supplies candidate preference.
+- Wisconsin remains valid for aggregate turnout and fails closed for group turnout in the model, URL decoder, and UI.
+- Scenario URL schema 3 serializes all five group settings. Schema 2 portfolios remain replayable with zero group settings, while old recipe fingerprints remain unchanged when all new settings are zero.
+- The expanded Turnout editor shows requested group changes, admitted VAP, realized added ballots, evidence limits, capacity competition, and a clear-groups action. It stacks cleanly at 390 px.
+- The same scenario endpoint flows through county and state results, national aggregation, Electoral College consequences, contribution ledgers, portfolio rehydration, and the existing Election Night compiler.
+- Six focused group-turnout tests, 61 focused model/URL tests, and three browser journeys pass.
+- The aggregate passes 245 of 245 tests in 1,405,538.8088 ms. ESLint and the production build pass. The existing deck.gl chunk warning remains.
+- Decision 0053, `docs/releases/v0.28b-group-turnout.md`, and `docs/review/v0.28b-group-turnout/VERIFICATION.md` define the release.
+
+### v0.28C candidate-complete group preference
+
+- An optional five-candidate vector can divide only the new ballots created by the same group's turnout assumption among Harris, Trump, Stein, Oliver, and residual Other/write-in.
+- Every vector is explicit, nonnegative, and sums to exactly 100 percent. Certified ballots never receive a demographic identity.
+- Groups without a custom vector inherit the existing visible Harris-Trump added-ballot split, preserving v0.28B meaning and older scenario fingerprints.
+- Candidate allocation is exact at group and reporting-unit level. State, county, portfolio, contribution, and Election Night endpoints remain candidate-complete.
+- Scenario URL schema 4 persists custom vectors. Schemas 2 and 3 restore vectors to inherited and remain compatible.
+- Pennsylvania and Michigan are eligible only where admitted composition exists. Wisconsin fails closed.
+- Decision 0054 and `docs/releases/v0.28c-group-preference.md` define the release.
+
+### v0.28D demographic contribution and sensitivity
+
+- The selected group exposes requested, realized, capacity-clipped, and off-map ballots plus its exact five-candidate allocation.
+- County and local reporting-unit rankings use accepted per-unit contribution records and identify where the authored operation entered the model.
+- The bounded sensitivity readout is signed Harris-minus-Trump movement per 1,000 added ballots derived from the explicit vector. It is arithmetic, not probability or forecast.
+- The panel isolates turnout at insertion time and warns that later statewide preference transfer and named third-party exchange operations may move ballots again.
+- Five focused browser journeys cover schema persistence, exact 100 percent conservation, candidate-complete allocation, geographic explanation, Wisconsin rejection, and mobile layout.
+- The final aggregate passes 248 of 248 tests in 636,135.4888 ms. The focused demographic/model/URL/ledger gate passes 73 of 73, the demographic browser gate passes 5 of 5, and the final candidate-complete Election Night isolation rerun passes. ESLint, production build, and diff integrity pass.
+- Decision 0055, `docs/releases/v0.28d-demographic-explanation.md`, and `docs/review/v0.28-final/VERIFICATION.md` define the completed v0.28 phase.
+
+### v0.29A precinct demographic artifact contract
+
+- `packages/data-contracts/src/precinctDemographicArtifact.ts` defines a state-independent compact map-unit artifact and a separate complete build-time Census-block trace.
+- The trace is authoritative. Every allocated block reconstructs its five-group VAP vector exactly across target units, while unavailable blocks retain their complete source vector without a fabricated target.
+- Compact unit profiles, statewide modeled and unavailable profiles, allocation-method totals, block coverage, split counts, source-block provenance, and map-unit availability reconcile against the trace before a bundle can publish.
+- Every allocation remains inside the source county. Unknown targets and cross-county placement fail closed.
+- Admitted methods are whole-block containment, Census internal point, population-weighted split, and housing-weighted split. Raw polygon-area weighting is deliberately absent.
+- Input demographic, precinct-geometry, and election-result artifacts require canonical SHA-256 checksums and explicit vintages.
+- Canonical normalization, serialization, Web Crypto SHA-256 fingerprints, input-order independence, unknown-field rejection, and immutable validated outputs are implemented.
+- The inference boundary remains aggregate population only. No individual turnout, candidate preference, ecological inference, scenario mutation, current runtime migration, or UI change is authorized.
+- Eight focused adversarial contract tests cover exact reconciliation, deterministic ordering and fingerprints, round-trip serialization, block tampering, fake splits, unavailable evidence, county boundaries, identity drift, method drift, quality claims, checksums, and package purity.
+- The final aggregate passes 256 of 256 tests in 592,504.3963 ms. The final v0.29A focused gate passes 8 of 8. TypeScript, ESLint, and the production build pass.
+- Decision 0056, `docs/plans/v0.29-precinct-demographic-data-factory.md`, `docs/releases/v0.29a-precinct-demographic-contract.md`, and `docs/review/v0.29a-precinct-demographic-contract/VERIFICATION.md` define the release.
+
+### v0.29B reference spatial compiler
+
+- `packages/demographic-compiler/src/referenceCompiler.ts` compiles normalized Census-block and election-unit Polygon or MultiPolygon geometry into the v0.29A bundle.
+- Allocation precedence is whole-block containment, an in-block Census internal point, explicit population or housing evidence split, then unavailable evidence.
+- Internal and split points must lie inside their source block. Unknown split bases, fractional weights, unsupported CRS, overlapping map units, and invalid map geometry fail closed.
+- Raw area remains prohibited. Equivalent evidence ratios reduce canonically, and exact integer largest remainders use canonical unit identity for ties.
+- Invalid source geometry, no compatible terrain, county conflicts, and zero-information splits retain the complete source profile as unavailable.
+- `data-sources/reference/v029b-precinct-demographic-fixture.json` is explicitly synthetic and exercises all admitted methods and unavailable paths.
+- `npm run data:v029b:reference` produces `tests/fixtures/v029b-reference-precinct-demographics.json` byte-identically.
+- Frozen fingerprints are artifact `sha256:0e18b49ba8b8e1352c5d2d72e7384d6d7990014a0f121c61ae8043c937109c96`, trace `sha256:98d25c3b00c14a834c8937a9ee72eda804cd46216a380cf80ab8b5190f9cf96b`, and bundle `sha256:fd535fa04e7905f0141d9a9a327bae9be8b411e7ea63c2c012de12d8c2a53bc4`.
+- Thirteen focused compiler tests and the combined 21-test v0.29A/v0.29B gate pass. The final aggregate passes 269 of 269 tests in 986,891.7531 ms. Full ESLint and the production build pass. No production state foundation or interface behavior was migrated.
+- Decision 0057, `docs/releases/v0.29b-reference-spatial-compiler.md`, and `docs/review/v0.29b-reference-spatial-compiler/VERIFICATION.md` define the release.
+
 ## 8. Verification state
 
 ### v0.22A replay reducer
@@ -988,21 +1106,53 @@ Re-run the commands before publishing if any model, data, or renderer file chang
 3. **The deck.gl chunk is about 1.6 MB minified.** It is already lazy, but further code splitting or bundle review is warranted.
 4. **No uncertainty model exists.** The deterministic result is intentional; do not add decorative random noise.
 5. **No CVAP or 2024 eligibility estimate exists.** The UI correctly discloses the 2020 VAP limitation.
-6. **No demographic preference model exists.** Candidate choice remains an explicit user input.
+6. **No observed demographic preference model exists.** v0.28C accepts only explicit user-authored choice for new group-turnout ballots. It does not estimate historical group voting or assign identities to certified ballots.
 7. **Residual Other has no historical county geography.** Keep its certified baseline statewide-only; scenario additions may be geographically allocated only as explicitly counterfactual exchanges.
-8. **A balanced third-party exchange can have zero `Harris - Trump` contribution.** This is correct even when exchanged ballot volume is large; the editor displays that volume separately.
+8. **A balanced third-party exchange can have zero `Harris - Trump` movement.** This remains mathematically correct. When it causes a third-party plurality flip, Contributors now changes its decisive metric to that winner's vote gains while explicitly preserving H-T as a separate diagnostic.
 9. **No backend-stored scenarios, authentication, or deployment exist.** Deterministic scenario URLs are client-side and require a compatible build.
 10. **Source redistribution status blocks an open public data release.** `docs/data/REDISTRIBUTION_INVENTORY.md` records the current review and approved delivery decisions; provenance alone is not treated as permission.
 11. **The audited national replay kernel still has a heavy cold initialization.** Its certified compilation and checkpoint creation take about 32 seconds locally. The visible three-state Election Night now has a bounded active-session cache and an exact default-recipe shortcut, but no persistent or precompiled national replay artifact exists.
 12. **Detailed county snapshots are intentionally periodic.** During active playback the national/state headline is current while the county list discloses that it refreshes on pause. Continuous multi-megabyte county snapshots are prohibited.
+13. **The compiler has processed a complete real Pennsylvania county, not the statewide foundation.** v0.29C's 3,879 Adams blocks and 50 VTDs match the admitted composition exactly. This adds block auditability without demonstrating better replacement coverage, newer geography, or improved election linkage. The runtime remains unchanged.
+14. **Michigan's statewide candidate remains a diagnostic, not an admitted bundle.** v0.29D.1's native-source policy normalizes 20 invalid rings and excludes six bounded overlap strips. Flint has a documented effective-cycle interpretation with raw attributes preserved. One Sturgis overlap still quarantines two targets; 382 precincts are partial and two unavailable. Never promote partial profiles or the diagnostic schema to runtime denominators. Decisions 0059 and 0060 preserve the source-map admission hold.
 
 ## 10. Exact next phase
 
-v0.27A is complete and verified. The Swingometer now derives one deterministic explanation from the accepted scenario delta ledger and presents main operation, strongest honest geography, and exact Electoral College consequence in the Contributors drawer.
+Current UI phase: `docs/review/v0.31c-swingometer/REVIEW.md` records the Swingometer editor and contributor-navigation polish: shared reading/control sizes, expanded slider hit areas, labeled filter groups, selected-geography rows, repaired editor collapse, and expandable operation evidence. The local candidate is `eadf5c162bc2de7f8031824832513972439df66125d63e3365765e00f8ea906f`, served on port 4173. The owner's restored overlay drawer is preserved. Continue with Election Night's returns-desk and replay-control visual pass. This is a local UI milestone, not completion of the entire premium design or human usability validation. The earlier reading/inspector phase remains documented in `docs/review/v0.31b-inspector/REVIEW.md`.
 
-The exact next work is v0.27B, Geographic Third-Party Behavior. Replace the current statewide proportional third-party allocation with an explicit deterministic reporting-unit allocation contract, then allow Stein or Oliver to receive honest county and local plurality colors when that named candidate genuinely exceeds both major candidates. Residual Other/write-in is an aggregate category, not one candidate; if it exceeds both major candidates it may receive a distinct aggregate marker but must never be described as a candidate winner. Preserve exact five-bucket conservation, keep the certified statewide-only residual off-map, and do not alter the existing Harris-versus-Trump Shift view. Add adversarial model and browser coverage before any visual polish.
+Owner dock preference: the bottom command dock again uses its earlier slide-up overlay behavior, collapsed default, taller Working/Expanded states, and drag thresholds. The new header and analysis layout remain intact. Earlier local package: `b92313db3a44142da9400e05473f53de5013b0c94b2ea9e59c85ea2d164732a4`; `docs/review/v0.31a-hybrid-premium/DOCK_ADJUSTMENT.md` records nine fresh passing browser cases, build/lint/foundation/package verification, and the updated screenshots. This preference supersedes the initial reserved-row dock requirement below.
 
-After v0.27B, complete v0.27C comparison and interaction polish. Demographic sliders begin in v0.28A with an evidence contract, followed by turnout behavior, preference behavior, and contribution/sensitivity explanation. Do not treat aggregate demographic categories as observed individual vote choice.
+The owner prioritized **Hybrid Premium UI/UX** before further feature work and supplied a detailed specification. Phase 1 now introduces the shared shell, reserved map/analysis/dock layout, compact navigation, independently scrolling/collapsible analysis, per-workspace dock settings, renderer resize handling, and preserved paused replay across workspace navigation. Decision 0065 records the layout boundary. The initial Phase 1 local package was `824cafe540d81e8ec51bab97d8102f7b73d2a7056b16b4540fdf0cb7a4db0544`; use `docs/review/v0.31a-hybrid-premium/REVIEW.md` for final verification and screenshots. All 34 selected browser cases have passing evidence across the documented runs. The final shell and integrated replay tests specifically cover the last pointer-resize correction; do not infer a new full-model-suite run. Packaging still uses `0.30.0-rc.1`; the design phase name is not a Git tag or public release. Next is the shared typography/control scale and clearer inspector information hierarchy, following the supplied specification.
+
+The earlier v0.30 informed AI technical walkthrough is retained in `docs/review/v0.30-release-candidate/TECHNICAL_ACCEPTANCE.md`. It fixed queued timer ticks resuming paused playback and mobile breadcrumb overflow in package `8307b9313f6e06d4d1419ce1ccdc696615f269263f926cfb0d72bf35b00d4759`. Those immutable candidates remain intact. Human-result rows remain NOT RUN. The deferred unfamiliar-user study and recorded external-delivery gates remain outstanding. Do not add states or force demographic migration to finish v1.
+
+`npm run release:package` builds through the foundation gate, checks source-input stability, and copies compiled assets plus scope/acceptance/delivery documents into `outputs/0.30.0-rc.1/<content-id>/`. `npm run release:verify` checks all packaged bytes and the current workspace inputs. The manifest records Git HEAD and dirty-tree provenance; this is not a Git tag or a clean checkout claim. Existing candidates are never overwritten. Decision 0064 records the local-only boundary. Use the current phase's `VERIFICATION.md` for the exact package identity and fresh checks; September results below are historical evidence.
+
+On return from the break on 2026-10-11, both normal shell and Node sandbox startup failed with `helper_unknown_error: setup refresh had errors`. The reviewed execution fallback worked. The existing foundation report verified unchanged. No data migration, remote operation, outreach, or deployment was performed. The copied build output is excluded from ESLint through `outputs/**`; source lint remains enabled.
+
+The local candidate preview uses port 4173 bound to `127.0.0.1`. Check the listener and its candidate identity before reusing it. Preview instructions are in `docs/review/v0.30-release-candidate/DELIVERY.md`.
+
+Decision 0063 implements decision 0062 as `data-sources/foundation-retention-policy.json`. Run `npm run verify:foundations`; both production build commands run it first. It pins the retained demographic artifacts, all 222 county map files, source registries, compiler configuration, and review evidence; then exercises the actual runtime adapters, zero-change model, national baseline, off-map accounting, and group capabilities. The policy accepts only the reviewed retention outcome and explicitly rejects replacement admission. A future candidate needs a new reviewed policy and runtime integration.
+
+The full existing Node suite passed 287 tests; the new retention suite passed nine, for 296 passing tests across the runs. All 21 selected integrated browser cases have passing results: 19 in the initial run, then two targeted reruns. One corrected a stale version-2 URL assertion to the existing version 4; the other passed the unchanged Election Night timeout after the model suite finished. Lint, both production builds, and reverse-order retention reproduction pass. See `docs/review/v0.29e-foundation-retention/VERIFICATION.md` for exact scope and limitations. Nine fresh Election Night screenshots are in that review directory; desktop/mobile captures were inspected. No runtime data or application behavior changed.
+
+The browser harness can route Election Night screenshots with `SANDBOX_REVIEW_SCREENSHOT_DIR`. The isolated browser case passed, but Windows server teardown stalled. Its two test-owned server processes were stopped after the pass, and the runner exited 0. Check port 4173 before starting a frontend server. No deployment or source-owner message was sent.
+
+### Retained v0.29D.3 evidence and future replacement constraints
+
+The review is in `docs/review/v0.29d3-evidence-quality/`. Its compiler inventories all 179 unavailable positive-VAP blocks, including the 26 non-Sturgis blocks / 491 VAP. All 382 partial precincts and 14 complete-to-partial regressions remain explicit; only City of Richmond Precinct 2's regression touches positive VAP (2). The 349 zero-VAP-only partials are not promoted.
+
+Two positive blocks touch no same-county target: Bay County block 260172856004038 (47 VAP) and Isabella County block 260730001001158 (1 VAP). The new county context covers all 63 source-county precincts, including 52 with diagnostic complete labels. This is uncertainty context, not a population allocation. The v0.29A profile-availability status and Michigan diagnostic completeness are different semantics; neither alone grants admission.
+
+All eight Flint Township profiles now reconstruct by 2020 Census VTD and individual block. Precinct 2's candidate 5,759 VAP is 1,900 from VTD 26049049117, 2,528 from 26049049119, and 1,331 from 26049049116. Its existing bridge selects only the first VTD. This explains the arithmetic and documents a bridge limitation, but does not independently validate the 2024 boundary. Township totals are 13,335 existing versus 24,904 candidate VAP. Retention does not assert that the existing bridge is more accurate.
+
+The v0.29D.1 candidate remains frozen: 254,730 blocks, 4,340 precincts, 3,956 complete / 382 partial / two unavailable, with 5,071 VAP unavailable. Sturgis quarantines 202 blocks / 4,580 VAP. Published state and city sources disagree, and v0.29D.2's two unapproved ownership hypotheses have identical assignments. Neither is admitted. Do not rerun the same sensitivity as a substitute for effective-cycle boundary evidence. The source clarification draft remains **unsent**; sending requires user authorization.
+
+A future Michigan replacement must resolve Sturgis, localize the remaining positive evidence, review completeness semantics and material local changes, then recompile and compare before admission. The Adams Pennsylvania pilot remains an identical 50-VTD county comparison, not statewide replacement validation. Wisconsin's existing LTSB 2020 VAP aggregated to 2025 wards is retained without a new replacement comparison.
+
+Reproduce this review with `npm run data:v029d3:review -- --verify --reverse`; tests are `npm run test:v029d3:review`. The registry pins prior evidence, the Census geography cache, contract, and all three retained runtime demographic artifacts. The launcher uses the existing OSGeo4W environment. Eight new Python tests and 39 focused Node tests pass; byte reproduction passes. See this phase's `VERIFICATION.md` for lint/build and verification scope. No runtime source or data changed in this phase.
+
+The frontend was last confirmed at `http://127.0.0.1:4173/app/` on 2026-09-08. Check the listener before starting a duplicate. Migration still requires explicit evidence comparison and review. Do not broaden the comparison into polling calibration, voter-file inference, forecast probabilities, persuasion scores, or observed group preference.
 
 ECharts GL is rejected for production. Do not let it become a second map engine. Do not add projections, calls, Decision Desk inference, demographic calibration, backend, memberships, rooms, public restricted-data delivery, or video without later authorization.
 

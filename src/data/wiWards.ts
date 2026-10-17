@@ -370,5 +370,6 @@ export function toWisconsinBehaviorModelUnits(
       turnoutCapacity: ward.denominatorStatus === "available"
         ? ward.turnoutCapacity
         : 0,
+      demographicComposition: null,
     }));
 }

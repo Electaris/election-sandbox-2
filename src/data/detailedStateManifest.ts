@@ -45,7 +45,7 @@ export const pennsylvaniaDetailedStateManifest = Object.freeze({
   },
   compatibility: {
     dataVersion: "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1",
-    engineVersion: "pa-behavior-v1",
+    engineVersion: "electaris-behavior-v2",
   },
   runtime: {
     loader: "pa-vtd-row-v1",
@@ -78,7 +78,7 @@ export const michiganDetailedStateManifest = Object.freeze({
   },
   compatibility: {
     dataVersion: "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1",
-    engineVersion: "pa-behavior-v1",
+    engineVersion: "electaris-behavior-v2",
   },
   runtime: {
     loader: "mi-precinct-row-v1",
@@ -111,7 +111,7 @@ export const wisconsinDetailedStateManifest = Object.freeze({
   },
   compatibility: {
     dataVersion: "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1",
-    engineVersion: "pa-behavior-v1",
+    engineVersion: "electaris-behavior-v2",
   },
   runtime: {
     loader: "wi-ward-row-v1",

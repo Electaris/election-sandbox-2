@@ -1,0 +1,2949 @@
+{
+  "schemaVersion": "pa-demographic-candidate-comparison-v1",
+  "scope": {
+    "stateCode": "PA",
+    "countyFips": "42001",
+    "countyName": "Adams",
+    "statewide": false,
+    "terrain": "2020 Census VTD",
+    "electionVintage": "2024"
+  },
+  "verdict": {
+    "decision": "retain_existing_vtd_foundation",
+    "migrationAuthorized": false,
+    "strictlyBetterEvidenceDemonstrated": false,
+    "reasons": [
+      "A bounded county pilot cannot establish statewide replacement quality.",
+      "The candidate uses the same 2020 geography and demographic vintage; block trace adds auditability, not fresher evidence.",
+      "Existing 2024 result linkage is reused and verified, so election linkage coverage does not improve."
+    ]
+  },
+  "coverage": {
+    "sourceBlockCount": 3879,
+    "allocatedBlockCount": 3879,
+    "unavailableBlockCount": 0,
+    "splitBlockCount": 0,
+    "mapUnitCount": 50,
+    "availableMapUnitCount": 50,
+    "unavailableMapUnitCount": 0,
+    "offMapElectionUnitCount": 0
+  },
+  "composition": {
+    "admittedProfile": {
+      "totalVotingAgePopulation": 83005,
+      "hispanic_any_race": 4865,
+      "non_hispanic_white": 73832,
+      "non_hispanic_black": 1183,
+      "non_hispanic_asian": 791,
+      "non_hispanic_other": 2334
+    },
+    "candidateSourceProfile": {
+      "totalVotingAgePopulation": 83005,
+      "hispanic_any_race": 4865,
+      "non_hispanic_white": 73832,
+      "non_hispanic_black": 1183,
+      "non_hispanic_asian": 791,
+      "non_hispanic_other": 2334
+    },
+    "candidateModeledProfile": {
+      "totalVotingAgePopulation": 83005,
+      "hispanic_any_race": 4865,
+      "non_hispanic_white": 73832,
+      "non_hispanic_black": 1183,
+      "non_hispanic_asian": 791,
+      "non_hispanic_other": 2334
+    },
+    "candidateUnavailableProfile": {
+      "totalVotingAgePopulation": 0,
+      "hispanic_any_race": 0,
+      "non_hispanic_white": 0,
+      "non_hispanic_black": 0,
+      "non_hispanic_asian": 0,
+      "non_hispanic_other": 0
+    },
+    "sourceDelta": {
+      "totalVotingAgePopulation": 0,
+      "hispanic_any_race": 0,
+      "non_hispanic_white": 0,
+      "non_hispanic_black": 0,
+      "non_hispanic_asian": 0,
+      "non_hispanic_other": 0
+    },
+    "modeledDelta": {
+      "totalVotingAgePopulation": 0,
+      "hispanic_any_race": 0,
+      "non_hispanic_white": 0,
+      "non_hispanic_black": 0,
+      "non_hispanic_asian": 0,
+      "non_hispanic_other": 0
+    },
+    "identicalUnitCount": 50,
+    "changedUnitCount": 0,
+    "maxAbsoluteGroupShareDeltaPp": 0
+  },
+  "allocationMethods": [
+    {
+      "method": "census_internal_point",
+      "blockCount": 42,
+      "allocatedVotingAgePopulation": 1334
+    },
+    {
+      "method": "whole_block_containment",
+      "blockCount": 3837,
+      "allocatedVotingAgePopulation": 81671
+    }
+  ],
+  "unavailableReasons": {},
+  "countyIntegrity": {
+    "crossCountyAllocationCount": 0,
+    "checkedBlockCount": 3879
+  },
+  "linkage": {
+    "admittedMappedVtdCount": 50,
+    "candidateAvailableMappedVtdCount": 50,
+    "admittedMappedVotes": 60650,
+    "candidateAvailableMappedVotes": 60650,
+    "exactIdentifierSourceUnitCount": 48,
+    "canonicalNameSourceUnitCount": 3,
+    "offMapPilot": [],
+    "offMapStatewide": [
+      {
+        "id": "pa-42-statewide-residual",
+        "countyFips": null,
+        "type": "other_bucket",
+        "totalVotes": 24526
+      },
+      {
+        "id": "pa-42003-0011405",
+        "countyFips": "42003",
+        "type": "precinct",
+        "totalVotes": 1687
+      },
+      {
+        "id": "pa-42003-0011430",
+        "countyFips": "42003",
+        "type": "precinct",
+        "totalVotes": 905
+      },
+      {
+        "id": "pa-42009-0000060",
+        "countyFips": "42009",
+        "type": "precinct",
+        "totalVotes": 746
+      },
+      {
+        "id": "pa-42011-0000020",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 1169
+      },
+      {
+        "id": "pa-42011-0000025",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 1107
+      },
+      {
+        "id": "pa-42011-0000290",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 873
+      },
+      {
+        "id": "pa-42011-0000380",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 1112
+      },
+      {
+        "id": "pa-42011-0001670",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 1373
+      },
+      {
+        "id": "pa-42011-0001675",
+        "countyFips": "42011",
+        "type": "precinct",
+        "totalVotes": 1547
+      },
+      {
+        "id": "pa-42013-0000050",
+        "countyFips": "42013",
+        "type": "precinct",
+        "totalVotes": 491
+      },
+      {
+        "id": "pa-42019-0000370",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 2239
+      },
+      {
+        "id": "pa-42019-0000380",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 1430
+      },
+      {
+        "id": "pa-42019-0000410",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 2283
+      },
+      {
+        "id": "pa-42019-0000439",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 1228
+      },
+      {
+        "id": "pa-42019-0000545",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 1664
+      },
+      {
+        "id": "pa-42019-0000555",
+        "countyFips": "42019",
+        "type": "precinct",
+        "totalVotes": 1523
+      },
+      {
+        "id": "pa-42021-0000610",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 797
+      },
+      {
+        "id": "pa-42021-0000635",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 766
+      },
+      {
+        "id": "pa-42021-0000860",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 331
+      },
+      {
+        "id": "pa-42021-0000880",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 798
+      },
+      {
+        "id": "pa-42021-0001040",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 443
+      },
+      {
+        "id": "pa-42021-0001080",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 267
+      },
+      {
+        "id": "pa-42021-0001145",
+        "countyFips": "42021",
+        "type": "precinct",
+        "totalVotes": 559
+      },
+      {
+        "id": "pa-42027-0000210",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 1376
+      },
+      {
+        "id": "pa-42027-0000215",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42027-0000235",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 1228
+      },
+      {
+        "id": "pa-42027-0000237",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 763
+      },
+      {
+        "id": "pa-42027-0000260",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42027-0000263",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 821
+      },
+      {
+        "id": "pa-42027-0000265",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42027-0000268",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 1111
+      },
+      {
+        "id": "pa-42027-0000610",
+        "countyFips": "42027",
+        "type": "precinct",
+        "totalVotes": 4004
+      },
+      {
+        "id": "pa-42029-0000034",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42029-0000035",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 1864
+      },
+      {
+        "id": "pa-42029-0000380",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 2635
+      },
+      {
+        "id": "pa-42029-0000385",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 2295
+      },
+      {
+        "id": "pa-42029-0000915",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 1159
+      },
+      {
+        "id": "pa-42029-0000916",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42029-0001420",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 1190
+      },
+      {
+        "id": "pa-42029-0001423",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 1180
+      },
+      {
+        "id": "pa-42029-0001426",
+        "countyFips": "42029",
+        "type": "precinct",
+        "totalVotes": 1193
+      },
+      {
+        "id": "pa-42041-0000600",
+        "countyFips": "42041",
+        "type": "precinct",
+        "totalVotes": 2189
+      },
+      {
+        "id": "pa-42041-0000620",
+        "countyFips": "42041",
+        "type": "precinct",
+        "totalVotes": 3208
+      },
+      {
+        "id": "pa-42049-0000220",
+        "countyFips": "42049",
+        "type": "precinct",
+        "totalVotes": 483
+      },
+      {
+        "id": "pa-42049-0000240",
+        "countyFips": "42049",
+        "type": "precinct",
+        "totalVotes": 578
+      },
+      {
+        "id": "pa-42049-0001070",
+        "countyFips": "42049",
+        "type": "precinct",
+        "totalVotes": 1322
+      },
+      {
+        "id": "pa-42049-0001075",
+        "countyFips": "42049",
+        "type": "precinct",
+        "totalVotes": 1490
+      },
+      {
+        "id": "pa-42071-0001775",
+        "countyFips": "42071",
+        "type": "precinct",
+        "totalVotes": 2020
+      },
+      {
+        "id": "pa-42077-0000090",
+        "countyFips": "42077",
+        "type": "precinct",
+        "totalVotes": 749
+      },
+      {
+        "id": "pa-42079-0000140",
+        "countyFips": "42079",
+        "type": "precinct",
+        "totalVotes": 1280
+      },
+      {
+        "id": "pa-42079-0000157",
+        "countyFips": "42079",
+        "type": "precinct",
+        "totalVotes": 1166
+      },
+      {
+        "id": "pa-42079-0000158",
+        "countyFips": "42079",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42079-0000800",
+        "countyFips": "42079",
+        "type": "precinct",
+        "totalVotes": 1119
+      },
+      {
+        "id": "pa-42079-0002120",
+        "countyFips": "42079",
+        "type": "precinct",
+        "totalVotes": 901
+      },
+      {
+        "id": "pa-42081-0000720",
+        "countyFips": "42081",
+        "type": "precinct",
+        "totalVotes": 664
+      },
+      {
+        "id": "pa-42081-0000725",
+        "countyFips": "42081",
+        "type": "precinct",
+        "totalVotes": 169
+      },
+      {
+        "id": "pa-42085-0000075",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 199
+      },
+      {
+        "id": "pa-42085-0000120",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 413
+      },
+      {
+        "id": "pa-42085-0000745",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 513
+      },
+      {
+        "id": "pa-42085-0000795",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 530
+      },
+      {
+        "id": "pa-42085-0000815",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 435
+      },
+      {
+        "id": "pa-42085-0000855",
+        "countyFips": "42085",
+        "type": "precinct",
+        "totalVotes": 785
+      },
+      {
+        "id": "pa-42089-0000253",
+        "countyFips": "42089",
+        "type": "precinct",
+        "totalVotes": 1655
+      },
+      {
+        "id": "pa-42091-0000910",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1340
+      },
+      {
+        "id": "pa-42091-0001080",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1421
+      },
+      {
+        "id": "pa-42091-0001132",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 845
+      },
+      {
+        "id": "pa-42091-0001691",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 874
+      },
+      {
+        "id": "pa-42091-0001700",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1029
+      },
+      {
+        "id": "pa-42091-0001701",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42091-0002275",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 960
+      },
+      {
+        "id": "pa-42091-0002800",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 2068
+      },
+      {
+        "id": "pa-42091-0002840",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 845
+      },
+      {
+        "id": "pa-42091-0002850",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1045
+      },
+      {
+        "id": "pa-42091-0002855",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1028
+      },
+      {
+        "id": "pa-42091-0002860",
+        "countyFips": "42091",
+        "type": "precinct",
+        "totalVotes": 1483
+      },
+      {
+        "id": "pa-42095-0000366",
+        "countyFips": "42095",
+        "type": "precinct",
+        "totalVotes": 942
+      },
+      {
+        "id": "pa-42095-0000775",
+        "countyFips": "42095",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42097-0000340",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 457
+      },
+      {
+        "id": "pa-42097-0000370",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 269
+      },
+      {
+        "id": "pa-42097-0000400",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 377
+      },
+      {
+        "id": "pa-42097-0000420",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 504
+      },
+      {
+        "id": "pa-42097-0000440",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 762
+      },
+      {
+        "id": "pa-42097-0000470",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 649
+      },
+      {
+        "id": "pa-42097-0000865",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 367
+      },
+      {
+        "id": "pa-42097-0000870",
+        "countyFips": "42097",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42101-0004160",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 390
+      },
+      {
+        "id": "pa-42101-0004235",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 1100
+      },
+      {
+        "id": "pa-42101-0005300",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 470
+      },
+      {
+        "id": "pa-42101-0005373",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 357
+      },
+      {
+        "id": "pa-42101-0005376",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 455
+      },
+      {
+        "id": "pa-42101-0005850",
+        "countyFips": "42101",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42101-county-residual",
+        "countyFips": "42101",
+        "type": "other_bucket",
+        "totalVotes": 2469
+      },
+      {
+        "id": "pa-42115-0000090",
+        "countyFips": "42115",
+        "type": "precinct",
+        "totalVotes": 752
+      },
+      {
+        "id": "pa-42129-0001680",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 1431
+      },
+      {
+        "id": "pa-42129-0001685",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 1665
+      },
+      {
+        "id": "pa-42129-0001690",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 1619
+      },
+      {
+        "id": "pa-42129-0001695",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 1593
+      },
+      {
+        "id": "pa-42129-0002850",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 754
+      },
+      {
+        "id": "pa-42129-0002855",
+        "countyFips": "42129",
+        "type": "precinct",
+        "totalVotes": 0
+      },
+      {
+        "id": "pa-42131-0000170",
+        "countyFips": "42131",
+        "type": "precinct",
+        "totalVotes": 382
+      },
+      {
+        "id": "pa-42133-0001429",
+        "countyFips": "42133",
+        "type": "precinct",
+        "totalVotes": 1919
+      }
+    ],
+    "statewideResidualVotes": 24526,
+    "statewideOffMapVotes": 125172
+  },
+  "local": [
+    {
+      "unitId": "42001000010",
+      "name": "ABBOTTSTOWN",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 48,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 744,
+        "hispanic_any_race": 83,
+        "non_hispanic_white": 639,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 21
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 744,
+        "hispanic_any_race": 83,
+        "non_hispanic_white": 639,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 21
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 507
+    },
+    {
+      "unitId": "42001000020",
+      "name": "ARENDTSVILLE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 20,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 634,
+        "hispanic_any_race": 97,
+        "non_hispanic_white": 521,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 4,
+        "non_hispanic_other": 4
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 634,
+        "hispanic_any_race": 97,
+        "non_hispanic_white": 521,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 4,
+        "non_hispanic_other": 4
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 439
+    },
+    {
+      "unitId": "42001000030",
+      "name": "BENDERSVILLE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 26,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 519,
+        "hispanic_any_race": 163,
+        "non_hispanic_white": 333,
+        "non_hispanic_black": 7,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 16
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 519,
+        "hispanic_any_race": 163,
+        "non_hispanic_white": 333,
+        "non_hispanic_black": 7,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 16
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 298
+    },
+    {
+      "unitId": "42001000040",
+      "name": "BERWICK",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 49,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1971,
+        "hispanic_any_race": 70,
+        "non_hispanic_white": 1781,
+        "non_hispanic_black": 28,
+        "non_hispanic_asian": 26,
+        "non_hispanic_other": 66
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1971,
+        "hispanic_any_race": 70,
+        "non_hispanic_white": 1781,
+        "non_hispanic_black": 28,
+        "non_hispanic_asian": 26,
+        "non_hispanic_other": 66
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1521
+    },
+    {
+      "unitId": "42001000050",
+      "name": "BIGLERVILLE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 53,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 926,
+        "hispanic_any_race": 141,
+        "non_hispanic_white": 741,
+        "non_hispanic_black": 13,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 31
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 926,
+        "hispanic_any_race": 141,
+        "non_hispanic_white": 741,
+        "non_hispanic_black": 13,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 31
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 561
+    },
+    {
+      "unitId": "42001000060",
+      "name": "BONNEAUVILLE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 26,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1334,
+        "hispanic_any_race": 50,
+        "non_hispanic_white": 1201,
+        "non_hispanic_black": 23,
+        "non_hispanic_asian": 10,
+        "non_hispanic_other": 50
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1334,
+        "hispanic_any_race": 50,
+        "non_hispanic_white": 1201,
+        "non_hispanic_black": 23,
+        "non_hispanic_asian": 10,
+        "non_hispanic_other": 50
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 883
+    },
+    {
+      "unitId": "42001000070",
+      "name": "BUTLER",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 138,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2084,
+        "hispanic_any_race": 145,
+        "non_hispanic_white": 1866,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 8,
+        "non_hispanic_other": 57
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2084,
+        "hispanic_any_race": 145,
+        "non_hispanic_white": 1866,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 8,
+        "non_hispanic_other": 57
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1456
+    },
+    {
+      "unitId": "42001000078",
+      "name": "CARROLL VALLEY DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 62,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1698,
+        "hispanic_any_race": 32,
+        "non_hispanic_white": 1580,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 74
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1698,
+        "hispanic_any_race": 32,
+        "non_hispanic_white": 1580,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 74
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1482
+    },
+    {
+      "unitId": "42001000082",
+      "name": "CARROLL VALLEY DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 64,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1456,
+        "hispanic_any_race": 30,
+        "non_hispanic_white": 1363,
+        "non_hispanic_black": 4,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 52
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1456,
+        "hispanic_any_race": 30,
+        "non_hispanic_white": 1363,
+        "non_hispanic_black": 4,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 52
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1195
+    },
+    {
+      "unitId": "42001000090",
+      "name": "CONEWAGO DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 110,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2928,
+        "hispanic_any_race": 110,
+        "non_hispanic_white": 2706,
+        "non_hispanic_black": 31,
+        "non_hispanic_asian": 18,
+        "non_hispanic_other": 63
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2928,
+        "hispanic_any_race": 110,
+        "non_hispanic_white": 2706,
+        "non_hispanic_black": 31,
+        "non_hispanic_asian": 18,
+        "non_hispanic_other": 63
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1473
+    },
+    {
+      "unitId": "42001000100",
+      "name": "CONEWAGO DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 69,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 3264,
+        "hispanic_any_race": 73,
+        "non_hispanic_white": 3047,
+        "non_hispanic_black": 46,
+        "non_hispanic_asian": 26,
+        "non_hispanic_other": 72
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 3264,
+        "hispanic_any_race": 73,
+        "non_hispanic_white": 3047,
+        "non_hispanic_black": 46,
+        "non_hispanic_asian": 26,
+        "non_hispanic_other": 72
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 2,
+        "canonicalName": 0
+      },
+      "mappedVotes": 2957
+    },
+    {
+      "unitId": "42001000110",
+      "name": "CUMBERLAND DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 47,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1701,
+        "hispanic_any_race": 113,
+        "non_hispanic_white": 1445,
+        "non_hispanic_black": 60,
+        "non_hispanic_asian": 21,
+        "non_hispanic_other": 62
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1701,
+        "hispanic_any_race": 113,
+        "non_hispanic_white": 1445,
+        "non_hispanic_black": 60,
+        "non_hispanic_asian": 21,
+        "non_hispanic_other": 62
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1345
+    },
+    {
+      "unitId": "42001000120",
+      "name": "CUMBERLAND DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 126,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1171,
+        "hispanic_any_race": 10,
+        "non_hispanic_white": 1090,
+        "non_hispanic_black": 24,
+        "non_hispanic_asian": 21,
+        "non_hispanic_other": 26
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1171,
+        "hispanic_any_race": 10,
+        "non_hispanic_white": 1090,
+        "non_hispanic_black": 24,
+        "non_hispanic_asian": 21,
+        "non_hispanic_other": 26
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 979
+    },
+    {
+      "unitId": "42001000130",
+      "name": "CUMBERLAND DISTRICT 03",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 63,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1609,
+        "hispanic_any_race": 80,
+        "non_hispanic_white": 1408,
+        "non_hispanic_black": 31,
+        "non_hispanic_asian": 37,
+        "non_hispanic_other": 53
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1609,
+        "hispanic_any_race": 80,
+        "non_hispanic_white": 1408,
+        "non_hispanic_black": 31,
+        "non_hispanic_asian": 37,
+        "non_hispanic_other": 53
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1174
+    },
+    {
+      "unitId": "42001000140",
+      "name": "CUMBERLAND DISTRICT 04",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 76,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1319,
+        "hispanic_any_race": 33,
+        "non_hispanic_white": 1194,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 36,
+        "non_hispanic_other": 30
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1319,
+        "hispanic_any_race": 33,
+        "non_hispanic_white": 1194,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 36,
+        "non_hispanic_other": 30
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1427
+    },
+    {
+      "unitId": "42001000150",
+      "name": "EAST BERLIN",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 69,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1181,
+        "hispanic_any_race": 34,
+        "non_hispanic_white": 1095,
+        "non_hispanic_black": 14,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 27
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1181,
+        "hispanic_any_race": 34,
+        "non_hispanic_white": 1095,
+        "non_hispanic_black": 14,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 27
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 883
+    },
+    {
+      "unitId": "42001000160",
+      "name": "FAIRFIELD",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 36,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 429,
+        "hispanic_any_race": 7,
+        "non_hispanic_white": 410,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 2,
+        "non_hispanic_other": 4
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 429,
+        "hispanic_any_race": 7,
+        "non_hispanic_white": 410,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 2,
+        "non_hispanic_other": 4
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 340
+    },
+    {
+      "unitId": "42001000170",
+      "name": "FRANKLIN DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 95,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1910,
+        "hispanic_any_race": 78,
+        "non_hispanic_white": 1756,
+        "non_hispanic_black": 18,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 43
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1910,
+        "hispanic_any_race": 78,
+        "non_hispanic_white": 1756,
+        "non_hispanic_black": 18,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 43
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1494
+    },
+    {
+      "unitId": "42001000180",
+      "name": "FRANKLIN DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 149,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1917,
+        "hispanic_any_race": 95,
+        "non_hispanic_white": 1726,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 67
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1917,
+        "hispanic_any_race": 95,
+        "non_hispanic_white": 1726,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 67
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1345
+    },
+    {
+      "unitId": "42001000190",
+      "name": "FREEDOM",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 66,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 702,
+        "hispanic_any_race": 6,
+        "non_hispanic_white": 675,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 5,
+        "non_hispanic_other": 8
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 702,
+        "hispanic_any_race": 6,
+        "non_hispanic_white": 675,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 5,
+        "non_hispanic_other": 8
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 594
+    },
+    {
+      "unitId": "42001000200",
+      "name": "GERMANY",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 68,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2290,
+        "hispanic_any_race": 35,
+        "non_hispanic_white": 2177,
+        "non_hispanic_black": 12,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 55
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2290,
+        "hispanic_any_race": 35,
+        "non_hispanic_white": 2177,
+        "non_hispanic_black": 12,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 55
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1870
+    },
+    {
+      "unitId": "42001000210",
+      "name": "GETTYSBURG WARD 01 PRECINCT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 90,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1854,
+        "hispanic_any_race": 174,
+        "non_hispanic_white": 1451,
+        "non_hispanic_black": 106,
+        "non_hispanic_asian": 49,
+        "non_hispanic_other": 74
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1854,
+        "hispanic_any_race": 174,
+        "non_hispanic_white": 1451,
+        "non_hispanic_black": 106,
+        "non_hispanic_asian": 49,
+        "non_hispanic_other": 74
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 980
+    },
+    {
+      "unitId": "42001000230",
+      "name": "GETTYSBURG WARD 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 72,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2993,
+        "hispanic_any_race": 261,
+        "non_hispanic_white": 2321,
+        "non_hispanic_black": 150,
+        "non_hispanic_asian": 166,
+        "non_hispanic_other": 95
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2993,
+        "hispanic_any_race": 261,
+        "non_hispanic_white": 2321,
+        "non_hispanic_black": 150,
+        "non_hispanic_asian": 166,
+        "non_hispanic_other": 95
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1288
+    },
+    {
+      "unitId": "42001000240",
+      "name": "GETTYSBURG WARD 03 PRECINCT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 78,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1339,
+        "hispanic_any_race": 186,
+        "non_hispanic_white": 996,
+        "non_hispanic_black": 79,
+        "non_hispanic_asian": 25,
+        "non_hispanic_other": 53
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1339,
+        "hispanic_any_race": 186,
+        "non_hispanic_white": 996,
+        "non_hispanic_black": 79,
+        "non_hispanic_asian": 25,
+        "non_hispanic_other": 53
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 887
+    },
+    {
+      "unitId": "42001000260",
+      "name": "HAMILTON",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 92,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2114,
+        "hispanic_any_race": 91,
+        "non_hispanic_white": 1983,
+        "non_hispanic_black": 9,
+        "non_hispanic_asian": 13,
+        "non_hispanic_other": 18
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2114,
+        "hispanic_any_race": 91,
+        "non_hispanic_white": 1983,
+        "non_hispanic_black": 9,
+        "non_hispanic_asian": 13,
+        "non_hispanic_other": 18
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1589
+    },
+    {
+      "unitId": "42001000270",
+      "name": "HAMILTONBAN",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 123,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1891,
+        "hispanic_any_race": 34,
+        "non_hispanic_white": 1786,
+        "non_hispanic_black": 7,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 53
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1891,
+        "hispanic_any_race": 34,
+        "non_hispanic_white": 1786,
+        "non_hispanic_black": 7,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 53
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1394
+    },
+    {
+      "unitId": "42001000280",
+      "name": "HIGHLAND",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 63,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 809,
+        "hispanic_any_race": 11,
+        "non_hispanic_white": 759,
+        "non_hispanic_black": 3,
+        "non_hispanic_asian": 3,
+        "non_hispanic_other": 33
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 809,
+        "hispanic_any_race": 11,
+        "non_hispanic_white": 759,
+        "non_hispanic_black": 3,
+        "non_hispanic_asian": 3,
+        "non_hispanic_other": 33
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 671
+    },
+    {
+      "unitId": "42001000290",
+      "name": "HUNTINGTON DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 138,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1849,
+        "hispanic_any_race": 124,
+        "non_hispanic_white": 1661,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 16,
+        "non_hispanic_other": 43
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1849,
+        "hispanic_any_race": 124,
+        "non_hispanic_white": 1661,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 16,
+        "non_hispanic_other": 43
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1363
+    },
+    {
+      "unitId": "42001000310",
+      "name": "LATIMORE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 127,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2069,
+        "hispanic_any_race": 69,
+        "non_hispanic_white": 1929,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 56
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2069,
+        "hispanic_any_race": 69,
+        "non_hispanic_white": 1929,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 56
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1676
+    },
+    {
+      "unitId": "42001000320",
+      "name": "LIBERTY",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 75,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1107,
+        "hispanic_any_race": 6,
+        "non_hispanic_white": 1052,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 41
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1107,
+        "hispanic_any_race": 6,
+        "non_hispanic_white": 1052,
+        "non_hispanic_black": 8,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 41
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 915
+    },
+    {
+      "unitId": "42001000330",
+      "name": "LITTLESTOWN WARD 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 54,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1875,
+        "hispanic_any_race": 53,
+        "non_hispanic_white": 1683,
+        "non_hispanic_black": 37,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 93
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1875,
+        "hispanic_any_race": 53,
+        "non_hispanic_white": 1683,
+        "non_hispanic_black": 37,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 93
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1166
+    },
+    {
+      "unitId": "42001000340",
+      "name": "LITTLESTOWN WARD 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 65,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1818,
+        "hispanic_any_race": 53,
+        "non_hispanic_white": 1682,
+        "non_hispanic_black": 18,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 56
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1818,
+        "hispanic_any_race": 53,
+        "non_hispanic_white": 1682,
+        "non_hispanic_black": 18,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 56
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1386
+    },
+    {
+      "unitId": "42001000350",
+      "name": "MCSHERRYSTOWN DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 43,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1388,
+        "hispanic_any_race": 115,
+        "non_hispanic_white": 1197,
+        "non_hispanic_black": 27,
+        "non_hispanic_asian": 14,
+        "non_hispanic_other": 35
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1388,
+        "hispanic_any_race": 115,
+        "non_hispanic_white": 1197,
+        "non_hispanic_black": 27,
+        "non_hispanic_asian": 14,
+        "non_hispanic_other": 35
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 819
+    },
+    {
+      "unitId": "42001000360",
+      "name": "MCSHERRYSTOWN DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 35,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 967,
+        "hispanic_any_race": 54,
+        "non_hispanic_white": 850,
+        "non_hispanic_black": 13,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 43
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 967,
+        "hispanic_any_race": 54,
+        "non_hispanic_white": 850,
+        "non_hispanic_black": 13,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 43
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 586
+    },
+    {
+      "unitId": "42001000370",
+      "name": "MENALLEN",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 171,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2835,
+        "hispanic_any_race": 381,
+        "non_hispanic_white": 2343,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 12,
+        "non_hispanic_other": 79
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2835,
+        "hispanic_any_race": 381,
+        "non_hispanic_white": 2343,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 12,
+        "non_hispanic_other": 79
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1987
+    },
+    {
+      "unitId": "42001000380",
+      "name": "MOUNT JOY DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 52,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1497,
+        "hispanic_any_race": 45,
+        "non_hispanic_white": 1367,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 19,
+        "non_hispanic_other": 46
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1497,
+        "hispanic_any_race": 45,
+        "non_hispanic_white": 1367,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 19,
+        "non_hispanic_other": 46
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1189
+    },
+    {
+      "unitId": "42001000385",
+      "name": "MOUNT JOY DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 88,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1614,
+        "hispanic_any_race": 39,
+        "non_hispanic_white": 1496,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 10,
+        "non_hispanic_other": 49
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1614,
+        "hispanic_any_race": 39,
+        "non_hispanic_white": 1496,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 10,
+        "non_hispanic_other": 49
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1359
+    },
+    {
+      "unitId": "42001000390",
+      "name": "MOUNT PLEASANT DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 114,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2131,
+        "hispanic_any_race": 51,
+        "non_hispanic_white": 1981,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 62
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2131,
+        "hispanic_any_race": 51,
+        "non_hispanic_white": 1981,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 11,
+        "non_hispanic_other": 62
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1621
+    },
+    {
+      "unitId": "42001000400",
+      "name": "MOUNT PLEASANT DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 80,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1599,
+        "hispanic_any_race": 212,
+        "non_hispanic_white": 1328,
+        "non_hispanic_black": 10,
+        "non_hispanic_asian": 12,
+        "non_hispanic_other": 37
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1599,
+        "hispanic_any_race": 212,
+        "non_hispanic_white": 1328,
+        "non_hispanic_black": 10,
+        "non_hispanic_asian": 12,
+        "non_hispanic_other": 37
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 966
+    },
+    {
+      "unitId": "42001000410",
+      "name": "NEW OXFORD",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 66,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1389,
+        "hispanic_any_race": 183,
+        "non_hispanic_white": 1152,
+        "non_hispanic_black": 10,
+        "non_hispanic_asian": 8,
+        "non_hispanic_other": 36
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1389,
+        "hispanic_any_race": 183,
+        "non_hispanic_white": 1152,
+        "non_hispanic_black": 10,
+        "non_hispanic_asian": 8,
+        "non_hispanic_other": 36
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 824
+    },
+    {
+      "unitId": "42001000425",
+      "name": "OXFORD DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 72,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2571,
+        "hispanic_any_race": 216,
+        "non_hispanic_white": 2271,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 28,
+        "non_hispanic_other": 36
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2571,
+        "hispanic_any_race": 216,
+        "non_hispanic_white": 2271,
+        "non_hispanic_black": 20,
+        "non_hispanic_asian": 28,
+        "non_hispanic_other": 36
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1823
+    },
+    {
+      "unitId": "42001000427",
+      "name": "OXFORD DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 56,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2225,
+        "hispanic_any_race": 101,
+        "non_hispanic_white": 2058,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 5,
+        "non_hispanic_other": 35
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2225,
+        "hispanic_any_race": 101,
+        "non_hispanic_white": 2058,
+        "non_hispanic_black": 26,
+        "non_hispanic_asian": 5,
+        "non_hispanic_other": 35
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1723
+    },
+    {
+      "unitId": "42001000432",
+      "name": "READING DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 84,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1496,
+        "hispanic_any_race": 76,
+        "non_hispanic_white": 1361,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 45
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1496,
+        "hispanic_any_race": 76,
+        "non_hispanic_white": 1361,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 45
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 0,
+        "canonicalName": 1
+      },
+      "mappedVotes": 1094
+    },
+    {
+      "unitId": "42001000434",
+      "name": "READING DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 58,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1482,
+        "hispanic_any_race": 134,
+        "non_hispanic_white": 1291,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 44
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1482,
+        "hispanic_any_race": 134,
+        "non_hispanic_white": 1291,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 7,
+        "non_hispanic_other": 44
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 0,
+        "canonicalName": 1
+      },
+      "mappedVotes": 1148
+    },
+    {
+      "unitId": "42001000436",
+      "name": "READING DISTRICT 03",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 38,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1516,
+        "hispanic_any_race": 29,
+        "non_hispanic_white": 1437,
+        "non_hispanic_black": 1,
+        "non_hispanic_asian": 6,
+        "non_hispanic_other": 43
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1516,
+        "hispanic_any_race": 29,
+        "non_hispanic_white": 1437,
+        "non_hispanic_black": 1,
+        "non_hispanic_asian": 6,
+        "non_hispanic_other": 43
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 0,
+        "canonicalName": 1
+      },
+      "mappedVotes": 1282
+    },
+    {
+      "unitId": "42001000440",
+      "name": "STRABAN DISTRICT 01",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 76,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1810,
+        "hispanic_any_race": 85,
+        "non_hispanic_white": 1636,
+        "non_hispanic_black": 36,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 38
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1810,
+        "hispanic_any_race": 85,
+        "non_hispanic_white": 1636,
+        "non_hispanic_black": 36,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 38
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1437
+    },
+    {
+      "unitId": "42001000450",
+      "name": "STRABAN DISTRICT 02",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 150,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2197,
+        "hispanic_any_race": 208,
+        "non_hispanic_white": 1803,
+        "non_hispanic_black": 94,
+        "non_hispanic_asian": 16,
+        "non_hispanic_other": 76
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2197,
+        "hispanic_any_race": 208,
+        "non_hispanic_white": 1803,
+        "non_hispanic_black": 94,
+        "non_hispanic_asian": 16,
+        "non_hispanic_other": 76
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1940
+    },
+    {
+      "unitId": "42001000460",
+      "name": "TYRONE",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 135,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 1788,
+        "hispanic_any_race": 148,
+        "non_hispanic_white": 1578,
+        "non_hispanic_black": 14,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 39
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 1788,
+        "hispanic_any_race": 148,
+        "non_hispanic_white": 1578,
+        "non_hispanic_black": 14,
+        "non_hispanic_asian": 9,
+        "non_hispanic_other": 39
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1159
+    },
+    {
+      "unitId": "42001000480",
+      "name": "UNION",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 102,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 2499,
+        "hispanic_any_race": 36,
+        "non_hispanic_white": 2356,
+        "non_hispanic_black": 9,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 83
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 2499,
+        "hispanic_any_race": 36,
+        "non_hispanic_white": 2356,
+        "non_hispanic_black": 9,
+        "non_hispanic_asian": 15,
+        "non_hispanic_other": 83
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 1934
+    },
+    {
+      "unitId": "42001000490",
+      "name": "YORK SPRINGS",
+      "status": "available",
+      "quality": "direct_block_assignment",
+      "sourceBlockCount": 22,
+      "splitBlockCount": 0,
+      "admittedProfile": {
+        "totalVotingAgePopulation": 496,
+        "hispanic_any_race": 205,
+        "non_hispanic_white": 270,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 3,
+        "non_hispanic_other": 12
+      },
+      "candidateProfile": {
+        "totalVotingAgePopulation": 496,
+        "hispanic_any_race": 205,
+        "non_hispanic_white": 270,
+        "non_hispanic_black": 6,
+        "non_hispanic_asian": 3,
+        "non_hispanic_other": 12
+      },
+      "delta": {
+        "totalVotingAgePopulation": 0,
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "groupShareDeltaPp": {
+        "hispanic_any_race": 0,
+        "non_hispanic_white": 0,
+        "non_hispanic_black": 0,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 0
+      },
+      "resultLinks": {
+        "exactIdentifier": 1,
+        "canonicalName": 0
+      },
+      "mappedVotes": 221
+    }
+  ],
+  "fingerprints": {
+    "normalizedInput": "sha256:e5607e09d96e5811f2f3740fdcd78fab2f709dfb82cbd7c4e9bdf1cfb6ccddfe",
+    "artifact": "sha256:d4885494d7582a353882ac57d504dd5e36535d51948cdaa7d4f3ceab7bb579c7",
+    "trace": "sha256:eafeaca56b6ff8b09f60b977f03db397fa19533182b9a97e166148135e36897a",
+    "bundle": "sha256:c8179739748e16b31eca412c4c6391e3f94b494bda26eafdae38f950a24ce0f4",
+    "sources": {
+      "public/data/pa/2020/vtd-demographics.json": "639341193ee9b44d25a1712d2e02979f54db41a312baa7df992db44df0e790f0",
+      "public/data/pa/2024/reporting-units.json": "88857f3dafb4fd1b3419e22cd0c1c4aba2eca662f2c080fa542429e2d3f7c106",
+      "public/data/pa/2024/precinct-geometry-manifest.json": "82224138bb6483b985bac14953e3fd4f7f6c290d6db7d2f563cdc53695bca8d7",
+      "data-sources/pennsylvania/2024-vtd-crosswalk.json": "c8875ee7b369a38a1784630c39a02d2d9817e730f52f8f403a794bff533f2109"
+    }
+  },
+  "bytes": {
+    "candidateArtifact": 22502,
+    "candidateBundleWithTrace": 2044844,
+    "normalizedInput": 7430532,
+    "normalizedInputGzip": 1320990,
+    "admittedPilotRowsWithFieldList": 4821,
+    "admittedStatewideRuntime": 874568,
+    "note": "Pilot row slice omits shared statewide metadata; candidate artifact includes metadata. Trace and geometry input are build-time evidence, not runtime payload."
+  }
+}

@@ -37,3 +37,7 @@ dev-server.err.log
 
 /outputs/
 /work/
+
+# Python data-compiler caches
+__pycache__/
+*.pyc

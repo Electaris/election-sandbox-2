@@ -1,0 +1,386 @@
+/* Hybrid Premium shell with the owner's preferred slide-up command drawer. */
+.premium-shell {
+  --canvas: #f6f5ef;
+  --surface: #fbfaf6;
+  --surface-muted: #ecefea;
+  --accent: #285a70;
+}
+
+.navigation-toggle { display: none; }
+.atlas-map-viewport { position: absolute; inset: 0; }
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] {
+  --dock-collapsed: 64px;
+  --dock-working: min(max(330px, 42dvh), calc(100dvh - 172px));
+  --dock-expanded: min(75dvh, calc(100dvh - 172px));
+  --workspace-dock-height: var(--dock-working);
+  display: grid;
+  grid-template-rows: 72px auto minmax(0, 1fr) var(--dock-collapsed);
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"][data-experience-mode="election-night"] { --dock-collapsed: 96px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"][data-dock-snap="collapsed"] { --workspace-dock-height: var(--dock-collapsed); }
+.premium-shell.application-shell[data-workspace-mode="laboratory"][data-dock-snap="expanded"] { --workspace-dock-height: var(--dock-expanded); }
+.premium-shell.application-shell[data-workspace-mode="laboratory"][data-dock-resizing="true"] {
+  --workspace-dock-height: clamp(var(--dock-collapsed), var(--workspace-dock-size), var(--dock-expanded));
+}
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .masthead {
+  height: 72px;
+  padding: 0 24px;
+  gap: 20px;
+  grid-template-columns: minmax(240px, 1fr) auto minmax(150px, 1fr);
+  background: var(--surface);
+}
+
+.premium-shell .workspace-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .map-toolbar {
+  position: static;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  transform: none;
+  pointer-events: auto;
+}
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .map-toolbar > div:first-child { display: block; }
+.premium-shell .workspace-header .breadcrumb { font-size: 22px; line-height: 1.15; }
+.premium-shell .workspace-header .overline { font-size: 10px; }
+.premium-shell .workspace-header .segmented { flex-shrink: 0; }
+.premium-shell .workspace-header .segmented button { font-size: 11px; min-height: 32px; }
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .laboratory-context {
+  position: static;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .laboratory-context > div.supported-state-links {
+  display: flex; flex-direction: row; width: auto; gap: 6px;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .laboratory-context > div.supported-state-links > span { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .laboratory-context > button { width: auto; }
+.premium-shell .workspace-header .laboratory-context > .overline,
+.premium-shell .workspace-header .laboratory-context > strong,
+.premium-shell .workspace-header .night-editorial-dek,
+.premium-shell .workspace-header .laboratory-context > button:not(.fit-selection-button):not(.share-button) { display: none; }
+.premium-shell .workspace-header .laboratory-context > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  font-size: 11px;
+}
+.premium-shell .workspace-header .laboratory-context > div span { display: grid; gap: 4px; }
+.premium-shell .workspace-header .supported-state-links > span { display: none; }
+.premium-shell .workspace-header .laboratory-context > div:has(+ .supported-state-links) { display: none; }
+.premium-shell .workspace-header button { white-space: nowrap; }
+.premium-shell .workspace-header .laboratory-context button,
+.premium-shell .inspector-toggle {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: transparent;
+  font: 11px "Libre Franklin", Arial, sans-serif;
+  text-transform: none;
+  cursor: pointer;
+}
+.premium-shell .workspace-header .laboratory-context .share-button { color: white; background: var(--accent); }
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 0;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"][data-inspector-open="false"] .workspace-layout { grid-template-columns: minmax(0, 1fr); }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .map-column {
+  position: relative;
+  inset: auto;
+  display: flex;
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 12px 16px;
+  overflow: hidden;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .map-stage {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  margin: 0;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at center, #edf0e8, #f6f5ef 75%);
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .map-stage::before { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .selected-readout {
+  position: static; inset: auto; flex: 0 0 auto; width: auto; min-height: 48px;
+  margin: 8px 0 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); box-shadow: none; transform: none;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .selected-readout > div:first-child strong { font-size: 18px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-map-scene { display: flex; flex-direction: column; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-map-viewport { position: relative; inset: auto; order: 1; min-height: 0; flex: 1; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-back-button { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-data-note {
+  position: static; display: flex; order: 0; width: auto; align-items: center; flex-wrap: wrap; gap: 6px 12px;
+  padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-data-note .overline { font-size: 9px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-data-note strong { margin: 0; font-size: 17px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-data-note p { width: 100%; order: 2; margin: 0; font-size: 10px; line-height: 1.4; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-height-switch { margin: 0 0 0 auto; padding: 0; border: 0; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-height-switch button { min-height: 30px; font-size: 10px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-county-readout {
+  position: static; order: 2; width: auto; transform: none; padding: 8px 12px;
+  border: 0; border-top: 1px solid var(--line); border-radius: 0; background: var(--surface); box-shadow: none;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-county-readout strong { display: inline; margin-left: 10px; font-size: 16px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-county-readout > div { display: inline-flex; margin-left: 12px; gap: 12px; font-size: 10px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .atlas-county-readout p { margin: 4px 0 0; font-size: 10px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .legend-row {
+  position: static;
+  inset: auto;
+  display: flex;
+  width: auto;
+  transform: none;
+  min-height: 24px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 6px 0;
+  font-size: 8px;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .causal-strip {
+  position: static;
+  display: flex;
+  min-height: 32px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  font-size: 11px;
+  transform: none;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .analysis-inspector {
+  position: static;
+  display: flex;
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  gap: 16px;
+  margin: 0;
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  scrollbar-width: thin;
+  pointer-events: auto;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .analysis-inspector[hidden] { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .analysis-inspector::after { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .analysis-inspector > section { flex: 0 0 auto; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .analysis-inspector .night-three-state-card { position: static; width: auto; }
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock {
+  position: fixed;
+  z-index: 12;
+  right: 16px;
+  bottom: 0;
+  left: 16px;
+  display: flex;
+  width: auto;
+  height: var(--workspace-dock-height);
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -12px 36px rgba(25, 58, 73, .12);
+  transition: height 220ms ease;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-toolbar {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto auto;
+  grid-template-rows: auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  flex: 0 0 auto;
+  padding: 16px 24px 10px;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-intent { min-width: 0; padding: 0; }
+.premium-shell .workspace-dock .drawer-intent strong { margin: 2px 0; font-size: 20px; }
+.premium-shell .workspace-dock .drawer-intent > button { position: static; display: block; width: fit-content; padding: 0; border: 0; background: none; color: var(--accent); font-size: 11px; cursor: pointer; }
+.premium-shell .workspace-dock .drawer-tabs,
+.premium-shell .workspace-dock .drawer-snaps { display: flex; align-items: center; min-width: 0; gap: 4px; }
+.premium-shell .workspace-dock .drawer-tabs button,
+.premium-shell .workspace-dock .drawer-snaps button { min-height: 32px; padding: 7px 10px; font-size: 11px; }
+.premium-shell .workspace-dock .drawer-position-label { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-panels { min-height: 0; flex: 1; overflow: hidden; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-panel { height: 100%; overflow: auto; padding: 16px 24px 24px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock[data-snap="collapsed"] .drawer-panels,
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock[data-snap="collapsed"] .drawer-tabs { display: none; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock[data-snap="collapsed"] .drawer-toolbar { grid-template-columns: minmax(0, 1fr) auto; min-height: 0; height: 100%; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock[data-snap="collapsed"] .drawer-intent:not(.night-dock-clock) {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px;
+}
+.premium-shell .workspace-dock[data-snap="collapsed"] .drawer-intent:not(.night-dock-clock) > .overline,
+.premium-shell .workspace-dock[data-snap="collapsed"] .drawer-intent:not(.night-dock-clock) > strong { grid-column: 1; }
+.premium-shell .workspace-dock[data-snap="collapsed"] .drawer-intent:not(.night-dock-clock) > button {
+  grid-column: 2; grid-row: 1 / 3; align-self: center; min-height: 36px; white-space: nowrap;
+}
+.premium-shell .workspace-dock .drawer-grab-handle { top: 0; height: 16px; }
+.premium-shell .workspace-dock .drawer-grab-handle span { width: 36px; height: 3px; margin-top: 4px; }
+.premium-shell .workspace-dock .drawer-empty { padding: 20px; }
+.premium-shell .workspace-dock .night-dock-clock small { font-size: 10px; }
+
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock .night-dock-toolbar,
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock[data-snap="collapsed"] .night-dock-toolbar {
+  grid-template-columns: minmax(170px, .8fr) auto minmax(160px, 1fr) auto;
+  grid-template-rows: auto auto;
+  min-height: 110px;
+  padding: 14px 24px 8px;
+  gap: 6px 16px;
+}
+.premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock[data-snap="collapsed"] .night-dock-toolbar { grid-template-rows: 1fr; min-height: 0; }
+.premium-shell .night-command-dock .night-dock-clock { grid-column: 1; grid-row: 1; }
+.premium-shell .night-command-dock .night-dock-playback { grid-column: 2; grid-row: 1; flex-wrap: wrap; }
+.premium-shell .night-command-dock .night-dock-timeline { display: grid; grid-column: 3; grid-row: 1; }
+.premium-shell .night-command-dock .drawer-snaps { grid-column: 4; grid-row: 1; }
+.premium-shell .night-command-dock .drawer-tabs { grid-column: 1 / -1; grid-row: 2; justify-content: center; }
+.premium-shell .night-command-dock .night-dock-playback button { min-height: 34px; font-size: 11px; }
+.premium-shell .night-command-dock .night-dock-playback label { font-size: 10px; }
+.premium-shell .night-command-dock .night-dock-playback select { min-height: 34px; font-size: 11px; }
+.premium-shell .night-command-dock .night-dock-timeline > span { font-size: 9px; }
+.premium-shell .night-command-dock .night-mobile-edit { display: none; }
+.premium-shell .night-command-dock .night-dock-clock strong { font-size: 18px; }
+.premium-shell .workspace-dock p { font-size: 12px; line-height: 1.6; }
+.premium-shell .workspace-dock .overline { font-size: 10px; }
+.premium-shell .workspace-dock .night-margin-timeline-chart,
+.premium-shell .workspace-dock .night-reporting-velocity-chart,
+.premium-shell .workspace-dock .night-timeline-loading { height: 180px; }
+.premium-shell.application-shell[data-workspace-mode="laboratory"] > .methodology-footer { display: none; }
+
+@media (min-width: 801px) and (max-width: 1080px) {
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .masthead { position: relative; grid-template-columns: 1fr auto; }
+  .premium-shell .build-status { display: none; }
+  .premium-shell .navigation-toggle { display: block; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  .premium-shell .primary-nav { display: none; }
+  .premium-shell .masthead[data-navigation-open="true"] .primary-nav { position: absolute; z-index: 30; top: 72px; right: 16px; display: flex; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+}
+
+@media (max-width: 1200px) {
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout { grid-template-columns: minmax(0, 1fr) 300px; }
+  .premium-shell .workspace-header { gap: 12px; padding: 12px 16px; flex-wrap: wrap; }
+  .premium-shell .workspace-header .map-toolbar { flex-basis: 55%; }
+  .premium-shell .workspace-header .supported-state-links { gap: 4px; }
+  .premium-shell .workspace-header .laboratory-context button { padding: 8px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-toolbar { gap: 8px; padding-inline: 16px; }
+  .premium-shell .workspace-dock .drawer-tabs button,
+  .premium-shell .workspace-dock .drawer-snaps button { padding: 6px 8px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock .night-dock-toolbar,
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock[data-snap="collapsed"] .night-dock-toolbar {
+    grid-template-columns: minmax(140px, .8fr) auto minmax(130px, 1fr);
+    gap: 6px 12px;
+  }
+  .premium-shell .night-command-dock .drawer-snaps { grid-column: 3; grid-row: 2; }
+  .premium-shell .night-command-dock .drawer-tabs { grid-column: 1 / 3; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"][data-experience-mode="election-night"] { --dock-collapsed: 120px; }
+}
+
+@media (max-width: 800px) {
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] {
+    --dock-working: min(48dvh, calc(100dvh - 172px));
+    --dock-expanded: min(76dvh, calc(100dvh - 172px));
+    grid-template-rows: 64px auto minmax(0, 1fr) var(--dock-collapsed);
+  }
+  .premium-shell .masthead,
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .masthead { position: relative; height: 64px; grid-template-columns: 1fr auto; padding: 0 16px; gap: 8px; }
+  .premium-shell .brand { gap: 10px; }
+  .premium-shell .brand .overline { font-size: 8px; }
+  .premium-shell .brand strong { font-size: 22px; }
+  .premium-shell .build-status { display: none; }
+  .premium-shell .navigation-toggle { display: block; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface); }
+  .premium-shell .primary-nav { display: none; }
+  .premium-shell .masthead[data-navigation-open="true"] .primary-nav { position: absolute; display: flex; z-index: 30; top: 64px; left: 12px; right: 12px; flex-direction: column; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  .premium-shell .primary-nav > * { min-height: 44px; }
+  .premium-shell .workspace-header { padding: 10px 12px; gap: 8px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-header .map-toolbar { flex-basis: 100%; min-height: 0; gap: 8px; }
+  .premium-shell .workspace-header .breadcrumb { font-size: 17px; gap: 5px; }
+  .premium-shell .workspace-header .overline { display: none; }
+  .premium-shell .workspace-header .segmented button { min-height: 36px; font-size: 10px; padding: 6px 8px; }
+  .premium-shell .workspace-header .laboratory-context { flex: 1; flex-wrap: wrap; }
+  .premium-shell .workspace-header .laboratory-context > div:not(.supported-state-links) { display: none; }
+  .premium-shell .workspace-header .supported-state-links { display: flex; flex-wrap: wrap; gap: 4px; }
+  .premium-shell .workspace-header .laboratory-context button,
+  .premium-shell .inspector-toggle { min-height: 40px; padding: 7px 8px; font-size: 10px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout,
+  .premium-shell.application-shell[data-workspace-mode="laboratory"][data-inspector-open="false"] .workspace-layout { grid-template-columns: minmax(0, 1fr); }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"][data-inspector-open="true"] .workspace-layout .map-column { display: none; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .analysis-inspector { border: 0; padding: 12px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .map-column { padding: 8px 12px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .legend-row { font-size: 7px; min-height: 20px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-layout .causal-strip { display: none; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock { right: 0; left: 0; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-toolbar,
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock[data-snap="collapsed"] .drawer-toolbar { grid-template-columns: minmax(0, 1fr) auto; padding: 14px 12px 8px; gap: 6px; }
+  .premium-shell .workspace-dock .drawer-intent strong { font-size: 16px; }
+  .premium-shell .workspace-dock[data-snap="collapsed"] .drawer-intent:not(.night-dock-clock) > strong { display: none; }
+  .premium-shell .workspace-dock[data-snap="collapsed"] .drawer-intent > .overline { font-size: 8px; }
+  .premium-shell .workspace-dock .drawer-tabs { grid-column: 1 / -1; overflow-x: auto; }
+  .premium-shell .workspace-dock .drawer-tabs button { min-height: 40px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-snaps { display: flex; grid-column: 2; grid-row: 1; }
+  .premium-shell .workspace-dock .drawer-snaps button { min-height: 40px; padding: 7px 6px; font-size: 10px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .workspace-dock .drawer-panel { padding: 12px 12px 24px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"][data-experience-mode="election-night"] { --dock-collapsed: 192px; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock .night-dock-toolbar,
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock[data-snap="collapsed"] .night-dock-toolbar { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; min-height: 0; height: auto; gap: 6px; }
+  .premium-shell .night-command-dock .night-dock-clock { grid-column: 1; grid-row: 1; }
+  .premium-shell .night-command-dock .night-dock-playback { grid-column: 1; grid-row: 2; gap: 6px; }
+  .premium-shell .night-command-dock .night-dock-timeline { grid-column: 1; grid-row: 3; }
+  .premium-shell.application-shell[data-workspace-mode="laboratory"] .night-command-dock .drawer-snaps { grid-column: 1; grid-row: 4; justify-content: flex-end; }
+  .premium-shell .night-command-dock .drawer-tabs { grid-column: 1; grid-row: 5; justify-content: flex-start; }
+  .premium-shell .night-command-dock .night-dock-playback button,
+  .premium-shell .night-command-dock .night-dock-playback select { min-height: 40px; }
+  .premium-shell .night-command-dock .drawer-snaps > button:first-child { margin-right: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-shell *, .premium-shell *::before, .premium-shell *::after { scroll-behavior: auto; transition-duration: 0s; }
+}

@@ -1,0 +1,8 @@
+# Preserve exact byte counts and hashes for retained runtime data and generated reviews.
+public/data/pa/2020/vtd-demographics.json text eol=lf
+public/data/mi/2020/precinct-demographics.json text eol=lf
+public/data/wi/2020/ward-demographics.json text eol=lf
+public/data/*/2024/precincts/*.topo.json text eol=lf
+data-sources/foundation-retention-policy.json text eol=lf
+docs/review/v0.29e-foundation-retention/*.json text eol=lf
+docs/review/v0.29e-foundation-retention/*.md text eol=lf

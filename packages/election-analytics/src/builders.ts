@@ -190,7 +190,7 @@ export function buildContributionAnalyticEnvelope(
 }
 
 export function buildElectoralConsequenceAnalyticEnvelope(
-  targetCandidate: "harris" | "trump",
+  targetCandidate: "harris" | "trump" | "stein" | "oliver" | "residual_other",
   targetElectoralDelta: number,
   context: SourceContext,
 ) {

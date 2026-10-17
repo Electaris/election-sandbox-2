@@ -1,10 +1,17 @@
 import {
   aggregateNational,
+  presidentialPlurality,
+  presidentialPluralityMargin,
+  stateElectoralVotes,
+  type PresidentialPluralityCandidate,
   type NationalPresidentialResult,
   type StatewidePresidentialResult,
 } from "../../packages/election-model/src/scenario.ts";
 
-export type MajorCandidate = "harris" | "trump";
+// Retain the historical exported name for URL and route compatibility. The
+// target can now be any named candidate represented by the scenario model.
+export type MajorCandidate = Exclude<PresidentialPluralityCandidate, "tie">;
+export type CandidateElectoralVotes = Record<MajorCandidate, number>;
 export type ElectoralThresholdStatus = "tie" | "exact-majority" | "above-majority" | "below-majority";
 
 export interface ElectoralConsequenceRow {
@@ -12,8 +19,8 @@ export interface ElectoralConsequenceRow {
   stateName: string;
   actualMargin: number;
   scenarioMargin: number;
-  actualWinner: MajorCandidate;
-  scenarioWinner: MajorCandidate;
+  actualWinner: PresidentialPluralityCandidate;
+  scenarioWinner: PresidentialPluralityCandidate;
   electoralVotes: number;
   targetElectoralDelta: number;
   winnerChanged: boolean;
@@ -31,31 +38,56 @@ export interface ElectoralConsequenceModel {
   electoralVotesToMajority: number;
   electoralVotesAboveMajority: number;
   thresholdStatus: ElectoralThresholdStatus;
+  actualCandidateElectoralVotes: CandidateElectoralVotes;
+  scenarioCandidateElectoralVotes: CandidateElectoralVotes;
   activeRows: ElectoralConsequenceRow[];
   consequentialRows: ElectoralConsequenceRow[];
 }
 
 type NamedStateResult = StatewidePresidentialResult & { name?: string };
 
-export const candidateNames: Record<MajorCandidate, string> = {
+export const candidateNames: Record<PresidentialPluralityCandidate, string> = {
   harris: "Harris",
   trump: "Trump",
+  stein: "Stein",
+  oliver: "Oliver",
+  residual_other: "Aggregate other",
+  tie: "Tie",
 };
 
 function resultMargin(result: StatewidePresidentialResult) {
-  return (result.harrisVotes - result.trumpVotes) / result.totalVotes * 100;
+  return presidentialPluralityMargin(result);
 }
 
-function winner(result: StatewidePresidentialResult): MajorCandidate {
-  return result.harrisVotes > result.trumpVotes ? "harris" : "trump";
-}
-
-function candidateElectoralVotes(result: NationalPresidentialResult, candidate: MajorCandidate) {
-  return candidate === "harris" ? result.harrisElectoralVotes : result.trumpElectoralVotes;
+function winner(result: StatewidePresidentialResult): PresidentialPluralityCandidate {
+  return presidentialPlurality(result);
 }
 
 function stateCandidateElectoralVotes(result: StatewidePresidentialResult, candidate: MajorCandidate) {
-  return candidate === "harris" ? result.harrisElectoralVotes : result.trumpElectoralVotes;
+  if (candidate === "harris") return result.harrisElectoralVotes;
+  if (candidate === "trump") return result.trumpElectoralVotes;
+  return winner(result) === candidate ? (result.otherElectoralVotes ?? 0) : 0;
+}
+
+export function electoralVotesByCandidate(
+  states: readonly StatewidePresidentialResult[],
+): CandidateElectoralVotes {
+  const totals: CandidateElectoralVotes = {
+    harris: 0,
+    trump: 0,
+    stein: 0,
+    oliver: 0,
+    residual_other: 0,
+  };
+  for (const state of states) {
+    totals.harris += state.harrisElectoralVotes;
+    totals.trump += state.trumpElectoralVotes;
+    const stateWinner = winner(state);
+    if (stateWinner !== "tie" && stateWinner !== "harris" && stateWinner !== "trump") {
+      totals[stateWinner] += state.otherElectoralVotes ?? 0;
+    }
+  }
+  return totals;
 }
 
 export function buildElectoralConsequenceModel(
@@ -66,14 +98,20 @@ export function buildElectoralConsequenceModel(
 ): ElectoralConsequenceModel {
   const actualNational = aggregateNational(actualStates);
   const scenarioNational = aggregateNational(scenarioStates);
-  const totalElectoralVotes = actualNational.harrisElectoralVotes + actualNational.trumpElectoralVotes;
-  const scenarioElectoralVotes = scenarioNational.harrisElectoralVotes + scenarioNational.trumpElectoralVotes;
+  const totalElectoralVotes = actualNational.harrisElectoralVotes
+    + actualNational.trumpElectoralVotes
+    + actualNational.otherElectoralVotes;
+  const scenarioElectoralVotes = scenarioNational.harrisElectoralVotes
+    + scenarioNational.trumpElectoralVotes
+    + scenarioNational.otherElectoralVotes;
   if (scenarioElectoralVotes !== totalElectoralVotes) {
     throw new Error("Scenario Electoral College allocation does not reconcile to the certified baseline");
   }
   const majorityThreshold = Math.floor(totalElectoralVotes / 2) + 1;
-  const targetActualElectoralVotes = candidateElectoralVotes(actualNational, targetCandidate);
-  const targetScenarioElectoralVotes = candidateElectoralVotes(scenarioNational, targetCandidate);
+  const actualCandidateElectoralVotes = electoralVotesByCandidate(actualStates);
+  const scenarioCandidateElectoralVotes = electoralVotesByCandidate(scenarioStates);
+  const targetActualElectoralVotes = actualCandidateElectoralVotes[targetCandidate];
+  const targetScenarioElectoralVotes = scenarioCandidateElectoralVotes[targetCandidate];
   const activeCodes = new Set(activeStateCodes);
   const scenarioByCode = new Map(scenarioStates.map((state) => [state.code, state]));
   const activeRows = actualStates
@@ -89,7 +127,7 @@ export function buildElectoralConsequenceModel(
         scenarioMargin: resultMargin(scenario),
         actualWinner,
         scenarioWinner,
-        electoralVotes: actual.harrisElectoralVotes + actual.trumpElectoralVotes,
+        electoralVotes: stateElectoralVotes(actual),
         targetElectoralDelta: stateCandidateElectoralVotes(scenario, targetCandidate)
           - stateCandidateElectoralVotes(actual, targetCandidate),
         winnerChanged: actualWinner !== scenarioWinner,
@@ -99,8 +137,10 @@ export function buildElectoralConsequenceModel(
       Math.abs(right.targetElectoralDelta) - Math.abs(left.targetElectoralDelta)
       || left.stateName.localeCompare(right.stateName)
     ));
-  const electoralTie = scenarioNational.harrisElectoralVotes === scenarioNational.trumpElectoralVotes
-    && scenarioNational.harrisElectoralVotes < majorityThreshold;
+  const rankedElectoralTotals = Object.values(scenarioCandidateElectoralVotes)
+    .sort((left, right) => right - left);
+  const electoralTie = rankedElectoralTotals[0] === rankedElectoralTotals[1]
+    && rankedElectoralTotals[0] < majorityThreshold;
   const thresholdStatus: ElectoralThresholdStatus = electoralTie
     ? "tie"
     : targetScenarioElectoralVotes === majorityThreshold
@@ -121,8 +161,10 @@ export function buildElectoralConsequenceModel(
     electoralVotesToMajority: Math.max(0, majorityThreshold - targetScenarioElectoralVotes),
     electoralVotesAboveMajority: Math.max(0, targetScenarioElectoralVotes - majorityThreshold),
     thresholdStatus,
+    actualCandidateElectoralVotes,
+    scenarioCandidateElectoralVotes,
     activeRows,
-    consequentialRows: activeRows.filter((row) => row.targetElectoralDelta !== 0),
+    consequentialRows: activeRows.filter((row) => row.winnerChanged),
   };
 }
 
@@ -142,6 +184,12 @@ export function electoralCausalSummary(model: ElectoralConsequenceModel) {
     return `${model.activeRows.length === 1 ? model.activeRows[0].stateName : `${model.activeRows.length} active states`} changed in the model, but no state changed its Electoral College allocation.`;
   }
   if (model.targetElectoralDelta === 0) {
+    if (model.consequentialRows.every((row) => row.targetElectoralDelta === 0)) {
+      const transfers = model.consequentialRows.map((row) => (
+        `${row.stateName}'s ${row.electoralVotes} EV move from ${candidateNames[row.actualWinner]} to ${candidateNames[row.scenarioWinner]}`
+      ));
+      return `${transfers.join("; ")}. ${targetName}'s Electoral College total is unchanged.`;
+    }
     return `${candidateNames[model.targetCandidate]}'s electoral gains and losses cancel across ${joinStateNames(model.consequentialRows)}, leaving the certified Electoral College total unchanged.`;
   }
   const direction = model.targetElectoralDelta > 0 ? "gains" : "loses";
@@ -153,7 +201,7 @@ export function electoralCausalSummary(model: ElectoralConsequenceModel) {
 export function electoralThresholdHeadline(model: ElectoralConsequenceModel) {
   const targetName = candidateNames[model.targetCandidate].toUpperCase();
   switch (model.thresholdStatus) {
-    case "tie": return `ELECTORAL COLLEGE TIE · ${model.scenarioNational.harrisElectoralVotes}-${model.scenarioNational.trumpElectoralVotes}`;
+    case "tie": return `ELECTORAL COLLEGE TIE · ${Object.values(model.scenarioCandidateElectoralVotes).sort((left, right) => right - left).slice(0, 2).join("-")}`;
     case "exact-majority": return `${targetName} REACHES ${model.majorityThreshold} · MINIMUM WINNING THRESHOLD`;
     case "above-majority": return `${targetName} HOLDS AN ELECTORAL COLLEGE MAJORITY`;
     case "below-majority": return `${model.electoralVotesToMajority} EV NEEDED FOR ${targetName}`;

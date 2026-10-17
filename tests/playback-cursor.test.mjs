@@ -67,6 +67,7 @@ async function fixture(national, pa, mi) {
     scenarioId: national.scenarioId,
     scenarioFingerprint: national.scenarioFingerprint,
     createdAt: national.createdAt,
+    scenarioEngineVersion: pa.engineVersion,
   }));
   const replay = await compileNationalReplay(endpoint, NATIONAL_REPLAY_DEFINITION);
   const context = await createReplayReducerContext(endpoint, replay);

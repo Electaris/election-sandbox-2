@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const DATA_VERSION = "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1";
-const ENGINE_VERSION = "pa-behavior-v1";
+const ENGINE_VERSION = "electaris-behavior-v2";
 const HOSTED_VISUALS = Boolean(process.env.GITHUB_ACTIONS);
 
 function scenarioPath(options: { state?: "MI" | "PA" | "WI"; preference?: number; county?: string; vtd?: string; plan?: string } = {}) {

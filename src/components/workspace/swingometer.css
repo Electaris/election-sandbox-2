@@ -1,0 +1,122 @@
+/* Swingometer controls and explanation navigation share the workspace scale. */
+.premium-shell .control-body[hidden] { display: none; }
+.premium-shell .assumption-card .card-heading { gap: 16px; }
+.premium-shell .collapse-button { min-width: var(--control-height); min-height: var(--control-height); flex-shrink: 0; }
+.premium-shell .behavior-tabs { gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 12px; }
+.premium-shell .behavior-tabs button,
+.premium-shell .contribution-view-tabs button,
+.premium-shell .contribution-tabs button,
+.premium-shell .contribution-operation-tabs button {
+  min-height: var(--control-height);
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  font-size: var(--text-label);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.premium-shell .behavior-tabs button:hover:not([aria-pressed="true"]),
+.premium-shell .contribution-navigation button:hover:not([aria-pressed="true"]),
+.premium-shell .contribution-operation-tabs button:hover:not([aria-pressed="true"]) { background: #e4eae5; color: var(--ink); }
+.premium-shell .editor-context { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.premium-shell .field-label { align-items: start; font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .field-label strong { font-size: var(--text-label); white-space: normal; }
+.premium-shell .coverage-strip { font-size: var(--text-label); line-height: 1.5; gap: 16px; }
+.premium-shell .coverage-strip strong { font-size: var(--text-label); white-space: normal; text-align: right; }
+.premium-shell .model-contract { margin: 16px 0 24px; }
+.premium-shell .model-contract-heading { grid-template-columns: auto 1fr; padding: 12px 16px; }
+.premium-shell .model-contract-heading > b { grid-column: 1 / -1; font-size: var(--text-meta); }
+.premium-shell .model-contract-grid > span { padding: 12px 16px; }
+.premium-shell .model-contract-grid small { font-size: var(--text-meta); color: var(--ink-soft); }
+.premium-shell .model-contract-grid strong,
+.premium-shell .operation-details > p { font-size: var(--text-label); line-height: 1.6; }
+.premium-shell .operation-details summary { padding: 12px 16px; cursor: pointer; font-size: var(--text-label); min-height: var(--control-height); }
+.premium-shell .operation-details > p { padding: 12px 16px; margin: 0; border-top: 1px solid var(--line); color: var(--ink-soft); }
+.premium-shell .range-labels { font-size: var(--text-meta); line-height: 1.4; gap: 8px; }
+.premium-shell .transfer-explainer { font-size: var(--text-label); line-height: 1.6; margin: 16px 0; }
+.premium-shell .reset-button { min-height: var(--control-height); font-size: var(--text-label); border-radius: var(--radius-control); }
+.premium-shell .demographic-turnout-heading strong,
+.premium-shell .demographic-preference-heading strong,
+.premium-shell .demographic-impact-heading strong { font-size: 18px; }
+.premium-shell .demographic-turnout-editor > p,
+.premium-shell .demographic-turnout-row small,
+.premium-shell .demographic-turnout-unavailable,
+.premium-shell .demographic-preference-mode,
+.premium-shell .demographic-preference-note,
+.premium-shell .demographic-impact-sequence { font-size: var(--text-label); line-height: 1.6; }
+.premium-shell .demographic-turnout-label label,
+.premium-shell .demographic-turnout-label strong { font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .demographic-turnout-row { padding: 12px; }
+.premium-shell .demographic-preference-groups button,
+.premium-shell .demographic-turnout-heading button,
+.premium-shell .demographic-preference-mode button,
+.premium-shell .demographic-impact-scope button { min-height: var(--control-height); font-size: var(--text-label); }
+.premium-shell .assumption-card select { min-height: var(--control-height); font-size: var(--text-label); }
+.premium-shell .demographic-preference-mode strong,
+.premium-shell .demographic-preference-mode span,
+.premium-shell .demographic-candidate-share > div,
+.premium-shell .demographic-candidate-share-list > p,
+.premium-shell .demographic-preference-boundary { font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .third-party-candidates button { min-height: var(--control-height); font-size: var(--text-label); }
+.premium-shell .assumption-card input[type="range"] { height: var(--control-height); margin: 8px 0; }
+.premium-shell .assumption-card .bidirectional-range input { background: transparent; border: 0; }
+.premium-shell .assumption-card .preference-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #b94d3f, #dfab77 calc(var(--zero-position) - 4%), #e9e5d8 var(--zero-position), #a9ced0 calc(var(--zero-position) + 4%), #347fa3);
+}
+.premium-shell .assumption-card .third-party-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #d5d2c6, #e9e5d8 var(--zero-position), var(--third-party-color, #63815d));
+}
+.premium-shell .assumption-card .preference-range::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #b94d3f, #dfab77 calc(var(--zero-position) - 4%), #e9e5d8 var(--zero-position), #a9ced0 calc(var(--zero-position) + 4%), #347fa3);
+}
+.premium-shell .assumption-card .third-party-range::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #d5d2c6, #e9e5d8 var(--zero-position), var(--third-party-color, #63815d));
+}
+.premium-shell .assumption-card .bidirectional-range input::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -7px; }
+.premium-shell .assumption-card .bidirectional-range input::-moz-range-thumb { width: 16px; height: 16px; }
+.premium-shell .contribution-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.premium-shell .contribution-navigation-field { min-width: 0; display: grid; align-content: start; gap: 8px; }
+.premium-shell .contribution-view-tabs,
+.premium-shell .contribution-tabs { display: grid; grid-template-columns: 1fr 1fr; margin: 0; padding: 4px; border-radius: 12px; }
+.premium-shell .contribution-operation-tabs { align-items: center; margin: 16px 0 12px; gap: 8px; }
+.premium-shell .contribution-operation-tabs > span { margin-right: 8px; }
+.premium-shell .contribution-definition,
+.premium-shell .contribution-empty,
+.premium-shell .contribution-footnote,
+.premium-shell .analytics-methodology-drawer { font-size: var(--text-label); line-height: 1.6; }
+.premium-shell .analytics-methodology-drawer summary { padding: 8px 0; min-height: var(--control-height); }
+.premium-shell .contribution-list button { padding: 12px 8px; border-radius: 8px; min-height: 60px; gap: 8px 12px; }
+.premium-shell .contribution-list button:hover,
+.premium-shell .contribution-list button[aria-current="location"] { background: #eaf0ea; }
+.premium-shell .contribution-rank { font-size: var(--text-meta); }
+.premium-shell .contribution-name strong { font-size: var(--text-body); line-height: 1.4; white-space: normal; }
+.premium-shell .contribution-name small { font-size: var(--text-meta); line-height: 1.4; color: var(--ink-soft); white-space: normal; }
+.premium-shell .contribution-value { font-size: var(--text-label); font-variant-numeric: tabular-nums; }
+.premium-shell .contribution-total { font-size: var(--text-label); }
+.premium-shell .contribution-structure-comparison header span,
+.premium-shell .contribution-structure-comparison header small,
+.premium-shell .contribution-resistance span,
+.premium-shell .contribution-resistance b,
+.premium-shell .contribution-structure-residuals { font-size: var(--text-meta); line-height: 1.5; }
+.premium-shell .contribution-resistance { min-height: var(--control-height); }
+.premium-shell .contribution-resistance strong { font-size: var(--text-label); white-space: normal; }
+.premium-shell .analytics-causal-chain span { font-size: var(--text-meta); }
+.premium-shell .analytics-causal-chain p { font-size: var(--text-label); line-height: 1.6; }
+.premium-shell .analytics-summary-copy > p,
+.premium-shell .analytics-actual-scenario-delta small,
+.premium-shell .analytics-actual-scenario-delta em { font-size: var(--text-meta); line-height: 1.5; }
+
+@media (max-width: 800px) {
+  .premium-shell .editor-context,
+  .premium-shell .contribution-navigation { grid-template-columns: 1fr; gap: 12px; }
+  .premium-shell .model-contract-heading { grid-template-columns: 1fr; }
+  .premium-shell .contribution-operation-tabs > span { flex-basis: 100%; }
+  .premium-shell .behavior-tabs button { padding: 8px 6px; }
+}

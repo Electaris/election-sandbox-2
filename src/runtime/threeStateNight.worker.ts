@@ -209,6 +209,9 @@ class ThreeStateNightRuntime {
       target = this.replay.events[this.eventIndex]?.atMs ?? this.replay.endsAtMs;
     } else if (command.type === "ADVANCE_LOGICAL_TIME") {
       if (!Number.isFinite(command.deltaMs) || command.deltaMs < 0) throw new Error("Invalid replay advance");
+      // A timer message can already be queued when PAUSE, RESET, or SEEK is handled.
+      // Only an explicit PLAY command may resume the count after those actions.
+      if (this.status !== "playing") return this.response(requestId, "UPDATE", [], [], false);
       target = Math.min(this.replay.endsAtMs, this.playheadMs + command.deltaMs);
     } else if (command.type === "SEEK_PROGRESS") {
       if (!Number.isSafeInteger(command.progressMillionths)
@@ -296,6 +299,9 @@ class ThreeStateNightRuntime {
       totalVotes: event.totalVotes,
       harrisVotes: event.harrisVotes,
       trumpVotes: event.trumpVotes,
+      steinVotes: event.steinVotes,
+      oliverVotes: event.oliverVotes,
+      residualOtherVotes: event.residualOtherVotes,
       netHarrisMarginVotes: event.harrisVotes - event.trumpVotes,
       stateMarginBeforeVotes,
       stateMarginAfterVotes: state.harris - state.trump,

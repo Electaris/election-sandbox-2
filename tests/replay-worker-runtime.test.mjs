@@ -87,6 +87,7 @@ async function certifiedEndpoint() {
     scenarioId: NATIONAL_BASELINE_REPLAY_FIXTURE.scenarioId,
     scenarioFingerprint: NATIONAL_BASELINE_REPLAY_FIXTURE.scenarioFingerprint,
     createdAt: NATIONAL_BASELINE_REPLAY_FIXTURE.createdAt,
+    scenarioEngineVersion: PENNSYLVANIA_BASELINE_REPLAY_FIXTURE.engineVersion,
   }));
 }
 

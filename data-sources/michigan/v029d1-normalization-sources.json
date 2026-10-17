@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "mi-2020-block-2024-native-normalized-diagnostic-v1",
+  "retrievedAt": "2026-09-07",
+  "scope": "Statewide Michigan native-coordinate correction audit; no runtime migration",
+  "sourceUrls": {
+    "census": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Michigan/mi2020.pl.zip",
+    "blocks": "https://www2.census.gov/geo/tiger/TIGER2020PL/STATE/26_MICHIGAN/26/tl_2020_26_tabblock20.zip",
+    "precincts": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/9",
+    "nativeQuery": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/9/query?where=1%3D1&outFields=*&outSR=3078&f=geojson&orderByFields=OBJECTID&resultRecordCount=1000&resultOffset={offset}",
+    "flintResolution": "https://cms3.revize.com/revize/flinttownship/Documents/Government/Meeting%20Agendas%20and%20Minutes/2024/Agendas/2024-01-18%20Election%20Commission%20-%20Full%20Agenda-1649.pdf"
+  },
+  "files": {
+    "work/mi-2024-source/mi2020.pl.zip": "971bd53abeb1d905bb9b09bfe4dc1afe8514a916f24d285b289e0f66ec5cfb62",
+    "work/mi-2024-source/pl94/migeo2020.pl": "9d19835294d8d7b445bd19d98cde9bf730896eea901e26620415f20dbd7f2347",
+    "work/mi-2024-source/pl94/mi000022020.pl": "0f1be71ee174c89227d7b9d62ff79064384f01a2d90fc690f2a0e9c74322fc4e",
+    "work/mi-2024-source/mi-2024-precincts.geojson": "bbc331967ac5e2e1293e581bcdd9c0fa7c5c556faa1b6caaa5d984720be90c4b",
+    "work/v029d/tl_2020_26_tabblock20.zip": "047ed7d25f944bccc23cb03ffb7b816efbd6a02a936ede8c2edcdae6a5d17674",
+    "work/v029d/blocks/tl_2020_26_tabblock20.shp": "fff2201e7458fcbf9324ce9a190d3c1c9d43049bc11ac86758f0192826393d88",
+    "work/v029d/blocks/tl_2020_26_tabblock20.dbf": "ba4435fc8d315a374a55f8bd63b7cc57d78961dbb1ffcd7f249f0607558327bf",
+    "work/v029d/blocks/tl_2020_26_tabblock20.prj": "0b9041e921d9ebb43247d314608fe9e38a0b008ee793067fc1806199ea1fb9dd",
+    "public/data/mi/2020/precinct-demographics.json": "2072a732924b5b6dec8da1822bfc8e4eb042e0c3fa22a411eed8d790ae5151e0",
+    "public/data/mi/2024/reporting-units.json": "0270c0a35636d1bf6cccb8a5e20c27dbdb40a318dd8390f9ea1d68ca70acca19",
+    "public/data/mi/2024/precinct-geometry-manifest.json": "ae6c16a25631bb0ca56f1846ce2b2680bfd20562c36405a8d4cf78334091e86c",
+    "data-sources/michigan/2024-precinct-crosswalk.json": "db3b8581209de40412d57a5ba0bded9237371024f6b8491f514f296b54754366",
+    "work/v029d1/native-0000.geojson": "2db6084aada717dafe7666fb124f7d681f7da10bdef32081f37f746498e2d495",
+    "work/v029d1/native-1000.geojson": "8af999da03b98e6771468cdb8d0da1c1f1a40fe54f970fbd93684b5ce401fc6a",
+    "work/v029d1/native-2000.geojson": "5353b532564cd6a1b859624a84bc845e20b1ac6f991e24576b9c15e8381b808a",
+    "work/v029d1/native-3000.geojson": "ec10dd20cff369d50ad2818b421d809d1a3f0190dc880205fa2f774be5065c74",
+    "work/v029d1/native-4000.geojson": "f7f726d4e1b166bde85370eda4fa7d5acafec47e0920d9630d51a463c2e34a9b",
+    "work/v029d1/official-layer.json": "fae33e7544338a750f30ae0e196bfeb6acf39324e2ee78717433f9eb3a0a0120",
+    "work/v029d1/flint-resolution.pdf": "9ab79b79aa60a46989aa6d83c0924985244594dc2001fbb894e9a967b49ce1b6",
+    "work/v029d1/sturgis-true-curves.json": "9461ad504e7cb1ebc5331f60bd72a7608b79a43ab08359247c925093b6c6354f",
+    "docs/review/v0.29d-michigan-comparison/candidate.json": "ed2c94740c25468bd72d404bfa450b81f6f3652f76bf9a0de5080c1135ccee13"
+  },
+  "nativePages": [
+    "work/v029d1/native-0000.geojson",
+    "work/v029d1/native-1000.geojson",
+    "work/v029d1/native-2000.geojson",
+    "work/v029d1/native-3000.geojson",
+    "work/v029d1/native-4000.geojson"
+  ],
+  "layerMetadata": "work/v029d1/official-layer.json",
+  "flintEffectiveCycleReview": {
+    "unitId": "WP-049-29020-00002",
+    "sourceElectionYear": 2023,
+    "effectiveElectionYear": 2024,
+    "sourcePropertiesSha256": "50bc26ace20022a6251637bdffbe542b6d0a4a818f486d04f2b0d0f4b0ee8631",
+    "evidenceFile": "work/v029d1/flint-resolution.pdf",
+    "packetPages": [
+      3,
+      4
+    ],
+    "resolution": "3091",
+    "approvedDate": "2023-12-07",
+    "effectiveMonth": "2024-02",
+    "interpretation": "2024 effective cycle inferred from the statewide 2024 layer context and approved township resolution. The raw ELECTIONYE=2023 attribute is preserved. This is not independent boundary certification."
+  },
+  "blockProjectionPipeline": "+proj=pipeline +step +proj=unitconvert +xy_in=deg +xy_out=rad +step +proj=omerc +no_uoff +lat_0=45.3091666666667 +lonc=-86 +alpha=337.25556 +gamma=337.25556 +k=0.9996 +x_0=2546731.496 +y_0=-4354009.816 +ellps=GRS80"
+}

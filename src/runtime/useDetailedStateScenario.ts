@@ -3,6 +3,8 @@ import type {
   BehaviorScenarioResult,
   BehaviorScenarioSettings,
 } from "../../packages/election-model/src/scenario.ts";
+import { DEMOGRAPHIC_PREFERENCE_CANDIDATES } from "../../packages/election-model/src/scenario.ts";
+import { DEMOGRAPHIC_GROUP_IDS } from "../../packages/data-contracts/src/demographicEvidence.ts";
 import {
   resolveDetailedStateArtifactUrl,
   type DetailedStateCode,
@@ -30,6 +32,15 @@ function settingsSignature(settings: BehaviorScenarioSettings) {
   return [
     settings.turnoutIncreasePoints,
     settings.addedVoterHarrisShare,
+    ...DEMOGRAPHIC_GROUP_IDS.map(
+      (groupId) => settings.demographicTurnoutIncreasePoints?.[groupId] ?? 0,
+    ),
+    ...DEMOGRAPHIC_GROUP_IDS.flatMap((groupId) => {
+      const shares = settings.demographicCandidateShares?.[groupId];
+      return shares == null
+        ? ["inherit"]
+        : DEMOGRAPHIC_PREFERENCE_CANDIDATES.map((candidate) => String(shares[candidate]));
+    }),
     settings.preferenceShiftPoints,
     settings.thirdPartyCandidate,
     settings.thirdPartyShiftPoints,

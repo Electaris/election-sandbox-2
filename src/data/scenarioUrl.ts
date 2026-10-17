@@ -1,5 +1,9 @@
 import type { ThirdPartyCandidate } from "../../packages/election-model/src/scenario.ts";
 import {
+  DEMOGRAPHIC_GROUP_IDS,
+  type DemographicGroupId,
+} from "../../packages/data-contracts/src/demographicEvidence.ts";
+import {
   getDetailedStateManifest,
   isDetailedStateCode,
   pennsylvaniaDetailedStateManifest,
@@ -7,7 +11,10 @@ import {
 } from "./detailedStateManifest.ts";
 import {
   createStateScenarioRecipe,
+  DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES,
+  DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS,
   DEFAULT_STATE_BEHAVIOR_SETTINGS,
+  type DemographicCandidateSharePercentVector,
   type StateBehaviorRecipeSettings,
   type StateScenarioRecipe,
 } from "./scenarioPortfolio.ts";
@@ -15,7 +22,9 @@ import type { MajorCandidate } from "./electoralConsequences.ts";
 import type { RouteMetric } from "./pathTo270.ts";
 
 export const LEGACY_SCENARIO_URL_SCHEMA_VERSION = "1";
-export const SCENARIO_URL_SCHEMA_VERSION = "2";
+export const PREVIOUS_PORTFOLIO_SCENARIO_URL_SCHEMA_VERSION = "2";
+export const DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION = "3";
+export const SCENARIO_URL_SCHEMA_VERSION = "4";
 export const SCENARIO_DATA_VERSION = pennsylvaniaDetailedStateManifest.compatibility.dataVersion;
 export const SCENARIO_ENGINE_VERSION = pennsylvaniaDetailedStateManifest.compatibility.engineVersion;
 
@@ -29,6 +38,11 @@ export interface ScenarioUrlState {
   selectedRouteStateCodes: string[];
   turnoutIncreasePoints: number;
   addedVoterHarrisShare: number;
+  demographicTurnoutIncreasePoints: Record<DemographicGroupId, number>;
+  demographicCandidateShares: Record<
+    DemographicGroupId,
+    DemographicCandidateSharePercentVector | null
+  >;
   preferenceShiftPoints: number;
   thirdPartyCandidate: ThirdPartyCandidate;
   thirdPartyShiftPoints: number;
@@ -62,6 +76,8 @@ export const DEFAULT_SCENARIO_URL_STATE: Readonly<ScenarioUrlState> = Object.fre
   selectedRouteStateCodes: [],
   turnoutIncreasePoints: 0,
   addedVoterHarrisShare: 55,
+  demographicTurnoutIncreasePoints: { ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS },
+  demographicCandidateShares: { ...DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES },
   preferenceShiftPoints: 0,
   thirdPartyCandidate: "stein",
   thirdPartyShiftPoints: 0,
@@ -107,7 +123,12 @@ const scenarioParameterNames = [
 class InvalidScenarioUrlError extends Error {}
 
 function defaultState(): ScenarioUrlState {
-  return { ...DEFAULT_SCENARIO_URL_STATE, selectedRouteStateCodes: [] };
+  return {
+    ...DEFAULT_SCENARIO_URL_STATE,
+    selectedRouteStateCodes: [],
+    demographicTurnoutIncreasePoints: { ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS },
+    demographicCandidateShares: { ...DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES },
+  };
 }
 
 function parseSelectedRouteStateCodes(params: URLSearchParams) {
@@ -232,12 +253,19 @@ function validateGeography(params: URLSearchParams) {
   };
 }
 
-function decodePortfolioRecipes(params: URLSearchParams) {
+function decodePortfolioRecipes(params: URLSearchParams, schemaVersion: string) {
   const recipes: StateScenarioRecipe[] = [];
   const seen = new Set<string>();
   for (const encoded of params.getAll("recipe")) {
     const fields = encoded.split("|");
-    if (fields.length !== 9) throw new InvalidScenarioUrlError("recipe field contract is malformed");
+    const expectedLength = schemaVersion === SCENARIO_URL_SCHEMA_VERSION
+      ? 11
+      : schemaVersion === DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION
+        ? 10
+        : 9;
+    if (fields.length !== expectedLength) {
+      throw new InvalidScenarioUrlError("recipe field contract is malformed");
+    }
     const [stateCode, electionId, dataVersion, engineVersion] = fields;
     if (!isDetailedStateCode(stateCode)) throw new InvalidScenarioUrlError("recipe state is unsupported");
     if (seen.has(stateCode)) throw new InvalidScenarioUrlError(`recipe ${stateCode} appears more than once`);
@@ -254,14 +282,80 @@ function decodePortfolioRecipes(params: URLSearchParams) {
     if (!(["stein", "oliver", "residual_other"] as string[]).includes(candidate)) {
       throw new InvalidScenarioUrlError(`${stateCode} recipe third-party candidate is not recognized`);
     }
+    const hasDemographicTurnout = schemaVersion === SCENARIO_URL_SCHEMA_VERSION
+      || schemaVersion === DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION;
+    const demographicFields = hasDemographicTurnout
+      ? fields[9].split(",")
+      : [];
+    if (hasDemographicTurnout
+      && demographicFields.length !== DEMOGRAPHIC_GROUP_IDS.length) {
+      throw new InvalidScenarioUrlError(`${stateCode} demographic turnout contract is malformed`);
+    }
+    const preferenceFields = schemaVersion === SCENARIO_URL_SCHEMA_VERSION
+      ? fields[10].split(";")
+      : [];
+    if (schemaVersion === SCENARIO_URL_SCHEMA_VERSION
+      && preferenceFields.length !== DEMOGRAPHIC_GROUP_IDS.length) {
+      throw new InvalidScenarioUrlError(`${stateCode} demographic preference contract is malformed`);
+    }
+    const decodedCandidateShares = Object.fromEntries(DEMOGRAPHIC_GROUP_IDS.map((groupId, index) => {
+      const encodedPreference = preferenceFields[index];
+      if (schemaVersion !== SCENARIO_URL_SCHEMA_VERSION || encodedPreference === "inherit") {
+        return [groupId, null];
+      }
+      const candidateFields = encodedPreference?.split(",") ?? [];
+      if (candidateFields.length !== 5) {
+        throw new InvalidScenarioUrlError(`${stateCode} ${groupId} candidate shares are malformed`);
+      }
+      const values = candidateFields.map((field, candidateIndex) => parseRawNumber(
+        field,
+        `${stateCode} ${groupId} candidate share ${candidateIndex + 1}`,
+        0,
+        100,
+        true,
+      ));
+      if (Math.abs(values.reduce((sum, value) => sum + value, 0) - 100) > 1e-9) {
+        throw new InvalidScenarioUrlError(`${stateCode} ${groupId} candidate shares do not sum to 100`);
+      }
+      return [groupId, {
+        harris: values[0],
+        trump: values[1],
+        stein: values[2],
+        oliver: values[3],
+        residualOther: values[4],
+      } satisfies DemographicCandidateSharePercentVector];
+    })) as Record<DemographicGroupId, DemographicCandidateSharePercentVector | null>;
     const settings: StateBehaviorRecipeSettings = {
       turnoutIncreasePoints: parseRawNumber(fields[4], `${stateCode} turnout`, 0, 1.5),
       addedVoterHarrisShare: parseRawNumber(fields[5], `${stateCode} turnout Harris share`, 0, 100, true),
+      demographicTurnoutIncreasePoints: hasDemographicTurnout
+        ? Object.fromEntries(DEMOGRAPHIC_GROUP_IDS.map((groupId, index) => [
+            groupId,
+            parseRawNumber(
+              demographicFields[index] ?? "",
+              `${stateCode} ${groupId} turnout`,
+              0,
+              100,
+            ),
+          ])) as Record<DemographicGroupId, number>
+        : { ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS },
+      demographicCandidateShares: decodedCandidateShares,
       preferenceShiftPoints: parseRawNumber(fields[7], `${stateCode} preference`, -200, 200),
       thirdPartyCandidate: candidate as ThirdPartyCandidate,
       thirdPartyShiftPoints: parseRawNumber(fields[8].split(",")[0], `${stateCode} third-party shift`, -100, 100),
       thirdPartyHarrisExchangeShare: parseRawNumber(fields[8].split(",")[1] ?? "", `${stateCode} third-party Harris share`, 0, 100, true),
     };
+    if (
+      stateCode === "WI"
+      && DEMOGRAPHIC_GROUP_IDS.some((groupId) => (
+        settings.demographicTurnoutIncreasePoints[groupId] !== 0
+        || settings.demographicCandidateShares[groupId] != null
+      ))
+    ) {
+      throw new InvalidScenarioUrlError(
+        "WI demographic turnout is unavailable because no approved group-composition foundation exists",
+      );
+    }
     recipes.push(createStateScenarioRecipe(stateCode, settings));
   }
   return recipes.sort((left, right) => left.stateCode.localeCompare(right.stateCode));
@@ -269,6 +363,10 @@ function decodePortfolioRecipes(params: URLSearchParams) {
 
 function encodePortfolioRecipe(recipe: StateScenarioRecipe) {
   const settings = recipe.settings;
+  const demographicSettings = settings.demographicTurnoutIncreasePoints
+    ?? DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS;
+  const demographicCandidateShares = settings.demographicCandidateShares
+    ?? DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES;
   return [
     recipe.stateCode,
     recipe.electionId,
@@ -279,6 +377,17 @@ function encodePortfolioRecipe(recipe: StateScenarioRecipe) {
     settings.thirdPartyCandidate,
     canonicalNumber(settings.preferenceShiftPoints),
     `${canonicalNumber(settings.thirdPartyShiftPoints)},${canonicalNumber(settings.thirdPartyHarrisExchangeShare)}`,
+    DEMOGRAPHIC_GROUP_IDS.map(
+      (groupId) => canonicalNumber(demographicSettings[groupId]),
+    ).join(","),
+    DEMOGRAPHIC_GROUP_IDS.map((groupId) => {
+      const shares = demographicCandidateShares[groupId];
+      return shares == null
+        ? "inherit"
+        : [shares.harris, shares.trump, shares.stein, shares.oliver, shares.residualOther]
+          .map(canonicalNumber)
+          .join(",");
+    }).join(";"),
   ].join("|");
 }
 
@@ -326,6 +435,8 @@ export function decodeScenarioSearch(search: string): ScenarioUrlLoadResult {
   const schemaVersion = params.get("scenario");
   if (
     schemaVersion !== LEGACY_SCENARIO_URL_SCHEMA_VERSION
+    && schemaVersion !== PREVIOUS_PORTFOLIO_SCENARIO_URL_SCHEMA_VERSION
+    && schemaVersion !== DEMOGRAPHIC_TURNOUT_SCENARIO_URL_SCHEMA_VERSION
     && schemaVersion !== SCENARIO_URL_SCHEMA_VERSION
   ) {
     return {
@@ -353,8 +464,8 @@ export function decodeScenarioSearch(search: string): ScenarioUrlLoadResult {
 
   try {
     const geography = validateGeography(params);
-    if (schemaVersion === SCENARIO_URL_SCHEMA_VERSION) {
-      const portfolioRecipes = decodePortfolioRecipes(params);
+    if (schemaVersion !== LEGACY_SCENARIO_URL_SCHEMA_VERSION) {
+      const portfolioRecipes = decodePortfolioRecipes(params, schemaVersion);
       const activeRaw = params.get("activeState")
         ?? (geography.selectedStateCode && isDetailedStateCode(geography.selectedStateCode)
           ? geography.selectedStateCode
@@ -368,7 +479,12 @@ export function decodeScenarioSearch(search: string): ScenarioUrlLoadResult {
         status: "valid",
         state: {
           ...settings,
-          targetCandidate: parseChoice(params, "target", ["harris", "trump"] as const, "harris"),
+          targetCandidate: parseChoice(
+            params,
+            "target",
+            ["harris", "trump", "stein", "oliver", "residual_other"] as const,
+            "harris",
+          ),
           routeMetric: parseChoice(params, "route", ["fewest-states", "margin-movement", "margin-votes"] as const, "fewest-states"),
           selectedRouteStateCodes: parseSelectedRouteStateCodes(params),
           viewMode: parseChoice(params, "view", ["actual", "scenario", "difference"] as const, "scenario"),
@@ -389,6 +505,8 @@ export function decodeScenarioSearch(search: string): ScenarioUrlLoadResult {
         selectedRouteStateCodes: [],
         turnoutIncreasePoints: parseNumber(params, "turnout", 0, 0, 1.5),
         addedVoterHarrisShare: parseNumber(params, "turnoutHarris", 55, 0, 100, true),
+        demographicTurnoutIncreasePoints: { ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS },
+        demographicCandidateShares: { ...DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES },
         preferenceShiftPoints: parseNumber(params, "preference", 0, -200, 200),
         thirdPartyCandidate: parseChoice(
           params,

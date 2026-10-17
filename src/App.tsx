@@ -8,15 +8,27 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   aggregateNational,
+  DEMOGRAPHIC_PREFERENCE_CANDIDATES,
+  electoralAllocationForResult,
   preferenceShiftBounds,
   type BehaviorScenarioUnit,
+  type DemographicPreferenceCandidate,
+  type PresidentialPluralityCandidate,
   type StatewidePresidentialResult,
   type ThirdPartyCandidate,
 } from "../packages/election-model/src/scenario.ts";
+import {
+  DEMOGRAPHIC_GROUP_IDS,
+  type DemographicGroupId,
+} from "../packages/data-contracts/src/demographicEvidence.ts";
+import { AppShell, AnalysisInspector, WorkspaceHeader, WorkspaceLayout } from "./components/workspace/AppShell";
+import { HomeIntroduction, HomeBaseline, HomeSections } from "./components/home/EditorialHome";
+import { GlobalHeader } from "./components/workspace/GlobalHeader";
+import { WorkspaceDock } from "./components/workspace/WorkspaceDock";
+import { useWorkspaceDock } from "./components/workspace/useWorkspaceDock";
 import { GeographyInspector } from "./components/GeographyInspector.tsx";
 import {
   buildDetailedScenarioCounties,
@@ -39,6 +51,7 @@ import {
   buildDetailedGeographyInspector,
 } from "./data/detailedStateInspector.ts";
 import { isPennsylvaniaFoundation, isWisconsinFoundation } from "./data/detailedStateFoundation.ts";
+import { buildDetailedStateDemographicEvidenceContract } from "./data/demographicEvidence.ts";
 import {
   buildScenarioUrl,
   decodeScenarioSearch,
@@ -56,6 +69,8 @@ import { states2024 } from "./data/states.ts";
 import { useDetailedStateScenario } from "./runtime/useDetailedStateScenario.ts";
 import {
   createStateScenarioRecipe,
+  DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES,
+  DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS,
   DEFAULT_STATE_BEHAVIOR_SETTINGS,
   isDefaultStateBehaviorSettings,
   recipesAsRecord,
@@ -63,6 +78,7 @@ import {
   summaryAsStateResult,
   type StateBehaviorRecipeSettings,
   type StateScenarioRecipe,
+  type DemographicCandidateSharePercentVector,
 } from "./data/scenarioPortfolio.ts";
 import { useScenarioPortfolio } from "./runtime/useScenarioPortfolio.ts";
 import { useReplayExperience } from "./runtime/useReplayExperience.ts";
@@ -100,7 +116,20 @@ import {
   rankScenarioDeltaRows,
 } from "../packages/election-analytics/src/scenarioDeltaLedger.ts";
 import { buildScenarioExplanation } from "../packages/election-analytics/src/scenarioExplanation.ts";
-import type { ScenarioDeltaOperationId } from "../packages/election-analytics/src/scenarioDeltaContracts.ts";
+import {
+  buildScenarioContributionComparison,
+  type ContributionStructureCandidate,
+  type ContributionStructureRow,
+} from "../packages/election-analytics/src/scenarioContributionComparison.ts";
+import type {
+  ScenarioDeltaOperationId,
+  ScenarioVoteDelta,
+} from "../packages/election-analytics/src/scenarioDeltaContracts.ts";
+import {
+  atlasPlurality,
+  atlasPluralityMargin,
+  type AtlasCandidateResult,
+} from "./map/atlasPalette.ts";
 
 installRuntimeDiagnosticsHook();
 
@@ -114,9 +143,25 @@ type LaboratoryDrawerTab = "behavior" | "contributors" | "inspector" | "assumpti
 type NightDockTab = "live" | "timeline" | "direct" | "returns" | "method";
 type NightAnalyticalLens = "margin" | "velocity" | "compare";
 type ContributionOperation = "all" | ScenarioDeltaOperationId;
+type ContributionView = "movement" | "structure";
 
 const laboratoryDrawerTabs: LaboratoryDrawerTab[] = ["behavior", "contributors", "inspector", "assumptions", "data"];
 const nightDockTabs: readonly NightDockTab[] = ["live", "timeline", "direct", "returns", "method"];
+const demographicGroupLabels: Record<DemographicGroupId, string> = {
+  hispanic_any_race: "Hispanic, any race",
+  non_hispanic_white: "Non-Hispanic White",
+  non_hispanic_black: "Non-Hispanic Black",
+  non_hispanic_asian: "Non-Hispanic Asian",
+  non_hispanic_other: "Non-Hispanic Other",
+};
+
+const demographicPreferenceCandidateLabels: Record<DemographicPreferenceCandidate, string> = {
+  harris: "Harris",
+  trump: "Trump",
+  stein: "Stein",
+  oliver: "Oliver",
+  residualOther: "Other/write-in",
+};
 
 interface ContributionRow {
   id: string;
@@ -169,6 +214,11 @@ function formatCompact(value: number) {
   return compactFormat.format(value);
 }
 
+function formatSignedCompact(value: number) {
+  if (value === 0) return "0";
+  return `${value > 0 ? "+" : "−"}${formatCompact(Math.abs(value))}`;
+}
+
 function margin(result: Pick<StatewidePresidentialResult, "harrisVotes" | "trumpVotes" | "totalVotes">) {
   return ((result.harrisVotes - result.trumpVotes) / result.totalVotes) * 100;
 }
@@ -180,23 +230,92 @@ function replayCandidateVotes(
   return value?.candidateVotes.find((candidate) => candidate.candidateId === candidateId)?.votes ?? 0;
 }
 
+function candidateVectorResult(
+  value: { candidateVotes: readonly { candidateId: string; votes: number }[]; totalVotes?: number; ballotsPublished?: number } | null | undefined,
+): AtlasCandidateResult | undefined {
+  const totalVotes = value?.totalVotes ?? value?.ballotsPublished ?? 0;
+  if (!value || totalVotes <= 0) return undefined;
+  return {
+    harrisVotes: replayCandidateVotes(value, "harris"),
+    trumpVotes: replayCandidateVotes(value, "trump"),
+    steinVotes: replayCandidateVotes(value, "stein"),
+    oliverVotes: replayCandidateVotes(value, "oliver"),
+    residualOtherVotes: replayCandidateVotes(value, "other-residual")
+      || replayCandidateVotes(value, "other"),
+    totalVotes,
+  };
+}
+
+function describePluralityPath(
+  value: { candidateVotes: readonly { candidateId: string; votes: number }[]; totalReportedVotes: number } | null | undefined,
+  modeledOutstandingBallots: number | null | undefined,
+) {
+  if (!value || value.totalReportedVotes === 0) return "Awaiting count";
+  if (modeledOutstandingBallots == null) return "Outstanding ballots unavailable";
+  if (modeledOutstandingBallots === 0) return "Count complete";
+  const ranked = [...value.candidateVotes].sort((left, right) => (
+    right.votes - left.votes || left.candidateId.localeCompare(right.candidateId)
+  ));
+  const lead = (ranked[0]?.votes ?? 0) - (ranked[1]?.votes ?? 0);
+  return lead > modeledOutstandingBallots
+    ? "Plurality path exhausted"
+    : `${formatCompact(modeledOutstandingBallots)} modeled ballots remain`;
+}
+
 function describeReturnMovement(value: NightCurrentReturn) {
+  const returnResult: AtlasCandidateResult = {
+    harrisVotes: value.harrisVotes,
+    trumpVotes: value.trumpVotes,
+    steinVotes: value.steinVotes,
+    oliverVotes: value.oliverVotes,
+    residualOtherVotes: value.residualOtherVotes,
+    totalVotes: value.totalVotes,
+  };
+  return `${formatResultLead(returnResult)} in this return`;
+}
+
+function describeHarrisTrumpReturnMovement(value: NightCurrentReturn) {
   const movement = value.netHarrisMarginVotes;
-  if (movement === 0) return "No two-party margin change";
+  if (movement === 0) return "H-T margin unchanged";
   const candidate = movement > 0 ? "Harris" : "Trump";
   const amount = formatCompact(Math.abs(movement));
   const before = value.stateMarginBeforeVotes;
   const after = value.stateMarginAfterVotes;
   if (before !== 0 && Math.sign(before) !== Math.sign(after)) {
-    return `${candidate} takes the ${value.jurisdictionId} lead by ${formatCompact(Math.abs(after))}`;
+    return `${candidate} takes the ${value.jurisdictionId} H-T lead by ${formatCompact(Math.abs(after))}`;
   }
-  if (after === 0) return `${value.jurisdictionId} moves to an exact tie`;
-  return `Net ${amount} toward ${candidate}`;
+  if (after === 0) return `${value.jurisdictionId} H-T margin reaches an exact tie`;
+  return `H-T net ${amount} toward ${candidate}`;
 }
 
 function formatMargin(value: number) {
-  if (Math.abs(value) < 0.005) return "EVEN";
+  if (Math.abs(value) < 0.05) return "EVEN";
   return `${value > 0 ? "D" : "R"} +${Math.abs(value).toFixed(1)}`;
+}
+
+function formatPluralityMargin(winner: PresidentialPluralityCandidate, value: number) {
+  if (winner === "tie" || Math.abs(value) < 0.05) return "EVEN";
+  if (winner === "harris") return `D +${value.toFixed(1)}`;
+  if (winner === "trump") return `R +${value.toFixed(1)}`;
+  return `${candidateNames[winner]} +${value.toFixed(1)}`;
+}
+
+function formatResultLead(result: AtlasCandidateResult | undefined, allowThirdParty = true) {
+  if (!result || result.totalVotes <= 0) return "NO RETURN";
+  if (!allowThirdParty) return formatMargin(margin(result));
+  const plurality = atlasPlurality(result);
+  if (plurality === "TIE") return "EVEN";
+  const lead = atlasPluralityMargin(result);
+  if (lead < 0.05) return "EVEN";
+  if (plurality === "DEM" || plurality === "GOP") {
+    return `${plurality === "DEM" ? "D" : "R"} +${lead.toFixed(1)}`;
+  }
+  const label = plurality === "GRN"
+    ? "Stein"
+    : plurality === "LIB"
+      ? "Oliver"
+      : "Aggregate other";
+  return `${label} +${lead.toFixed(1)}`;
 }
 
 function formatPreferenceMovement(value: number) {
@@ -209,10 +328,51 @@ function formatMarginVotes(value: number) {
   return `+${formatCompact(Math.abs(value))} ${value > 0 ? "D" : "R"}`;
 }
 
+type ContributionPluralityCandidate = "stein" | "oliver" | "residual_other";
+
+function candidateDeltaVotes(delta: ScenarioVoteDelta, candidate: ContributionPluralityCandidate) {
+  if (candidate === "stein") return delta.steinVotes;
+  if (candidate === "oliver") return delta.oliverVotes;
+  return delta.residualOtherVotes;
+}
+
+function formatCandidateVoteDelta(value: number, candidate: ContributionPluralityCandidate) {
+  if (value === 0) return "No movement";
+  return `${value > 0 ? "+" : "−"}${formatCompact(Math.abs(value))} ${candidateNames[candidate]}`;
+}
+
 function electoralDeltaClass(value: number, target: MajorCandidate) {
   if (value === 0) return "";
-  const movesTowardHarris = target === "harris" ? value > 0 : value < 0;
-  return movesTowardHarris ? "toward-dem" : "toward-rep";
+  if (value < 0) return "away-target";
+  if (target === "harris") return "toward-dem";
+  if (target === "trump") return "toward-rep";
+  return "toward-other";
+}
+
+const electoralTargetCandidates: readonly MajorCandidate[] = [
+  "harris",
+  "trump",
+  "stein",
+  "oliver",
+  "residual_other",
+];
+
+function candidateScoreClass(candidate: MajorCandidate) {
+  if (candidate === "harris") return "dem-text";
+  if (candidate === "trump") return "rep-text";
+  return `candidate-${candidate.replace("residual_other", "other")}-text`;
+}
+
+function contributionCandidateClass(candidate: ContributionStructureCandidate) {
+  if (candidate === "harris") return "democratic";
+  if (candidate === "trump") return "republican";
+  if (candidate === "tie") return "none";
+  return "third-party";
+}
+
+function formatTargetMargin(candidate: MajorCandidate, value: number) {
+  if (Math.abs(value) < 0.05) return "EVEN";
+  return `${candidateNames[candidate]} ${value > 0 ? "+" : "−"}${Math.abs(value).toFixed(1)}`;
 }
 
 const thirdPartyLabels: Record<ThirdPartyCandidate, string> = {
@@ -242,6 +402,41 @@ function normalizeBidirectionalSlider(value: number, minimum: number, maximum: n
   if (value <= minimum) return minimum;
   if (value >= maximum) return maximum;
   return Math.min(maximum, Math.max(minimum, Number(value.toFixed(1))));
+}
+
+function rebalanceDemographicCandidateShares(
+  current: DemographicCandidateSharePercentVector,
+  candidate: DemographicPreferenceCandidate,
+  requestedValue: number,
+) {
+  const nextValue = Math.min(100, Math.max(0, Math.round(requestedValue)));
+  const otherCandidates = DEMOGRAPHIC_PREFERENCE_CANDIDATES.filter(
+    (entry) => entry !== candidate,
+  );
+  const remaining = 100 - nextValue;
+  const currentOtherTotal = otherCandidates.reduce((sum, entry) => sum + current[entry], 0);
+  const raw = otherCandidates.map((entry, index) => ({
+    entry,
+    index,
+    value: currentOtherTotal > 0
+      ? current[entry] / currentOtherTotal * remaining
+      : index === 0 ? remaining : 0,
+  }));
+  const allocated = raw.map((entry) => Math.floor(entry.value));
+  let remainder = remaining - allocated.reduce((sum, value) => sum + value, 0);
+  raw
+    .map((entry) => ({ ...entry, fraction: entry.value - Math.floor(entry.value) }))
+    .sort((left, right) => right.fraction - left.fraction || left.index - right.index)
+    .forEach((entry) => {
+      if (remainder <= 0) return;
+      allocated[entry.index] += 1;
+      remainder -= 1;
+    });
+  const result = { ...current, [candidate]: nextValue };
+  otherCandidates.forEach((entry, index) => {
+    result[entry] = allocated[index];
+  });
+  return result;
 }
 
 function scenarioUrlNotice(load: ScenarioUrlLoadResult) {
@@ -357,6 +552,10 @@ function ScenarioApp() {
     const initialSettings: StateBehaviorRecipeSettings = {
       turnoutIncreasePoints: initialScenarioUrlState.turnoutIncreasePoints,
       addedVoterHarrisShare: initialScenarioUrlState.addedVoterHarrisShare,
+      demographicTurnoutIncreasePoints: {
+        ...initialScenarioUrlState.demographicTurnoutIncreasePoints,
+      },
+      demographicCandidateShares: { ...initialScenarioUrlState.demographicCandidateShares },
       preferenceShiftPoints: initialScenarioUrlState.preferenceShiftPoints,
       thirdPartyCandidate: initialScenarioUrlState.thirdPartyCandidate,
       thirdPartyShiftPoints: initialScenarioUrlState.thirdPartyShiftPoints,
@@ -388,6 +587,15 @@ function ScenarioApp() {
   const [addedVoterHarrisShare, setAddedVoterHarrisShare] = useState(
     initialScenarioUrlState.addedVoterHarrisShare,
   );
+  const [demographicTurnoutIncreasePoints, setDemographicTurnoutIncreasePoints] = useState(
+    { ...initialScenarioUrlState.demographicTurnoutIncreasePoints },
+  );
+  const [demographicCandidateShares, setDemographicCandidateShares] = useState(
+    { ...initialScenarioUrlState.demographicCandidateShares },
+  );
+  const [selectedDemographicPreferenceGroup, setSelectedDemographicPreferenceGroup] = useState<
+    DemographicGroupId
+  >("non_hispanic_black");
   const [preferenceShiftPoints, setPreferenceShiftPoints] = useState(
     initialScenarioUrlState.preferenceShiftPoints,
   );
@@ -404,6 +612,10 @@ function ScenarioApp() {
     initialScenarioUrlState.contributionScope,
   );
   const [contributionOperation, setContributionOperation] = useState<ContributionOperation>("all");
+  const [contributionView, setContributionView] = useState<ContributionView>("movement");
+  const [demographicContributionScope, setDemographicContributionScope] = useState<ContributionScope>(
+    "county",
+  );
   const [assumptionsOpen, setAssumptionsOpen] = useState(true);
   const [experienceMode, setExperienceMode] = useState<ExperienceMode>("swingometer");
   const [nightBehavior, setNightBehavior] = useState<ElectionNightBehavior>(() => ({
@@ -433,17 +645,17 @@ function ScenarioApp() {
   );
   const nightBehaviorDirty = appliedNightBehavior == null
     || nightBehaviorFingerprint(appliedNightBehavior) !== nightBehaviorFingerprint(nightBehavior);
-  const [laboratoryDrawerSnap, setLaboratoryDrawerSnap] = useState<LaboratoryDrawerSnap>(
-    initialScenarioUrlState.selectedCountyFips || initialScenarioUrlState.selectedVtdGeoid ? "working" : "collapsed",
-  );
+  const dock = useWorkspaceDock(experienceMode,
+    initialScenarioUrlState.selectedCountyFips || initialScenarioUrlState.selectedVtdGeoid ? "working" : "collapsed");
+  const laboratoryDrawerSnap = dock.snap;
+  const changeDrawerSnap = dock.changeSnap;
+  const setLaboratoryDrawerSnap = dock.changeSnap;
+  const replayRecipeKeyRef = useRef<string | null>(null);
   const [laboratoryDrawerTab, setLaboratoryDrawerTab] = useState<LaboratoryDrawerTab>(
     initialScenarioUrlState.selectedCountyFips || initialScenarioUrlState.selectedVtdGeoid ? "inspector" : "behavior",
   );
-  const [laboratoryDrawerDragHeight, setLaboratoryDrawerDragHeight] = useState<number | null>(null);
   const [fitSelectionRequest, setFitSelectionRequest] = useState(0);
   const [routeAlternativesOpen, setRouteAlternativesOpen] = useState(false);
-  const laboratoryDrawerRef = useRef<HTMLDivElement>(null);
-  const drawerDragRef = useRef<{ pointerId: number; startY: number; startHeight: number } | null>(null);
   const routeAlternativesButtonRef = useRef<HTMLButtonElement>(null);
   const replaySeekTimerRef = useRef<number | null>(null);
   const replayTimelineInputRef = useRef<HTMLInputElement>(null);
@@ -457,12 +669,23 @@ function ScenarioApp() {
   const behaviorScenarioSettings = useMemo(() => ({
     turnoutIncreasePoints,
     addedVoterHarrisShare: addedVoterHarrisShare / 100,
+    demographicTurnoutIncreasePoints,
+    demographicCandidateShares: Object.fromEntries(DEMOGRAPHIC_GROUP_IDS.flatMap((groupId) => {
+      const shares = demographicCandidateShares[groupId];
+      return shares == null
+        ? []
+        : [[groupId, Object.fromEntries(DEMOGRAPHIC_PREFERENCE_CANDIDATES.map(
+            (candidate) => [candidate, shares[candidate] / 100],
+          ))]];
+    })),
     preferenceShiftPoints,
     thirdPartyCandidate,
     thirdPartyShiftPoints,
     thirdPartyHarrisExchangeShare: thirdPartyHarrisExchangeShare / 100,
   }), [
     addedVoterHarrisShare,
+    demographicTurnoutIncreasePoints,
+    demographicCandidateShares,
     preferenceShiftPoints,
     thirdPartyCandidate,
     thirdPartyHarrisExchangeShare,
@@ -482,6 +705,26 @@ function ScenarioApp() {
   const demographicFoundation = detailedStateFoundation?.stateCode === activeDetailedStateCode
     ? detailedStateFoundation
     : null;
+  const demographicEvidence = useMemo(
+    () => demographicFoundation
+      ? buildDetailedStateDemographicEvidenceContract(demographicFoundation)
+      : null,
+    [demographicFoundation],
+  );
+  const demographicGroupTurnoutAvailable = demographicEvidence
+    ?.capability.futureGroupTurnoutAssumptionsEligible ?? false;
+  const demographicTurnoutActive = DEMOGRAPHIC_GROUP_IDS.some(
+    (groupId) => demographicTurnoutIncreasePoints[groupId] > 0,
+  );
+  const demographicTurnoutResultByGroup = useMemo(() => new Map(
+    behaviorScenario?.demographicTurnout.groups.map((group) => [group.groupId, group]) ?? [],
+  ), [behaviorScenario]);
+  const selectedDemographicCandidateShares = demographicCandidateShares[
+    selectedDemographicPreferenceGroup
+  ];
+  const selectedDemographicTurnoutResult = demographicTurnoutResultByGroup.get(
+    selectedDemographicPreferenceGroup,
+  ) ?? null;
 
   const applyScenarioUrlState = useCallback((state: ScenarioUrlState) => {
     setTargetCandidate(state.targetCandidate);
@@ -489,6 +732,8 @@ function ScenarioApp() {
     setSelectedRouteStateCodes(state.selectedRouteStateCodes);
     setTurnoutIncreasePoints(state.turnoutIncreasePoints);
     setAddedVoterHarrisShare(state.addedVoterHarrisShare);
+    setDemographicTurnoutIncreasePoints({ ...state.demographicTurnoutIncreasePoints });
+    setDemographicCandidateShares({ ...state.demographicCandidateShares });
     setPreferenceShiftPoints(state.preferenceShiftPoints);
     setThirdPartyCandidate(state.thirdPartyCandidate);
     setThirdPartyShiftPoints(state.thirdPartyShiftPoints);
@@ -516,6 +761,8 @@ function ScenarioApp() {
       const settings: StateBehaviorRecipeSettings = {
         turnoutIncreasePoints: state.turnoutIncreasePoints,
         addedVoterHarrisShare: state.addedVoterHarrisShare,
+        demographicTurnoutIncreasePoints: { ...state.demographicTurnoutIncreasePoints },
+        demographicCandidateShares: { ...state.demographicCandidateShares },
         preferenceShiftPoints: state.preferenceShiftPoints,
         thirdPartyCandidate: state.thirdPartyCandidate,
         thirdPartyShiftPoints: state.thirdPartyShiftPoints,
@@ -525,7 +772,7 @@ function ScenarioApp() {
         ? {}
         : recipesAsRecord([createStateScenarioRecipe(nextActiveState, settings)]));
     }
-  }, []);
+  }, [setLaboratoryDrawerSnap]);
 
   useEffect(() => {
     function restoreBrowserHistoryState() {
@@ -604,6 +851,79 @@ function ScenarioApp() {
     () => demographicFoundation ? toDetailedBehaviorModelUnits(demographicFoundation) : null,
     [demographicFoundation],
   );
+  const demographicContributionSummary = useMemo(() => {
+    const empty = {
+      counties: [] as Array<{
+        id: string;
+        name: string;
+        context: string;
+        ballots: number;
+        marginVotes: number;
+      }>,
+      units: [] as Array<{
+        id: string;
+        name: string;
+        context: string;
+        ballots: number;
+        marginVotes: number;
+      }>,
+      receivingUnitCount: 0,
+      offMapBallots: 0,
+    };
+    if (!behaviorScenario) return empty;
+    const countyNames = new Map(detailedCounties.map((county) => [county.fips, county.name]));
+    const geographyById = new Map(detailedGeographies.map((geography) => [geography.id, geography]));
+    const countyTotals = new Map<string, { ballots: number; marginVotes: number }>();
+    const units = behaviorScenario.units.flatMap((unit) => {
+      const contribution = unit.demographicTurnoutByGroup?.[selectedDemographicPreferenceGroup];
+      if (!contribution || contribution.totalVotes === 0) return [];
+      const marginVotes = contribution.harrisVotes - contribution.trumpVotes;
+      if (unit.countyFips) {
+        const current = countyTotals.get(unit.countyFips) ?? { ballots: 0, marginVotes: 0 };
+        current.ballots += contribution.totalVotes;
+        current.marginVotes += marginVotes;
+        countyTotals.set(unit.countyFips, current);
+      }
+      if (!unit.geometryId) return [];
+      const geography = geographyById.get(unit.geometryId);
+      return [{
+        id: unit.geometryId,
+        name: geography?.name ?? unit.geometryId,
+        context: countyNames.get(unit.countyFips ?? "") ?? unit.countyFips ?? "Outside county terrain",
+        ballots: contribution.totalVotes,
+        marginVotes,
+      }];
+    }).sort((left, right) => (
+      right.ballots - left.ballots
+      || Math.abs(right.marginVotes) - Math.abs(left.marginVotes)
+      || left.id.localeCompare(right.id)
+    ));
+    const counties = [...countyTotals.entries()].map(([countyFips, value]) => ({
+      id: countyFips,
+      name: countyNames.get(countyFips) ?? countyFips,
+      context: "County total",
+      ...value,
+    })).sort((left, right) => (
+      right.ballots - left.ballots
+      || Math.abs(right.marginVotes) - Math.abs(left.marginVotes)
+      || left.id.localeCompare(right.id)
+    ));
+    const offMapBallots = behaviorScenario.units.reduce((sum, unit) => {
+      if (unit.geometryId) return sum;
+      return sum + (unit.demographicTurnoutByGroup?.[selectedDemographicPreferenceGroup]?.totalVotes ?? 0);
+    }, 0);
+    return {
+      counties: counties.slice(0, 12),
+      units: units.slice(0, 12),
+      receivingUnitCount: units.length,
+      offMapBallots,
+    };
+  }, [
+    behaviorScenario,
+    detailedCounties,
+    detailedGeographies,
+    selectedDemographicPreferenceGroup,
+  ]);
   const preferenceBase = useMemo(() => ({
     harrisVotes: detailedActual.harrisVotes + (behaviorScenario?.turnout.harrisVotes ?? 0),
     trumpVotes: detailedActual.trumpVotes + (behaviorScenario?.turnout.trumpVotes ?? 0),
@@ -637,12 +957,16 @@ function ScenarioApp() {
   const currentStateRecipeSettings = useMemo<StateBehaviorRecipeSettings>(() => ({
     turnoutIncreasePoints,
     addedVoterHarrisShare,
+    demographicTurnoutIncreasePoints,
+    demographicCandidateShares,
     preferenceShiftPoints: effectivePreferenceShiftPoints,
     thirdPartyCandidate,
     thirdPartyShiftPoints: effectiveThirdPartyShiftPoints,
     thirdPartyHarrisExchangeShare,
   }), [
     addedVoterHarrisShare,
+    demographicCandidateShares,
+    demographicTurnoutIncreasePoints,
     effectivePreferenceShiftPoints,
     effectiveThirdPartyShiftPoints,
     thirdPartyCandidate,
@@ -682,6 +1006,8 @@ function ScenarioApp() {
     selectedRouteStateCodes,
     turnoutIncreasePoints,
     addedVoterHarrisShare,
+    demographicTurnoutIncreasePoints,
+    demographicCandidateShares,
     preferenceShiftPoints: effectivePreferenceShiftPoints,
     thirdPartyCandidate,
     thirdPartyShiftPoints: effectiveThirdPartyShiftPoints,
@@ -699,6 +1025,8 @@ function ScenarioApp() {
     addedVoterHarrisShare,
     behaviorEditorMode,
     contributionScope,
+    demographicCandidateShares,
+    demographicTurnoutIncreasePoints,
     effectivePreferenceShiftPoints,
     effectiveThirdPartyShiftPoints,
     portfolioRecipes,
@@ -738,16 +1066,13 @@ function ScenarioApp() {
 
   const detailedScenario = useMemo<StatewidePresidentialResult>(() => {
     if (!behaviorScenario) return detailedActual;
-    const harrisWins = behaviorScenario.totals.harrisVotes > behaviorScenario.totals.trumpVotes;
     return {
       ...detailedActual,
       ...behaviorScenario.totals,
-      harrisElectoralVotes: harrisWins
-        ? activeDetailedStateManifest.election.electoralVotes
-        : 0,
-      trumpElectoralVotes: harrisWins
-        ? 0
-        : activeDetailedStateManifest.election.electoralVotes,
+      ...electoralAllocationForResult(
+        behaviorScenario.totals,
+        activeDetailedStateManifest.election.electoralVotes,
+      ),
     };
   }, [activeDetailedStateManifest, behaviorScenario, detailedActual]);
 
@@ -827,11 +1152,17 @@ function ScenarioApp() {
       if (jurisdiction.totalReportedVotes === 0) return [];
       const harrisVotes = replayCandidateVotes(jurisdiction, "harris");
       const trumpVotes = replayCandidateVotes(jurisdiction, "trump");
+      const steinVotes = replayCandidateVotes(jurisdiction, "stein");
+      const oliverVotes = replayCandidateVotes(jurisdiction, "oliver");
+      const residualOtherVotes = replayCandidateVotes(jurisdiction, "other-residual");
       return [{
         code: jurisdiction.jurisdictionId,
         harrisVotes,
         trumpVotes,
-        otherVotes: jurisdiction.totalReportedVotes - harrisVotes - trumpVotes,
+        steinVotes,
+        oliverVotes,
+        residualOtherVotes,
+        otherVotes: steinVotes + oliverVotes + residualOtherVotes,
         totalVotes: jurisdiction.totalReportedVotes,
         harrisElectoralVotes: 0,
         trumpElectoralVotes: 0,
@@ -847,11 +1178,17 @@ function ScenarioApp() {
         if (!actual) return [];
         const harrisVotes = replayCandidateVotes(county, "harris");
         const trumpVotes = replayCandidateVotes(county, "trump");
+        const steinVotes = replayCandidateVotes(county, "stein");
+        const oliverVotes = replayCandidateVotes(county, "oliver");
+        const residualOtherVotes = replayCandidateVotes(county, "other-residual");
         return [{
           ...actual,
           harrisVotes,
           trumpVotes,
-          otherVotes: county.totalReportedVotes - harrisVotes - trumpVotes,
+          steinVotes,
+          oliverVotes,
+          residualOtherVotes,
+          otherVotes: steinVotes + oliverVotes + residualOtherVotes,
           totalVotes: county.totalReportedVotes,
           netHarrisGain: 0,
         }];
@@ -929,6 +1266,12 @@ function ScenarioApp() {
       ),
     });
   }, [detailedCounties, detailedGeographies, scenarioDeltaLedger]);
+  const contributionPluralityCandidate: ContributionPluralityCandidate | null = scenarioExplanation?.dominantOperation?.basis === "plurality-winner-votes"
+    && (scenarioExplanation.electoral.scenarioWinner === "stein"
+      || scenarioExplanation.electoral.scenarioWinner === "oliver"
+      || scenarioExplanation.electoral.scenarioWinner === "residual_other")
+    ? scenarioExplanation.electoral.scenarioWinner
+    : null;
   const contributionSummary = useMemo(() => {
     const empty = {
       counties: [] as ContributionRow[],
@@ -943,11 +1286,15 @@ function ScenarioApp() {
       detailedCounties.map((county) => [county.fips, county.name]),
     );
     const operationId = contributionOperation === "all" ? undefined : contributionOperation;
-    const marginFor = (row: { delta: { harrisTrumpMarginVotes: number }; operations: readonly { operationId: ScenarioDeltaOperationId; delta: { harrisTrumpMarginVotes: number } }[] }) => (
-      operationId
-        ? row.operations.find((operation) => operation.operationId === operationId)?.delta.harrisTrumpMarginVotes ?? 0
-        : row.delta.harrisTrumpMarginVotes
-    );
+    const marginFor = (row: { delta: ScenarioVoteDelta; operations: readonly { operationId: ScenarioDeltaOperationId; delta: ScenarioVoteDelta }[] }) => {
+      const delta = operationId
+        ? row.operations.find((operation) => operation.operationId === operationId)?.delta
+        : row.delta;
+      if (!delta) return 0;
+      return contributionPluralityCandidate
+        ? candidateDeltaVotes(delta, contributionPluralityCandidate)
+        : delta.harrisTrumpMarginVotes;
+    };
     const counties = rankScenarioDeltaRows(scenarioDeltaLedger.counties, { operationId })
       .map((county) => ({
         id: county.id,
@@ -986,17 +1333,37 @@ function ScenarioApp() {
       ? scenarioDeltaLedger.units
         .filter((unit) => unit.mapStatus === "off-map")
         .reduce((sum, unit) => sum + marginFor(unit), 0)
-      : offMap?.delta.harrisTrumpMarginVotes ?? 0;
+      : offMap
+        ? contributionPluralityCandidate
+          ? candidateDeltaVotes(offMap.delta, contributionPluralityCandidate)
+          : offMap.delta.harrisTrumpMarginVotes
+        : 0;
     return {
       counties,
       vtds,
-      statewideMarginDelta: scenarioDeltaLedger.delta.harrisTrumpMarginVotes,
-      displayedMarginDelta: operation?.delta.harrisTrumpMarginVotes
-        ?? scenarioDeltaLedger.delta.harrisTrumpMarginVotes,
+      statewideMarginDelta: contributionPluralityCandidate
+        ? candidateDeltaVotes(scenarioDeltaLedger.delta, contributionPluralityCandidate)
+        : scenarioDeltaLedger.delta.harrisTrumpMarginVotes,
+      displayedMarginDelta: contributionPluralityCandidate
+        ? candidateDeltaVotes(operation?.delta ?? scenarioDeltaLedger.delta, contributionPluralityCandidate)
+        : operation?.delta.harrisTrumpMarginVotes ?? scenarioDeltaLedger.delta.harrisTrumpMarginVotes,
       outsideCountyMarginDelta: residualMargin,
       outsideTerrainMarginDelta: offMapMargin,
     };
-  }, [contributionOperation, detailedCounties, detailedGeographies, scenarioDeltaLedger]);
+  }, [contributionOperation, contributionPluralityCandidate, detailedCounties, detailedGeographies, scenarioDeltaLedger]);
+  const contributionComparison = useMemo(() => {
+    if (!scenarioDeltaLedger) return null;
+    return buildScenarioContributionComparison({
+      ledger: scenarioDeltaLedger,
+      scope: contributionScope === "county" ? "county" : "unit",
+      countyNames: Object.fromEntries(
+        detailedCounties.map((county) => [county.fips, county.name]),
+      ),
+      unitNames: Object.fromEntries(
+        detailedGeographies.map((geography) => [geography.id, geography.name]),
+      ),
+    });
+  }, [contributionScope, detailedCounties, detailedGeographies, scenarioDeltaLedger]);
 
   const selectedActual = states2024.find((state) => state.code === selectedStateCode) ?? detailedActual;
   const selectedScenario = scenarioStates.find((state) => state.code === selectedStateCode) ?? detailedScenario;
@@ -1040,13 +1407,33 @@ function ScenarioApp() {
   const replayPresentedHarrisVotes = replayCandidateVotes(replayPresentedResult, "harris");
   const replayPresentedTrumpVotes = replayCandidateVotes(replayPresentedResult, "trump");
   const replayPresentedTotalVotes = replayPresentedResult?.totalReportedVotes ?? 0;
+  const replayPresentedAtlasResult: AtlasCandidateResult | undefined = replayPresentedTotalVotes > 0
+    ? {
+        harrisVotes: replayPresentedHarrisVotes,
+        trumpVotes: replayPresentedTrumpVotes,
+        steinVotes: replayCandidateVotes(replayPresentedResult, "stein"),
+        oliverVotes: replayCandidateVotes(replayPresentedResult, "oliver"),
+        residualOtherVotes: replayCandidateVotes(replayPresentedResult, "other-residual"),
+        totalVotes: replayPresentedTotalVotes,
+      }
+    : undefined;
+  const replayPresentedLabel = formatResultLead(replayPresentedAtlasResult);
   const replayPresentedMargin = replayPresentedTotalVotes > 0
     ? ((replayPresentedHarrisVotes - replayPresentedTrumpVotes) / replayPresentedTotalVotes) * 100
     : null;
   const replayNational = replay.current?.election.national ?? null;
   const replayNationalHarrisVotes = replayCandidateVotes(replayNational, "harris");
   const replayNationalTrumpVotes = replayCandidateVotes(replayNational, "trump");
-  const replayNationalMarginVotes = replayNationalHarrisVotes - replayNationalTrumpVotes;
+  const replayNationalResult: AtlasCandidateResult | undefined = replayNational?.totalReportedVotes
+    ? {
+        harrisVotes: replayNationalHarrisVotes,
+        trumpVotes: replayNationalTrumpVotes,
+        steinVotes: replayCandidateVotes(replayNational, "stein"),
+        oliverVotes: replayCandidateVotes(replayNational, "oliver"),
+        residualOtherVotes: replayCandidateVotes(replayNational, "other-residual"),
+        totalVotes: replayNational.totalReportedVotes,
+      }
+    : undefined;
   const replayAnalytics = replay.analytics;
   const replayFiveMinuteWindow = replayAnalytics?.windows.find((window) => window.windowMinutes === 5) ?? null;
   const replayFifteenMinuteWindow = replayAnalytics?.windows.find((window) => window.windowMinutes === 15) ?? null;
@@ -1109,13 +1496,22 @@ function ScenarioApp() {
     thirdPartyCandidate,
   ]);
   const activeScenarioChanged = !isDefaultStateBehaviorSettings(currentStateRecipeSettings);
+  const contributionMetricLabel = contributionPluralityCandidate
+    ? `${candidateNames[contributionPluralityCandidate]} vote change`
+    : "Harris-Trump margin movement";
+  const formatContributionDelta = (value: number) => contributionPluralityCandidate
+    ? formatCandidateVoteDelta(value, contributionPluralityCandidate)
+    : formatMarginVotes(value);
+  const preferenceMarginDelta = scenarioDeltaLedger?.operations.find(
+    (operation) => operation.operationId === "preference",
+  )?.delta.harrisTrumpMarginVotes ?? 0;
   const contributionRows = contributionScope === "county"
     ? contributionSummary.counties.slice(0, 5)
     : contributionSummary.vtds.slice(0, 5);
   const contributionEmptyText = activeScenarioChanged && contributionSummary.displayedMarginDelta === 0
     ? contributionOperation === "all"
-      ? "The active operations change ballots but net to no Harris minus Trump margin movement."
-      : "This operation produces no Harris minus Trump margin movement in the selected geography."
+      ? `The active operations change ballots but net to no ${contributionMetricLabel.toLowerCase()}.`
+      : `This operation produces no ${contributionMetricLabel.toLowerCase()} in the selected geography.`
     : contributionScope === "county" && contributionSummary.outsideCountyMarginDelta !== 0
       ? "This movement is confined to the statewide-only residual and has no honest county placement."
       : contributionScope === "vtd" && contributionSummary.outsideTerrainMarginDelta !== 0
@@ -1125,10 +1521,16 @@ function ScenarioApp() {
     1,
     ...contributionRows.map((row) => Math.abs(row.marginDelta)),
   );
+  const comparisonMaximum = {
+    certified: Math.max(1, ...(contributionComparison?.certified.supportingRows.slice(0, 5).map((row) => row.contributionVotes) ?? [])),
+    scenario: Math.max(1, ...(contributionComparison?.scenario.supportingRows.slice(0, 5).map((row) => row.contributionVotes) ?? [])),
+  };
   const operationWaterfallMaximum = Math.max(
     1,
     ...(scenarioDeltaLedger?.operations.map((operation) => (
-      Math.abs(operation.delta.harrisTrumpMarginVotes)
+      Math.abs(contributionPluralityCandidate
+        ? candidateDeltaVotes(operation.delta, contributionPluralityCandidate)
+        : operation.delta.harrisTrumpMarginVotes)
     )) ?? []),
   );
   const preferenceZeroPosition = (
@@ -1172,6 +1574,28 @@ function ScenarioApp() {
   const presentedShift = presentedActualMargin == null || presentedScenarioMargin == null
     ? null
     : presentedScenarioMargin - presentedActualMargin;
+  const presentedActualResult: AtlasCandidateResult = workspaceMode === "home"
+    ? actualNational
+    : selectedVtd?.baselineVotes
+      ?? selectedActualCounty
+      ?? selectedActual;
+  const presentedScenarioResult: AtlasCandidateResult = workspaceMode === "home"
+    ? scenarioNational
+    : selectedVtdScenario
+      ?? selectedScenarioCounty
+      ?? selectedScenario;
+  const presentedPluralityChanged = atlasPlurality(presentedActualResult)
+    !== atlasPlurality(presentedScenarioResult);
+  const allowLocalThirdPartyPlurality = workspaceMode === "laboratory"
+    && Boolean(selectedStateCode || selectedVtd || selectedActualCounty);
+  const presentedActualLabel = formatResultLead(
+    presentedActualResult,
+    allowLocalThirdPartyPlurality,
+  );
+  const presentedScenarioLabel = formatResultLead(
+    presentedScenarioResult,
+    allowLocalThirdPartyPlurality,
+  );
   const activeGeographyShortLabel = activeDetailedStateManifest.geography.unitLabelPlural;
   const activeGeographyFullLabel = activeDetailedStateCode === "PA"
     ? "Voting districts (VTDs)"
@@ -1185,6 +1609,8 @@ function ScenarioApp() {
   function applyStateRecipeSettings(settings: StateBehaviorRecipeSettings) {
     setTurnoutIncreasePoints(settings.turnoutIncreasePoints);
     setAddedVoterHarrisShare(settings.addedVoterHarrisShare);
+    setDemographicTurnoutIncreasePoints({ ...settings.demographicTurnoutIncreasePoints });
+    setDemographicCandidateShares({ ...settings.demographicCandidateShares });
     setPreferenceShiftPoints(settings.preferenceShiftPoints);
     setThirdPartyCandidate(settings.thirdPartyCandidate);
     setThirdPartyShiftPoints(settings.thirdPartyShiftPoints);
@@ -1239,7 +1665,7 @@ function ScenarioApp() {
       setWorkspaceMode("laboratory");
       return;
     }
-    replay.stop();
+    replay.pause();
     setExperienceMode("swingometer");
     const homeUrl = workspaceUrl("home");
     window.history.pushState(window.history.state, "", homeUrl);
@@ -1288,6 +1714,8 @@ function ScenarioApp() {
   function resetScenario() {
     setTurnoutIncreasePoints(DEFAULT_SCENARIO_URL_STATE.turnoutIncreasePoints);
     setAddedVoterHarrisShare(DEFAULT_SCENARIO_URL_STATE.addedVoterHarrisShare);
+    setDemographicTurnoutIncreasePoints({ ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS });
+    setDemographicCandidateShares({ ...DEFAULT_DEMOGRAPHIC_CANDIDATE_SHARES });
     setPreferenceShiftPoints(DEFAULT_SCENARIO_URL_STATE.preferenceShiftPoints);
     setThirdPartyCandidate(DEFAULT_SCENARIO_URL_STATE.thirdPartyCandidate);
     setThirdPartyShiftPoints(DEFAULT_SCENARIO_URL_STATE.thirdPartyShiftPoints);
@@ -1314,45 +1742,82 @@ function ScenarioApp() {
     setSelectedVtdGeoid(row.vtdGeoid);
     setLaboratoryDrawerTab("inspector");
     setLaboratoryDrawerSnap("working");
+    requestAnimationFrame(() => document.getElementById("laboratory-tab-inspector")?.focus());
   }
 
-  function changeDrawerSnap(snap: LaboratoryDrawerSnap) {
-    setLaboratoryDrawerDragHeight(null);
-    setLaboratoryDrawerSnap(snap);
+  function focusStructureContribution(row: ContributionStructureRow) {
+    selectState(activeDetailedStateCode);
+    setSelectedCountyFips(row.countyFips);
+    setSelectedVtdGeoid(row.geometryId);
+    setLaboratoryDrawerTab("inspector");
+    setLaboratoryDrawerSnap("working");
+    requestAnimationFrame(() => document.getElementById("laboratory-tab-inspector")?.focus());
   }
 
-  function handleDrawerPointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
-    const drawer = laboratoryDrawerRef.current;
-    if (!drawer) return;
-    drawerDragRef.current = {
-      pointerId: event.pointerId,
-      startY: event.clientY,
-      startHeight: drawer.getBoundingClientRect().height,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
+  function handleRankedListKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>) {
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    const list = event.currentTarget.closest("ol");
+    if (!list) return;
+    const buttons = [...list.querySelectorAll<HTMLButtonElement>("li > button")];
+    const index = buttons.indexOf(event.currentTarget);
+    if (index < 0) return;
     event.preventDefault();
-  }
-
-  function handleDrawerPointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
-    const drag = drawerDragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    const minimum = 64;
-    const maximum = Math.max(320, window.innerHeight - 210);
-    setLaboratoryDrawerDragHeight(Math.min(maximum, Math.max(minimum, drag.startHeight + drag.startY - event.clientY)));
-  }
-
-  function handleDrawerPointerEnd(event: ReactPointerEvent<HTMLButtonElement>) {
-    const drag = drawerDragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    const height = laboratoryDrawerRef.current?.getBoundingClientRect().height ?? 64;
-    drawerDragRef.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-    changeDrawerSnap(height < window.innerHeight * 0.25 ? "collapsed" : height > window.innerHeight * 0.6 ? "expanded" : "working");
+    const nextIndex = event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? buttons.length - 1
+        : Math.min(buttons.length - 1, Math.max(0, index + (event.key === "ArrowDown" ? 1 : -1)));
+    buttons[nextIndex]?.focus();
   }
 
   function chooseThirdPartyCandidate(candidate: ThirdPartyCandidate) {
     setThirdPartyCandidate(candidate);
     setThirdPartyShiftPoints(0);
+  }
+
+  function updateDemographicTurnout(groupId: DemographicGroupId, points: number) {
+    setDemographicTurnoutIncreasePoints((current) => ({
+      ...current,
+      [groupId]: Math.min(10, Math.max(0, Number(points.toFixed(1)))),
+    }));
+  }
+
+  function customizeDemographicPreference(groupId: DemographicGroupId) {
+    setSelectedDemographicPreferenceGroup(groupId);
+    setDemographicCandidateShares((current) => ({
+      ...current,
+      [groupId]: current[groupId] ?? {
+        harris: Math.round(addedVoterHarrisShare),
+        trump: 100 - Math.round(addedVoterHarrisShare),
+        stein: 0,
+        oliver: 0,
+        residualOther: 0,
+      },
+    }));
+  }
+
+  function inheritDemographicPreference(groupId: DemographicGroupId) {
+    setDemographicCandidateShares((current) => ({ ...current, [groupId]: null }));
+  }
+
+  function updateDemographicCandidateShare(
+    groupId: DemographicGroupId,
+    candidate: DemographicPreferenceCandidate,
+    value: number,
+  ) {
+    setDemographicCandidateShares((current) => {
+      const existing = current[groupId] ?? {
+        harris: Math.round(addedVoterHarrisShare),
+        trump: 100 - Math.round(addedVoterHarrisShare),
+        stein: 0,
+        oliver: 0,
+        residualOther: 0,
+      };
+      return {
+        ...current,
+        [groupId]: rebalanceDemographicCandidateShares(existing, candidate, value),
+      };
+    });
   }
 
   function beginElectionNight() {
@@ -1362,26 +1827,34 @@ function ScenarioApp() {
       (scenarioRecipeRecord[stateCode]
         ?? createStateScenarioRecipe(stateCode, DEFAULT_STATE_BEHAVIOR_SETTINGS)).settings,
     ])) as Record<DetailedStateCode, StateBehaviorRecipeSettings>;
+    const recipeKey = JSON.stringify(recipes);
+    if (selectedStateCode && !isDetailedStateCode(selectedStateCode)) selectNation();
+    if (replay.phase === "ready" && replayRecipeKeyRef.current === recipeKey) {
+      setExperienceMode("election-night");
+      return;
+    }
+    replayRecipeKeyRef.current = recipeKey;
     replay.start({
       recipes,
       behavior: nightBehavior,
     });
     setAppliedNightBehavior(cloneNightBehavior(nightBehavior));
     setNightProfileFeedback("Chronology applied. The count restarted from zero.");
-    if (selectedStateCode && !isDetailedStateCode(selectedStateCode)) selectNation();
     setViewMode("scenario");
     if (experienceMode !== "election-night") {
-      window.requestAnimationFrame(() => setFitSelectionRequest((request) => request + 1));
       setNightDockTab("live");
-      changeDrawerSnap("collapsed");
     }
     setExperienceMode("election-night");
   }
 
   function returnToSwingometer() {
-    replay.stop();
+    replay.pause();
     setExperienceMode("swingometer");
-    window.requestAnimationFrame(() => setFitSelectionRequest((request) => request + 1));
+  }
+
+  function restartElectionNight() {
+    replayRecipeKeyRef.current = null;
+    beginElectionNight();
   }
 
   function updateNightBehavior<Key extends keyof ElectionNightBehavior>(
@@ -1505,26 +1978,29 @@ function ScenarioApp() {
     }, 140);
   }
 
+  const scenarioShareButton = <button className="share-button" disabled={!demographicFoundation || scenarioPending}
+    onClick={copyScenarioLink} type="button">
+    {shareStatus === "copied" ? "Scenario link copied" : shareStatus === "error" ? "Try copy" : "Copy scenario link"}
+  </button>;
+
   return (
-    <main
-      className="application-shell"
-      data-experience-mode={experienceMode}
-      data-geography-level={selectedVtdGeoid ? "reporting-unit" : selectedCountyFips ? "county" : selectedStateCode ? "state" : "national"}
-      data-workspace-mode={workspaceMode}
-    >
-      <header className="masthead">
+    <AppShell workspaceMode={workspaceMode} experienceMode={experienceMode}
+      geographyLevel={selectedVtdGeoid ? "reporting-unit" : selectedCountyFips ? "county" : selectedStateCode ? "state" : "national"}
+      snap={dock.snap} dragHeight={dock.dragHeight} inspectorOpen={dock.inspectorOpen}>
+      <GlobalHeader>
         <button className="brand" onClick={() => navigateWorkspace("home")} type="button" aria-label="Sandbox 2.0 editorial home">
           <span className="brand-rule" aria-hidden="true"><i /><i /></span>
           <span>
-            <span className="overline">American electorate laboratory</span>
-            <strong>Sandbox 2.0</strong>
+            <span className="overline">{workspaceMode === "home" ? "THE ELECTION EXPLORATION STUDIO" : "American electorate laboratory"}</span>
+            <strong>{workspaceMode === "home" ? "American Electorate" : "Sandbox 2.0"}</strong>
           </span>
         </button>
 
-        <nav className="primary-nav" aria-label="Primary navigation">
+        <nav id="product-navigation" className="primary-nav" aria-label="Primary navigation">
           {workspaceMode === "home" ? <>
-            <button className="nav-item active" type="button">Home</button>
-            <button className="nav-item" onClick={() => navigateWorkspace("laboratory")} type="button">Open Sandbox</button>
+            <button className="nav-item active" aria-current="page" type="button">Overview</button>
+            <button className="nav-item" onClick={() => navigateWorkspace("laboratory")} type="button">Swingometer</button>
+            <button className="nav-item" onClick={() => { navigateWorkspace("laboratory"); beginElectionNight(); }} disabled={scenarioPending} type="button">Election Night</button>
             <a className="nav-item" href="#methodology">Sources</a>
           </> : <>
             <button
@@ -1542,12 +2018,38 @@ function ScenarioApp() {
           </>}
         </nav>
 
-        <div className="build-status"><span />{experienceMode === "election-night" ? "Scenario replay · analytical workspace · v0.27A" : "Three-state swingometer · causal explanation · v0.27A"}</div>
-      </header>
+        <div className="build-status"><span />{experienceMode === "election-night" ? "Deterministic reporting · 2024" : "2024 election laboratory"}</div>
+      </GlobalHeader>
 
-      <div className="workbench" id="top">
-        <section className="editorial-column" aria-labelledby="page-heading">
-          {workspaceMode === "laboratory" && (
+      {workspaceMode === "laboratory" && <WorkspaceHeader inspectorOpen={dock.inspectorOpen} onToggleInspector={dock.toggleInspector}>
+          <div className="map-toolbar">
+            <div>
+              <span className="overline">Geographic scope</span>
+              <div className="breadcrumb">
+                {!selectedStateCode
+                  ? <strong aria-current="location">United States</strong>
+                  : <button onClick={selectNation} type="button">United States</button>}
+                {selectedStateCode && <><span>/</span>{selectedCountyFips ? <button onClick={() => selectCounty(null)} type="button">{selectedActual.name}</button> : <strong aria-current="location">{selectedActual.name}</strong>}</>}
+                {selectedActualCounty && <><span>/</span>{selectedVtd ? <button onClick={() => selectPrecinct(null)} type="button">{selectedActualCounty.name}</button> : <strong aria-current="location">{selectedActualCounty.name}</strong>}</>}
+                {selectedVtd && <><span>/</span><strong aria-current="location">{selectedVtd.name}</strong></>}
+              </div>
+            </div>
+            {experienceMode === "election-night" ? (
+              <div className="night-map-status"><span />Reported returns</div>
+            ) : <div className="segmented" aria-label="Map comparison mode">
+              {(["actual", "scenario", "difference"] as ViewMode[]).map((mode) => (
+                <button
+                  aria-pressed={viewMode === mode}
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  type="button"
+                >
+                  {mode === "difference" ? "Shift" : mode[0].toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>}
+          </div>
+
             <div className="laboratory-context">
               <span className="overline">{experienceMode === "election-night" ? "Election night replay" : `${selectedStateCode ? selectedActual.name : "United States"} laboratory`}</span>
               <strong>{experienceMode === "election-night"
@@ -1568,13 +2070,16 @@ function ScenarioApp() {
               </p>}
               <div>
                 {experienceMode === "election-night" ? <>
-                  <span>Reported <b>{replayPresentedMargin == null ? "No return" : formatMargin(replayPresentedMargin)}</b></span>
+                  <span>Reported <b>{replayPresentedLabel}</b></span>
                   <span>Ballots <b>{formatCompact(replayPresentedTotalVotes)}</b></span>
                   <span>Returns <b>{replaySelectedState?.returnsPublished ?? replay.current?.election.national.returnsPublished ?? 0}</b></span>
                 </> : <>
-                  <span>Actual <b>{readoutActualMargin == null ? "Unavailable" : formatMargin(readoutActualMargin)}</b></span>
-                  <span>Scenario <b>{readoutScenarioMargin == null ? "Unavailable" : formatMargin(readoutScenarioMargin)}</b></span>
-                  {!selectedStateCode && <span>Electoral College <b>{electoralConsequences.scenarioNational.harrisElectoralVotes}–{electoralConsequences.scenarioNational.trumpElectoralVotes}</b></span>}
+                  <span>{selectedStateCode ? "Actual" : "Actual H-T"} <b>{presentedActualLabel}</b></span>
+                  <span>{selectedStateCode ? "Scenario" : "Scenario H-T"} <b>{presentedScenarioLabel}</b></span>
+                  {!selectedStateCode && <span>Electoral College <b>{electoralTargetCandidates
+                    .filter((candidate) => electoralConsequences.scenarioCandidateElectoralVotes[candidate] > 0)
+                    .map((candidate) => `${candidateNames[candidate]} ${electoralConsequences.scenarioCandidateElectoralVotes[candidate]}`)
+                    .join(" · ")}</b></span>}
                 </>}
               </div>
               {selectedStateCode && <button onClick={selectedCountyFips ? () => selectCounty(null) : selectNation} type="button">
@@ -1584,78 +2089,15 @@ function ScenarioApp() {
               <button className="fit-selection-button" onClick={() => setFitSelectionRequest((request) => request + 1)} type="button">
                 {selectedStateCode ? "Fit selection" : "Fit United States"}
               </button>
+              {scenarioShareButton}
             </div>
-          )}
-          <p className="overline">Election modeling and replay studio</p>
-          <h1 id="page-heading">Build the electorate.<br />Then watch it count.</h1>
-          <p className="lede">
-            Create a detailed counterfactual, trace where every vote moves, and direct how the result arrives on election night.
-          </p>
+      </WorkspaceHeader>}
 
-          <button className="open-sandbox-button" onClick={() => navigateWorkspace("laboratory")} type="button">Enter the laboratory <span aria-hidden="true">→</span></button>
-
-          <div className="baseline-lockup">
-            <div className="baseline-head">
-              <span className="overline">Actual 2024</span>
-              <span className="verified-pill">Official statewide baseline</span>
-            </div>
-            <div className="baseline-score">
-              <div><strong className="dem-text">226</strong><span>Harris</span></div>
-              <div className="to-win"><b>270</b><span>to win</span></div>
-              <div><strong className="rep-text">312</strong><span>Trump</span></div>
-            </div>
-          </div>
-
-          <div className="principle-note">
-            <span className="index">01</span>
-            <div>
-              <strong>No changes means the actual result.</strong>
-              <p>Pennsylvania, Michigan, and Wisconsin reconcile to their statewide results. Unmatched geography and reconstructed local values remain explicit.</p>
-            </div>
-          </div>
-
-          <div className="foundation-progress" aria-label="Foundation progress">
-            <div className="progress-title"><span>Foundation status</span><strong>6 / 6</strong></div>
-            <ol>
-              <li className="complete"><span />Independent product</li>
-              <li className="complete"><span />State baseline</li>
-              <li className="complete"><span />Deterministic mutation</li>
-              <li className="complete"><span />Three detailed-state foundations</li>
-              <li className="complete"><span />State-specific geometry contracts</li>
-              <li className="complete"><span />Demographic denominator</li>
-            </ol>
-          </div>
-        </section>
+      <WorkspaceLayout>
+        {workspaceMode === "home" && <HomeIntroduction onEnter={() => navigateWorkspace("laboratory")} />}
 
         <section className="map-column" aria-label={workspaceMode === "home" ? "National election introduction" : selectedStateCode ? `${selectedActual.name} election laboratory` : "United States election laboratory"}>
-          <div className="map-toolbar">
-            <div>
-              <span className="overline">Geographic scope</span>
-              <div className="breadcrumb">
-                {workspaceMode === "home" || !selectedStateCode
-                  ? <strong aria-current="location">United States</strong>
-                  : <button onClick={selectNation} type="button">United States</button>}
-                {workspaceMode === "laboratory" && selectedStateCode && <><span>/</span>{selectedCountyFips ? <button onClick={() => selectCounty(null)} type="button">{selectedActual.name}</button> : <strong aria-current="location">{selectedActual.name}</strong>}</>}
-                {workspaceMode === "laboratory" && selectedActualCounty && <><span>/</span>{selectedVtd ? <button onClick={() => selectPrecinct(null)} type="button">{selectedActualCounty.name}</button> : <strong aria-current="location">{selectedActualCounty.name}</strong>}</>}
-                {workspaceMode === "laboratory" && selectedVtd && <><span>/</span><strong aria-current="location">{selectedVtd.name}</strong></>}
-              </div>
-            </div>
-            {experienceMode === "election-night" ? (
-              <div className="night-map-status"><span />Reported returns</div>
-            ) : <div className="segmented" aria-label="Map comparison mode">
-              {(["actual", "scenario", "difference"] as ViewMode[]).map((mode) => (
-                <button
-                  aria-pressed={viewMode === mode}
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  type="button"
-                >
-                  {mode === "difference" ? "Shift" : mode[0].toUpperCase() + mode.slice(1)}
-                </button>
-              ))}
-            </div>}
-          </div>
-
+          {workspaceMode === "home" && <HomeBaseline />}
           <div className="map-stage">
             <Suspense fallback={<div className="map-loading"><span /> Preparing the election terrain</div>}>
               <AtlasMapScene
@@ -1702,34 +2144,51 @@ function ScenarioApp() {
               </div>
             )}
 
+
+          </div>
+
             {experienceMode === "swingometer" && <div className="selected-readout" data-drilled={Boolean(selectedStateCode)} aria-live="polite">
               <div>
                 <span className="overline">Selected</span>
                 <strong>{presentedGeographyName}</strong>
               </div>
               <div className="readout-margin">
-                <span>Actual</span><strong>{presentedActualMargin == null ? "NO RETURN" : formatMargin(presentedActualMargin)}</strong>
+                <span>{selectedStateCode ? "Actual" : "Actual H-T"}</span><strong>{presentedActualLabel}</strong>
               </div>
               <div className="readout-arrow" aria-hidden="true">→</div>
               <div className="readout-margin">
-                <span>Scenario</span><strong>{presentedScenarioMargin == null ? "NO RETURN" : formatMargin(presentedScenarioMargin)}</strong>
+                <span>{selectedStateCode ? "Scenario" : "Scenario H-T"}</span><strong>{presentedScenarioLabel}</strong>
               </div>
               <div className={`shift-chip ${presentedShift != null && presentedShift > 0.05 ? "toward-dem" : ""}`}>
                 {presentedShift == null
                   ? "Unavailable"
                   : Math.abs(presentedShift) < 0.05
-                    ? "No change"
+                    ? presentedPluralityChanged ? "Harris-Trump unchanged" : "No change"
                     : `${presentedShift > 0 ? "+" : ""}${presentedShift.toFixed(1)} pts D`}
               </div>
             </div>}
-          </div>
-
           <div className="legend-row">
-            <span>Democratic</span>
-            <div className="margin-ramp" aria-hidden="true" />
-            <span>Republican</span>
-            <i />
-            <span>Tile color: statewide winning margin</span>
+            {experienceMode === "swingometer" && viewMode === "difference" ? <>
+              <span>Toward Harris</span>
+              <div className="margin-ramp" aria-hidden="true" />
+              <span>Toward Trump</span>
+              <i />
+              <span>Harris vs Trump margin shift</span>
+            </> : <>
+              <span>Democratic</span>
+              <div className="margin-ramp" aria-hidden="true" />
+              <span>Republican</span>
+              <>
+                <i />
+                <span className="candidate-legend"><b className="candidate-ramp green" />Stein margin</span>
+                <span className="candidate-legend"><b className="candidate-ramp libertarian" />Oliver margin</span>
+                <span className="candidate-legend"><b className="candidate-ramp other" />Aggregate other margin</span>
+              </>
+              <i />
+              <span>{experienceMode === "election-night"
+                ? "Tile color: reported winning margin"
+                : "Color: plurality winner · height: ballots"}</span>
+            </>}
           </div>
           {workspaceMode === "laboratory" && (
             <div className="causal-strip" aria-live="polite">
@@ -1738,7 +2197,7 @@ function ScenarioApp() {
                 <i aria-hidden="true">→</i>
                 <strong>{replayPresentedMargin == null
                   ? `${selectedGeographyName} has no published return`
-                  : `${selectedGeographyName} ${formatMargin(replayPresentedMargin)} reported`}</strong>
+                  : `${selectedGeographyName} ${replayPresentedLabel} reported`}</strong>
                 <i aria-hidden="true">→</i>
                 <b>{replaySelectedState?.geographyAvailability === "detailed"
                   ? `${replaySelectedState.returnsPublished} reporting-unit returns`
@@ -1749,12 +2208,17 @@ function ScenarioApp() {
                 : behaviorEditorMode === "preference"
                 ? formatPreferenceMovement(effectivePreferenceShiftPoints)
                 : behaviorEditorMode === "turnout"
-                  ? `Turnout +${turnoutIncreasePoints.toFixed(1)} pts`
+                  ? demographicTurnoutActive
+                    ? `Turnout · ${DEMOGRAPHIC_GROUP_IDS.filter((groupId) => demographicTurnoutIncreasePoints[groupId] > 0).length} group assumptions`
+                    : `Turnout +${turnoutIncreasePoints.toFixed(1)} pts`
                   : formatThirdPartyMovement(effectiveThirdPartyShiftPoints, thirdPartyCandidate)}</span>
               <i aria-hidden="true">→</i>
               <strong>{selectedStateCode
-                ? `${activeDetailedStateCode} ${formatMarginVotes(contributionSummary.statewideMarginDelta)} margin`
-                : `${electoralConsequences.scenarioNational.harrisElectoralVotes} Harris · ${electoralConsequences.scenarioNational.trumpElectoralVotes} Trump`}</strong>
+                ? `${activeDetailedStateCode} ${presentedActualLabel} → ${presentedScenarioLabel}`
+                : electoralTargetCandidates
+                  .filter((candidate) => electoralConsequences.scenarioCandidateElectoralVotes[candidate] > 0)
+                  .map((candidate) => `${electoralConsequences.scenarioCandidateElectoralVotes[candidate]} ${candidateNames[candidate]}`)
+                  .join(" · ")}</strong>
               {activeRouteConstructionState && <><i aria-hidden="true">→</i><b>{activeRouteConstructionState.status === "satisfied"
                 ? `+${activeRouteConstructionState.electoralVotes} EV verified`
                 : `${formatCompact(activeRouteConstructionState.remainingNetMarginVotes)} still required`}</b></>}
@@ -1763,7 +2227,7 @@ function ScenarioApp() {
           )}
         </section>
 
-        <aside className={`control-column ${assumptionsOpen ? "open" : ""}`} aria-label="Scenario editor">
+        <AnalysisInspector open={workspaceMode === "laboratory" && dock.inspectorOpen} className={`control-column ${assumptionsOpen ? "open" : ""}`}>
           {experienceMode === "election-night" && (
             <section className="night-three-state-card" aria-label="Three-state election night desk">
               <div className="card-heading"><div><span className="overline">Election night desk</span><strong>Detailed states only</strong></div><span className="year-chip">2024</span></div>
@@ -1773,12 +2237,19 @@ function ScenarioApp() {
                   const state = replayJurisdictions?.find((item) => item.jurisdictionId === stateCode);
                   const harris = replayCandidateVotes(state, "harris");
                   const trump = replayCandidateVotes(state, "trump");
-                  const reportedMargin = state?.totalReportedVotes
-                    ? (harris - trump) / state.totalReportedVotes * 100
-                    : null;
+                  const reportedResult: AtlasCandidateResult | undefined = state?.totalReportedVotes
+                    ? {
+                        harrisVotes: harris,
+                        trumpVotes: trump,
+                        steinVotes: replayCandidateVotes(state, "stein"),
+                        oliverVotes: replayCandidateVotes(state, "oliver"),
+                        residualOtherVotes: replayCandidateVotes(state, "other-residual"),
+                        totalVotes: state.totalReportedVotes,
+                      }
+                    : undefined;
                   return <div className="night-state-row" data-selected={selectedStateCode === stateCode} key={stateCode}>
                     <span><strong>{stateCode}</strong><small>{getDetailedStateManifest(stateCode).geography.unitLabelPlural}</small></span>
-                    <span><b>{reportedMargin == null ? "NO RETURNS" : formatMargin(reportedMargin)}</b><small>{state?.returnsPublished ?? 0} / {state?.expectedReturns ?? 0}</small></span>
+                    <span><b>{formatResultLead(reportedResult)}</b><small>{state?.returnsPublished ?? 0} / {state?.expectedReturns ?? 0}</small></span>
                   </div>;
                 })}
               </div>
@@ -1790,20 +2261,16 @@ function ScenarioApp() {
               <div><span className="overline">Your scenario</span><strong>Electoral College</strong></div>
               <div className="scenario-actions">
                 <span className="year-chip">{activeDetailedStateManifest.election.year}</span>
-                <button
-                  className="share-button"
-                  disabled={!demographicFoundation || scenarioPending}
-                  onClick={copyScenarioLink}
-                  type="button"
-                >{shareStatus === "copied" ? "Scenario link copied" : shareStatus === "error" ? "Try copy" : "Copy scenario link"}</button>
+                {workspaceMode === "home" && scenarioShareButton}
               </div>
             </div>
             <div className="target-selector" aria-label="Electoral College target candidate">
               <span>Explain for</span>
               <div>
-                {(["harris", "trump"] as MajorCandidate[]).map((candidate) => (
+                {electoralTargetCandidates.map((candidate) => (
                   <button
                     aria-pressed={targetCandidate === candidate}
+                    data-candidate={candidate}
                     key={candidate}
                     onClick={() => changeTargetCandidate(candidate)}
                     type="button"
@@ -1811,11 +2278,15 @@ function ScenarioApp() {
                 ))}
               </div>
             </div>
-            <div className="scenario-score">
-              <div><span>Harris</span><strong className="dem-text">{scenarioNational.harrisElectoralVotes}</strong></div>
-              <div className="score-divider"><span>{electoralConsequences.majorityThreshold}</span></div>
-              <div><strong className="rep-text">{scenarioNational.trumpElectoralVotes}</strong><span>Trump</span></div>
+            <div className="scenario-score" aria-label="Scenario Electoral College votes by candidate" data-testid="candidate-electoral-votes">
+              {electoralTargetCandidates.map((candidate) => (
+                <div data-candidate={candidate} data-testid={`candidate-electoral-votes-${candidate}`} key={candidate}>
+                  <span>{candidateNames[candidate]}</span>
+                  <strong className={candidateScoreClass(candidate)}>{electoralConsequences.scenarioCandidateElectoralVotes[candidate]}</strong>
+                </div>
+              ))}
             </div>
+            <div className="electoral-majority-marker"><span>{electoralConsequences.majorityThreshold} EV needed for a majority</span></div>
             <div className="threshold-lockup" data-status={electoralConsequences.thresholdStatus} data-target={targetCandidate}>
               <span>{electoralThresholdHeadline(electoralConsequences)}</span>
               <p>{electoralThresholdDetail(electoralConsequences)}</p>
@@ -1845,8 +2316,8 @@ function ScenarioApp() {
                     type="button"
                   >
                     <span className="consequence-state"><strong>{row.stateName}</strong><small>{row.stateCode} · Modeled</small></span>
-                    <span><small>{candidateNames[row.actualWinner]}</small><strong>{formatMargin(row.actualMargin)}</strong></span>
-                    <span><small>{candidateNames[row.scenarioWinner]}</small><strong>{scenarioPending ? "Updating" : formatMargin(row.scenarioMargin)}</strong></span>
+                    <span><small>{candidateNames[row.actualWinner]}</small><strong>{formatPluralityMargin(row.actualWinner, row.actualMargin)}</strong></span>
+                    <span><small>{candidateNames[row.scenarioWinner]}</small><strong>{scenarioPending ? "Updating" : formatPluralityMargin(row.scenarioWinner, row.scenarioMargin)}</strong></span>
                     <span className={electoralDeltaClass(row.targetElectoralDelta, targetCandidate)}>
                       <small>{candidateNames[targetCandidate]}</small>
                       <strong>{row.targetElectoralDelta === 0
@@ -1857,16 +2328,34 @@ function ScenarioApp() {
                 ))}
               </div>
             )}
-            <div className="popular-row">
-              <span>National popular vote</span>
-              <strong>{formatMargin(((scenarioNational.harrisVotes - scenarioNational.trumpVotes) / scenarioNational.totalVotes) * 100)}</strong>
+            <details className="inspector-disclosure">
+              <summary>National vote share</summary>
+            <div className="national-candidate-vote-grid" aria-label="Scenario national popular vote by candidate">
+              <span className="national-candidate-vote-title">Named scenario vote share</span>
+              {electoralTargetCandidates.map((candidate) => {
+                const votes = candidate === "harris"
+                  ? scenarioNational.harrisVotes
+                  : candidate === "trump"
+                    ? scenarioNational.trumpVotes
+                    : candidate === "stein"
+                      ? scenarioNational.steinVotes
+                      : candidate === "oliver"
+                        ? scenarioNational.oliverVotes
+                        : scenarioNational.residualOtherVotes;
+                return <span data-candidate={candidate} key={candidate}>
+                  <small>{candidateNames[candidate]}</small>
+                  <strong>{(votes / scenarioNational.totalVotes * 100).toFixed(1)}%</strong>
+                </span>;
+              })}
+              <p>Unsupported states retain their unseparated minor-candidate ballots in Aggregate other.</p>
             </div>
+            </details>
             <div
               className="scenario-version-row"
               title={`Dataset ${SCENARIO_DATA_VERSION} · Engine ${SCENARIO_ENGINE_VERSION}`}
             >
               <span>Replay URL v{SCENARIO_URL_SCHEMA_VERSION}</span>
-              <span>Data v2 · engine v1</span>
+              <span>Data v2 · engine v2</span>
               <strong aria-live="polite">{scenarioPending ? "Updating scenario" : shareStatus === "copied" ? "Scenario link copied — this URL reconstructs your current assumptions." : shareStatus === "error" ? "Copy unavailable" : ""}</strong>
             </div>
             {scenarioLinkNotice && (
@@ -1901,7 +2390,9 @@ function ScenarioApp() {
               </div>
               <div className="state-flip-metrics">
                 <span><small>Certified requirement</small><strong>{formatNumber(selectedStateFlipRequirement.certifiedRequiredNetMarginVotes)}</strong></span>
-                <span><small>Current modeled movement</small><strong>{selectedStateFlipRequirement.modeledNetMarginMovement >= 0 ? "+" : "−"}{formatNumber(Math.abs(selectedStateFlipRequirement.modeledNetMarginMovement))} {targetCandidate === "harris" ? "D" : "R"}</strong></span>
+                <span><small>Current modeled movement</small><strong>{selectedStateFlipRequirement.modeledNetMarginMovement === 0
+                  ? "No movement"
+                  : `${formatNumber(Math.abs(selectedStateFlipRequirement.modeledNetMarginMovement))} ${selectedStateFlipRequirement.modeledNetMarginMovement > 0 ? "toward" : "away from"} ${candidateNames[targetCandidate]}`}</strong></span>
                 <span><small>Still needed</small><strong>{formatNumber(selectedStateFlipRequirement.remainingNetMarginVotes)}</strong></span>
               </div>
               <p>The remaining requirement is recalculated from the current effective state result. It does not require a Path to 270 selection.</p>
@@ -2041,8 +2532,8 @@ function ScenarioApp() {
                         const stateContent = (
                           <>
                             <span><strong>{state.stateName}</strong><small>{state.currentClassification} → required</small></span>
-                            <span><small>Current</small><strong>{formatMargin(targetCandidate === "harris" ? state.currentMargin : -state.currentMargin)}</strong></span>
-                            <span><small>Required</small><strong>+{state.requiredMarginPoints.toFixed(1)} pts {targetCandidate === "harris" ? "D" : "R"}</strong></span>
+                            <span><small>Current vs strongest opponent</small><strong>{formatTargetMargin(targetCandidate, state.currentMargin)}</strong></span>
+                            <span><small>Required</small><strong>+{state.requiredMarginPoints.toFixed(1)} pts {candidateNames[targetCandidate]}</strong></span>
                             <span><small>Net margin votes</small><strong>{formatNumber(state.requiredNetMarginVotes)}</strong></span>
                             <b>+{state.electoralVotes} EV</b>
                           </>
@@ -2078,26 +2569,17 @@ function ScenarioApp() {
             )}
             <p className="route-disclosure">
               Required means statewide mathematical movement still needed, not a forecast. Modeled means a detailed PA or MI recipe exists. Satisfied means that recipe changes the state&apos;s electoral winner. Maine and Nebraska are excluded until district allocation is supported.
+              {targetCandidate !== "harris" && targetCandidate !== "trump" && " Named candidate baselines are exact in supported detailed states; unseparated minor-candidate votes in unsupported states remain in Aggregate other."}
             </p>
           </section>
 
-          {experienceMode === "election-night" && <div
-            aria-label="Election night controls"
-            className="laboratory-drawer night-command-dock"
-            data-snap={laboratoryDrawerSnap}
-            ref={laboratoryDrawerRef}
-            role="region"
-            style={laboratoryDrawerDragHeight == null ? undefined : { "--drawer-drag-height": `${laboratoryDrawerDragHeight}px` } as CSSProperties}
+        </AnalysisInspector>
+      </WorkspaceLayout>
+      {workspaceMode === "laboratory" && <>
+          {experienceMode === "election-night" && <WorkspaceDock
+            label="Election night controls" resizeLabel="Resize Election Night dock" night
+            snap={laboratoryDrawerSnap} onSnap={changeDrawerSnap} onResize={dock.setDragHeight}
           >
-            <button
-              aria-label="Resize Election Night dock"
-              className="drawer-grab-handle"
-              onPointerCancel={handleDrawerPointerEnd}
-              onPointerDown={handleDrawerPointerDown}
-              onPointerMove={handleDrawerPointerMove}
-              onPointerUp={handleDrawerPointerEnd}
-              type="button"
-            ><span /></button>
             <div className="drawer-toolbar night-dock-toolbar">
               <div className="drawer-intent night-dock-clock">
                 <span className="overline">Run my election</span>
@@ -2159,17 +2641,17 @@ function ScenarioApp() {
               <div aria-labelledby="night-dock-tab-live" className="drawer-panel" data-active={nightDockTab === "live"} id="night-dock-panel-live" role="tabpanel">
                 <section className="night-live-grid">
                   <article className="night-live-lead">
-                    <span className="overline">What is happening?</span>
+                    <span className="overline">Three-state reported plurality</span>
                     <strong>{replayNational?.totalReportedVotes
-                      ? `${replayNationalMarginVotes >= 0 ? "Harris" : "Trump"} +${formatNumber(Math.abs(replayNationalMarginVotes))}`
+                      ? formatResultLead(replayNationalResult)
                       : "No returns"}</strong>
                     <p>{replayFifteenMinuteWindow?.national.returnsPublished
-                      ? `${replayFifteenMinuteWindow.national.returnsPublished} published local units added ${formatNumber(replayFifteenMinuteWindow.national.ballotsPublished)} ballots in the last 15 logical minutes, moving the three-state margin ${formatMarginVotes(replayFifteenMinuteWindow.national.signedHarrisMinusTrumpMovement)}.`
+                      ? `${replayFifteenMinuteWindow.national.returnsPublished} published local units added ${formatNumber(replayFifteenMinuteWindow.national.ballotsPublished)} ballots in the last 15 logical minutes. Their Harris-Trump margin movement was ${formatMarginVotes(replayFifteenMinuteWindow.national.signedHarrisMinusTrumpMovement)}.`
                       : "PA, MI, and WI are built upward from published local units. No other state participates."}</p>
                     <div className="night-window-headlines">
                       <span><small>5 minute pace</small><b>{replayFiveMinuteWindow?.returnsPerHourMilli == null ? "Waiting" : `${(replayFiveMinuteWindow.returnsPerHourMilli / 1_000).toFixed(1)} returns/hr`}</b></span>
                       <span><small>15 minute ballots</small><b>{formatNumber(replayFifteenMinuteWindow?.national.ballotsPublished ?? 0)}</b></span>
-                      <span><small>30 minute movement</small><b>{formatMarginVotes(replayThirtyMinuteWindow?.national.signedHarrisMinusTrumpMovement ?? 0)}</b></span>
+                      <span><small>30 minute H-T movement</small><b>{formatMarginVotes(replayThirtyMinuteWindow?.national.signedHarrisMinusTrumpMovement ?? 0)}</b></span>
                     </div>
                   </article>
                   <div className="night-live-states">
@@ -2177,7 +2659,14 @@ function ScenarioApp() {
                       const state = replayJurisdictions?.find((item) => item.jurisdictionId === stateCode);
                       const harris = replayCandidateVotes(state, "harris");
                       const trump = replayCandidateVotes(state, "trump");
-                      const reportedMargin = state?.totalReportedVotes ? (harris - trump) / state.totalReportedVotes * 100 : null;
+                      const reportedResult: AtlasCandidateResult | undefined = state?.totalReportedVotes ? {
+                        harrisVotes: harris,
+                        trumpVotes: trump,
+                        steinVotes: replayCandidateVotes(state, "stein"),
+                        oliverVotes: replayCandidateVotes(state, "oliver"),
+                        residualOtherVotes: replayCandidateVotes(state, "other-residual"),
+                        totalVotes: state.totalReportedVotes,
+                      } : undefined;
                       const unitProgress = state?.expectedReturns
                         ? Math.round((state.returnsPublished / state.expectedReturns) * 100)
                         : 0;
@@ -2186,17 +2675,11 @@ function ScenarioApp() {
                       const chronology = replayChronologyByState.get(stateCode);
                       return <button data-fresh={replay.currentReturn?.jurisdictionId === stateCode} key={stateCode} onClick={() => selectState(stateCode)} type="button">
                         <span><b>{stateCode}</b><small>{progress?.returns ? `${(progress.returns.partsPerMillion / 10_000).toFixed(1)}% units` : `${state?.returnsPublished ?? 0} / ${state?.expectedReturns ?? 0} units`}</small></span>
-                        <strong>{reportedMargin == null ? "No returns" : formatMargin(reportedMargin)}</strong>
+                        <strong>{formatResultLead(reportedResult)}</strong>
                         <em aria-label={`${unitProgress}% of ${stateCode} reporting units published`}><i style={{ width: `${unitProgress}%` }} /></em>
                         <small className="night-state-diagnostic" data-stalled={chronology?.stalled}>{chronology?.stalled
                           ? `Stalled ${Math.round((chronology.elapsedSinceActivityMs ?? 0) / 60_000)}m`
-                          : openness?.status === "open"
-                            ? `${formatCompact(openness.modeledOutstandingBallots ?? 0)} modeled ballots remain`
-                            : openness?.status === "exhausted"
-                              ? "Arithmetic path exhausted"
-                              : openness?.status === "complete"
-                                ? "Count complete"
-                                : "Awaiting count"}</small>
+                          : describePluralityPath(state, openness?.modeledOutstandingBallots)}</small>
                       </button>;
                     })}
                   </div>
@@ -2205,7 +2688,7 @@ function ScenarioApp() {
                     {replay.recentReturns.length ? <ol>
                       {replay.recentReturns.slice(0, 4).map((returnEvent) => <li key={returnEvent.eventId}>
                         <span><b>{returnEvent.jurisdictionId}</b><small>{returnEvent.countyId ? replayCountyNames.get(`${returnEvent.jurisdictionId}:${returnEvent.countyId}`) ?? returnEvent.countyId : "Off-map return"}</small></span>
-                        <span><strong>{describeReturnMovement(returnEvent)}</strong><small>{formatNumber(returnEvent.totalVotes)} ballots · {replayTimeShortFormat.format(new Date(returnEvent.atMs))}</small></span>
+                        <span><strong>{describeReturnMovement(returnEvent)}</strong><small>{describeHarrisTrumpReturnMovement(returnEvent)} · {formatNumber(returnEvent.totalVotes)} ballots · {replayTimeShortFormat.format(new Date(returnEvent.atMs))}</small></span>
                       </li>)}
                     </ol> : <div className="night-tape-empty"><strong>Waiting for the first unit</strong><p>Press Play or Next return when the scenario is ready.</p></div>}
                   </article>
@@ -2216,7 +2699,7 @@ function ScenarioApp() {
                 <section className="night-timeline-panel">
                   <div className="night-dock-section-heading">
                     <div><span className="overline">Analytical workspace</span><strong>How the count moved</strong></div>
-                    <p>Compare margin, reporting pace, and state progress using only the returns visible at this moment.</p>
+                    <p>Compare candidate share, reporting pace, and state progress using only the returns visible at this moment.</p>
                   </div>
                   <div aria-label="Election night analytical lenses" className="night-analytical-lens-tabs" role="tablist">
                     {(["margin", "velocity", "compare"] as const).map((lens) => <button
@@ -2225,7 +2708,7 @@ function ScenarioApp() {
                       onClick={() => setNightAnalyticalLens(lens)}
                       role="tab"
                       type="button"
-                    >{lens === "compare" ? "Compare states" : lens[0].toUpperCase() + lens.slice(1)}</button>)}
+                    >{lens === "margin" ? "Vote share" : lens === "compare" ? "Compare states" : "Velocity"}</button>)}
                   </div>
                   {nightDockTab === "timeline" && replay.marginTimeline && replay.reportingPace ? <>
                     {nightAnalyticalLens === "margin" && <div className="night-timeline-layout">
@@ -2239,7 +2722,7 @@ function ScenarioApp() {
                             timeline={replay.marginTimeline}
                           />
                         </Suspense>
-                        <div className="night-timeline-axis-note"><span>Republican lead</span><b>Reported margin</b><span>Democratic lead</span></div>
+                        <div className="night-timeline-axis-note"><span>0%</span><b>{selectedStateCode && isDetailedStateCode(selectedStateCode) ? `${selectedStateCode} reported candidate share` : "Three-state reported candidate share"}</b><span>Vote share</span></div>
                       </article>
                       <aside className="night-timeline-readout">
                         <span className="overline">Visible prefix</span>
@@ -2249,13 +2732,15 @@ function ScenarioApp() {
                           : "Every published return is represented in the displayed line."}</p>
                         <dl>
                           {(["PA", "MI", "WI"] as const).map((stateCode) => {
-                            const latest = replay.marginTimeline?.points.at(-1);
-                            const marginParts = latest?.jurisdictionMarginPartsPerMillion[stateCode] ?? null;
                             const state = replay.current?.election.jurisdictions.find((row) => row.jurisdictionId === stateCode);
-                            return <div key={stateCode}><dt>{stateCode}</dt><dd>{marginParts === null ? "No return" : formatMargin(marginParts / 10_000)}</dd><small>{formatNumber(state?.returnsPublished ?? 0)} units</small></div>;
+                            const result = candidateVectorResult(state ? {
+                              candidateVotes: state.candidateVotes,
+                              totalVotes: state.totalReportedVotes,
+                            } : null);
+                            return <div key={stateCode}><dt>{stateCode}</dt><dd>{formatResultLead(result)}</dd><small>{formatNumber(state?.returnsPublished ?? 0)} units</small></div>;
                           })}
                         </dl>
-                        <small>Above zero is a Democratic reported-vote lead. Below zero is Republican. This is observation, not projection.</small>
+                        <small>Lines are each candidate&apos;s share of ballots reported so far. The state readouts show the true leader over the runner-up. This is observation, not projection.</small>
                       </aside>
                     </div>}
                     {nightAnalyticalLens === "velocity" && <div className="night-timeline-layout">
@@ -2392,7 +2877,7 @@ function ScenarioApp() {
                     </div> : <p className="night-override-empty">No county exceptions. Every county follows its state profile.</p>}
                   </section>
 
-                  <div className="night-apply-row"><p>{nightBehavior.countyOverrides.length} county {nightBehavior.countyOverrides.length === 1 ? "override" : "overrides"} · {nightBehavior.durationHours} hour plan · seed {nightBehavior.seed}</p><button className="night-apply-behavior" disabled={!nightBehaviorDirty || scenarioPending} onClick={beginElectionNight} type="button">Apply and restart count</button></div>
+                  <div className="night-apply-row"><p>{nightBehavior.countyOverrides.length} county {nightBehavior.countyOverrides.length === 1 ? "override" : "overrides"} · {nightBehavior.durationHours} hour plan · seed {nightBehavior.seed}</p><button className="night-apply-behavior" disabled={!nightBehaviorDirty || scenarioPending} onClick={restartElectionNight} type="button">Apply and restart count</button></div>
                 </section>
               </div>
 
@@ -2400,31 +2885,31 @@ function ScenarioApp() {
                 <section className="night-returns-panel">
                   <div className="night-dock-section-heading"><div><span className="overline">Geographic return ledger</span><strong>{selectedStateCode ? selectedGeographyName : "Three detailed states"}</strong></div><p>Click the map or state desk to change scope.</p></div>
                   <div className="night-return-metrics">
-                    <span><small>Reported margin</small><strong>{replayPresentedMargin == null ? "No return" : formatMargin(replayPresentedMargin)}</strong></span>
+                    <span><small>Reported plurality</small><strong>{replayPresentedLabel}</strong></span>
                     <span><small>Ballots</small><strong>{formatNumber(replayPresentedTotalVotes)}</strong></span>
                     <span><small>Published units</small><strong>{replaySelectedState?.returnsPublished ?? replayNational?.returnsPublished ?? 0}</strong></span>
                     <span><small>Status</small><strong>{replay.current?.controller.status ?? replay.phase}</strong></span>
                   </div>
                   <div className="night-analytics-workspace">
                     <section className="night-window-ledger" aria-label="Logical return windows">
-                      <div><span>Window</span><span>Returns</span><span>Ballots</span><span>Margin movement</span></div>
+                      <div><span>Window</span><span>Returns</span><span>Ballots</span><span>Window plurality</span></div>
                       {(replayAnalytics?.windows ?? []).map((window) => <div key={window.windowMinutes}>
                         <strong>{window.windowMinutes} min</strong>
                         <span>{window.national.returnsPublished}</span>
                         <span>{formatNumber(window.national.ballotsPublished)}</span>
-                        <span data-direction={window.national.signedHarrisMinusTrumpMovement < 0 ? "republican" : "democratic"}>{formatMarginVotes(window.national.signedHarrisMinusTrumpMovement)}</span>
+                        <span className="night-window-result"><b>{formatResultLead(candidateVectorResult(window.national))}</b><small>H-T {formatMarginVotes(window.national.signedHarrisMinusTrumpMovement)}</small></span>
                       </div>)}
                     </section>
                     <section className="night-mover-ledger" aria-label="Recent geographic movers">
                       <div className="night-mover-column">
-                        <span className="overline">County movers · 15m</span>
+                        <span className="overline">County H-T movers · 15m</span>
                         {replaySelectedCountyMovers.length ? <ol>{replaySelectedCountyMovers.map((row) => <li key={`${row.jurisdictionId}:${row.geographyId}`}>
                           <span><b>{replayCountyNames.get(`${row.jurisdictionId}:${row.geographyId}`) ?? row.geographyId}</b><small>{row.jurisdictionId} · {row.returnsPublished} returns</small></span>
                           <strong data-direction={row.signedHarrisMinusTrumpMovement < 0 ? "republican" : "democratic"}>{formatMarginVotes(row.signedHarrisMinusTrumpMovement)}</strong>
                         </li>)}</ol> : <p>No county moved inside the current 15-minute window.</p>}
                       </div>
                       <div className="night-mover-column">
-                        <span className="overline">Reporting-unit movers · 15m</span>
+                        <span className="overline">Reporting-unit H-T movers · 15m</span>
                         {replaySelectedUnitMovers.length ? <ol>{replaySelectedUnitMovers.map((row) => <li key={`${row.jurisdictionId}:${row.geographyId}`}>
                           <span><b>{row.geographyId}</b><small>{row.jurisdictionId} · {formatNumber(row.ballotsPublished)} ballots</small></span>
                           <strong data-direction={row.signedHarrisMinusTrumpMovement < 0 ? "republican" : "democratic"}>{formatMarginVotes(row.signedHarrisMinusTrumpMovement)}</strong>
@@ -2442,40 +2927,28 @@ function ScenarioApp() {
                   <article><span>Chronology</span><strong>Deterministic reconstruction</strong><p>County windows, bursts, stalls, and jitter are reproducible from the selected seed.</p></article>
                   <article><span>Coverage</span><strong>PA · MI · WI only</strong><p>The remaining 48 jurisdictions stay inert because they lack approved detailed inputs.</p></article>
                   <article><span>Progress</span><strong>Units and ballots stay separate</strong><p>Published-unit progress uses exact return counts. Represented-ballot progress uses the locked scenario ballot denominator.</p></article>
-                  <article><span>Open path</span><strong>Arithmetic, not a call</strong><p>Open or exhausted asks only whether every modeled outstanding ballot could overtake the current reported margin.</p></article>
+                  <article><span>Result semantics</span><strong>Plurality first</strong><p>Map colors, state cards, result readouts, and the vote-share timeline compare the leading candidate with the runner-up across all five candidate buckets.</p></article>
+                  <article><span>Harris-Trump diagnostics</span><strong>Secondary and explicit</strong><p>Movement windows and mover rankings retain the signed Harris-minus-Trump analytic. They are labeled H-T and never substitute for the reported plurality.</p></article>
                   <article><span>Time windows</span><strong>Current prefix only</strong><p>Five-, fifteen-, and thirty-minute diagnostics cannot read a hidden future return or final candidate share.</p></article>
                   <article><span>Stall alert</span><strong>{nightBehavior.stallThresholdMinutes} logical minutes</strong><p>A stall marks elapsed synthetic count time since activity. It does not imply a reporting failure.</p></article>
                 </section>
               </div>
             </div>
-          </div>}
+          </WorkspaceDock>}
 
-          {experienceMode === "swingometer" && <div
-            aria-label="Laboratory desk"
-            className="laboratory-drawer"
-            data-snap={laboratoryDrawerSnap}
-            ref={laboratoryDrawerRef}
-            role="region"
-            style={laboratoryDrawerDragHeight == null ? undefined : { "--drawer-drag-height": `${laboratoryDrawerDragHeight}px` } as CSSProperties}
+          {experienceMode === "swingometer" && <WorkspaceDock
+            label="Laboratory desk" resizeLabel="Resize laboratory drawer"
+            snap={laboratoryDrawerSnap} onSnap={changeDrawerSnap} onResize={dock.setDragHeight}
           >
-            <button
-              aria-label="Resize laboratory drawer"
-              className="drawer-grab-handle"
-              onPointerCancel={handleDrawerPointerEnd}
-              onPointerDown={handleDrawerPointerDown}
-              onPointerMove={handleDrawerPointerMove}
-              onPointerUp={handleDrawerPointerEnd}
-              type="button"
-            ><span /></button>
             <div className="drawer-toolbar">
               <div className="drawer-intent">
                 <span className="overline">Change {mutationScopeName}</span>
                 <strong>{laboratoryDrawerSnap === "collapsed"
                   ? selectedStateCode
                     ? "Turnout · Preference · Third party"
-                    : "Choose Pennsylvania or Michigan to model voter behavior"
+                    : "Choose Pennsylvania, Michigan, or Wisconsin to model voter behavior"
                   : selectedGeographyName}</strong>
-                {laboratoryDrawerSnap === "collapsed" && (
+                {(
                   <button onClick={() => openLaboratoryPanel("behavior")} type="button">Open controls</button>
                 )}
               </div>
@@ -2508,14 +2981,23 @@ function ScenarioApp() {
                 {!selectedStateCode ? <section className="national-drawer-summary" aria-label="United States data inspector">
                   <div className="card-heading compact"><div><span className="overline">National Inspector</span><strong>Certified and modeled America</strong></div></div>
                   <div className="national-summary-grid">
-                    <span><small>Actual popular vote</small><strong>{formatMargin(((actualNational.harrisVotes - actualNational.trumpVotes) / actualNational.totalVotes) * 100)}</strong></span>
-                    <span><small>Scenario popular vote</small><strong>{formatMargin(((scenarioNational.harrisVotes - scenarioNational.trumpVotes) / scenarioNational.totalVotes) * 100)}</strong></span>
-                    <span><small>Actual Electoral College</small><strong>{actualNational.harrisElectoralVotes}–{actualNational.trumpElectoralVotes}</strong></span>
-                    <span><small>Scenario Electoral College</small><strong>{scenarioNational.harrisElectoralVotes}–{scenarioNational.trumpElectoralVotes}</strong></span>
+                    <span><small>Actual plurality</small><strong>{formatResultLead(actualNational)}</strong></span>
+                    <span><small>Scenario plurality</small><strong>{formatResultLead(scenarioNational)}</strong></span>
+                    <span><small>Actual Harris-Trump margin</small><strong>{formatMargin(((actualNational.harrisVotes - actualNational.trumpVotes) / actualNational.totalVotes) * 100)}</strong></span>
+                    <span><small>Scenario Harris-Trump margin</small><strong>{formatMargin(((scenarioNational.harrisVotes - scenarioNational.trumpVotes) / scenarioNational.totalVotes) * 100)}</strong></span>
+                    <span><small>Actual Electoral College</small><strong>{electoralTargetCandidates.filter((candidate) => electoralConsequences.actualCandidateElectoralVotes[candidate] > 0).map((candidate) => `${candidateNames[candidate]} ${electoralConsequences.actualCandidateElectoralVotes[candidate]}`).join(" · ")}</strong></span>
+                    <span><small>Scenario Electoral College</small><strong>{electoralTargetCandidates.filter((candidate) => electoralConsequences.scenarioCandidateElectoralVotes[candidate] > 0).map((candidate) => `${candidateNames[candidate]} ${electoralConsequences.scenarioCandidateElectoralVotes[candidate]}`).join(" · ")}</strong></span>
                   </div>
                   <p>All states use certified statewide totals. Pennsylvania, Michigan, and Wisconsin provide detailed local foundations with state-specific evidence contracts.</p>
                 </section> : selectedInspector ? (
-                  <GeographyInspector model={selectedInspector} onClearVtd={() => selectPrecinct(null)} />
+                  <GeographyInspector
+                    model={selectedInspector}
+                    onClearVtd={() => selectPrecinct(null)}
+                    onReturnToContributors={() => {
+                      setLaboratoryDrawerTab("contributors");
+                      requestAnimationFrame(() => document.getElementById("laboratory-tab-contributors")?.focus());
+                    }}
+                  />
                 ) : <div className="drawer-empty"><strong>No local geography selected.</strong><span>Choose a county or {activeDetailedStateManifest.geography.unitLabel.toLowerCase()} to inspect its baseline and scenario result.</span></div>}
               </div>
 
@@ -2524,13 +3006,13 @@ function ScenarioApp() {
           <section className="assumption-card">
             <div className="card-heading">
               <div><span className="overline">Behavior editor</span><strong>Change participation or choice</strong></div>
-              <button className="collapse-button" onClick={() => setAssumptionsOpen((value) => !value)} type="button" aria-expanded={assumptionsOpen}>
+              <button className="collapse-button" onClick={() => setAssumptionsOpen((value) => !value)} type="button" aria-expanded={assumptionsOpen} aria-controls="behavior-editor-body" aria-label={assumptionsOpen ? "Collapse behavior editor" : "Expand behavior editor"}>
                 {assumptionsOpen ? "−" : "+"}
               </button>
             </div>
 
-            <div className="control-body">
-              <div className="behavior-tabs" aria-label="Behavior operation">
+            <div className="control-body" id="behavior-editor-body" hidden={!assumptionsOpen}>
+              <div className="behavior-tabs" aria-label="Behavior operation" role="group">
                 <button
                   aria-pressed={behaviorEditorMode === "turnout"}
                   onClick={() => setBehaviorEditorMode("turnout")}
@@ -2547,6 +3029,7 @@ function ScenarioApp() {
                   type="button"
                 >Third party</button>
               </div>
+              <div className="editor-context">
               <div className="field-label">
                 <span>Geography</span>
                 <strong>{activeDetailedStateManifest.name}</strong>
@@ -2554,6 +3037,7 @@ function ScenarioApp() {
               <div className="field-label">
                 <span>Population</span>
                 <strong>{activeOperationSemantics.populationBasis}</strong>
+              </div>
               </div>
 
               <div className={`coverage-strip ${demographicError ? "error" : ""}`}>
@@ -2585,12 +3069,15 @@ function ScenarioApp() {
                   <strong>{behaviorEditorMode === "turnout" ? "Participation" : behaviorEditorMode === "preference" ? "Two-party choice" : "Third-party exchange"}</strong>
                   <b>Scenario assumption, not a forecast</b>
                 </div>
+                <details className="operation-details">
+                  <summary>How this operation works</summary>
                 <div className="model-contract-grid">
                   <span><small>Changes</small><strong>{activeOperationSemantics.changes}</strong></span>
                   <span><small>Stays fixed</small><strong>{activeOperationSemantics.preserves}</strong></span>
                   <span><small>Feasible boundary</small><strong>{activeOperationSemantics.boundary}</strong></span>
                 </div>
                 {behaviorEditorMode === "turnout" && <p><b>Denominator:</b> {activeModelSemantics.denominatorDisclosure}</p>}
+                </details>
               </section>
 
               {behaviorEditorMode === "turnout" ? (
@@ -2626,8 +3113,139 @@ function ScenarioApp() {
                   />
                   <div className="range-labels"><span>Actual</span><span>+0.8 pts</span><span>+1.5 pts model window</span></div>
 
+                  <section className="demographic-turnout-editor" aria-labelledby="demographic-turnout-title">
+                    <div className="demographic-turnout-heading">
+                      <div>
+                        <span className="overline">Observed aggregate composition</span>
+                        <strong id="demographic-turnout-title">Group turnout assumptions</strong>
+                      </div>
+                      {demographicGroupTurnoutAvailable && demographicTurnoutActive && (
+                        <button
+                          onClick={() => setDemographicTurnoutIncreasePoints({
+                            ...DEFAULT_DEMOGRAPHIC_TURNOUT_INCREASE_POINTS,
+                          })}
+                          type="button"
+                        >Clear groups</button>
+                      )}
+                    </div>
+                    {demographicGroupTurnoutAvailable ? (
+                      <>
+                        <p>Each setting adds ballots using that group&apos;s aggregate 2020 VAP geography. It does not claim how individual people voted.</p>
+                        <div className="demographic-turnout-list">
+                          {DEMOGRAPHIC_GROUP_IDS.map((groupId) => {
+                            const result = demographicTurnoutResultByGroup.get(groupId);
+                            const value = demographicTurnoutIncreasePoints[groupId];
+                            return (
+                              <div className="demographic-turnout-row" key={groupId}>
+                                <div className="demographic-turnout-label">
+                                  <label htmlFor={`demographic-turnout-${groupId}`}>
+                                    {demographicGroupLabels[groupId]}
+                                  </label>
+                                  <strong>+{value.toFixed(1)} pts</strong>
+                                </div>
+                                <input
+                                  aria-valuetext={`${demographicGroupLabels[groupId]} plus ${value.toFixed(1)} turnout points`}
+                                  id={`demographic-turnout-${groupId}`}
+                                  max="10"
+                                  min="0"
+                                  onChange={(event) => updateDemographicTurnout(
+                                    groupId,
+                                    Number(event.currentTarget.value),
+                                  )}
+                                  onInput={(event) => updateDemographicTurnout(
+                                    groupId,
+                                    Number(event.currentTarget.value),
+                                  )}
+                                  step="0.1"
+                                  type="range"
+                                  value={value}
+                                />
+                                <small>
+                                  {result
+                                    ? `${formatCompact(result.population)} VAP · ${formatCompact(result.addedVotes)} added · ${result.candidateShareMode === "custom-five-candidate" ? "custom choice" : "shared split"}`
+                                    : "Calculating local capacity…"}
+                                </small>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <section className="demographic-preference-editor" aria-labelledby="demographic-preference-title">
+                          <div className="demographic-preference-heading">
+                            <div>
+                              <span className="overline">Authored candidate choice</span>
+                              <strong id="demographic-preference-title">Preference for added group ballots</strong>
+                            </div>
+                            <span>Five candidates · 100%</span>
+                          </div>
+                          <div className="demographic-preference-groups" aria-label="Demographic preference group">
+                            {DEMOGRAPHIC_GROUP_IDS.map((groupId) => <button
+                              aria-pressed={selectedDemographicPreferenceGroup === groupId}
+                              key={groupId}
+                              onClick={() => setSelectedDemographicPreferenceGroup(groupId)}
+                              type="button"
+                            >{demographicGroupLabels[groupId]}</button>)}
+                          </div>
+                          <div className="demographic-preference-mode">
+                            <div>
+                              <strong>{demographicGroupLabels[selectedDemographicPreferenceGroup]}</strong>
+                              <span>{selectedDemographicCandidateShares
+                                ? "Custom five-candidate vector"
+                                : `Shared added-ballot split · Harris ${addedVoterHarrisShare.toFixed(0)}% · Trump ${(100 - addedVoterHarrisShare).toFixed(0)}%`}</span>
+                            </div>
+                            {selectedDemographicCandidateShares ? <button
+                              onClick={() => inheritDemographicPreference(selectedDemographicPreferenceGroup)}
+                              type="button"
+                            >Use shared split</button> : <button
+                              onClick={() => customizeDemographicPreference(selectedDemographicPreferenceGroup)}
+                              type="button"
+                            >Customize choice</button>}
+                          </div>
+                          {selectedDemographicCandidateShares && <div className="demographic-candidate-share-list">
+                            {DEMOGRAPHIC_PREFERENCE_CANDIDATES.map((candidate) => <div className="demographic-candidate-share" key={candidate}>
+                              <div>
+                                <label htmlFor={`demographic-preference-${selectedDemographicPreferenceGroup}-${candidate}`}>
+                                  {demographicPreferenceCandidateLabels[candidate]}
+                                </label>
+                                <strong>{selectedDemographicCandidateShares[candidate]}%</strong>
+                              </div>
+                              <input
+                                aria-valuetext={`${demographicPreferenceCandidateLabels[candidate]} ${selectedDemographicCandidateShares[candidate]} percent`}
+                                id={`demographic-preference-${selectedDemographicPreferenceGroup}-${candidate}`}
+                                max="100"
+                                min="0"
+                                onChange={(event) => updateDemographicCandidateShare(
+                                  selectedDemographicPreferenceGroup,
+                                  candidate,
+                                  Number(event.currentTarget.value),
+                                )}
+                                onInput={(event) => updateDemographicCandidateShare(
+                                  selectedDemographicPreferenceGroup,
+                                  candidate,
+                                  Number(event.currentTarget.value),
+                                )}
+                                step="1"
+                                type="range"
+                                value={selectedDemographicCandidateShares[candidate]}
+                              />
+                            </div>)}
+                            <p>The edited candidate remains fixed while the other four shares rebalance proportionally. The vector always sums to 100%.</p>
+                          </div>}
+                          <p className="demographic-preference-boundary">This preference applies only to new ballots created by this group&apos;s turnout setting. Certified ballots are never assigned a demographic identity.</p>
+                        </section>
+                        <p className="demographic-turnout-boundary">
+                          Group additions run after the statewide setting and share the same local remaining capacity. Canonical group order resolves capacity competition. Groups without a custom vector inherit the shared split below.
+                        </p>
+                      </>
+                    ) : (
+                      <div className="demographic-turnout-unavailable" role="status">
+                        <strong>Group controls unavailable for {activeDetailedStateManifest.name}</strong>
+                        <span>The admitted runtime contains total VAP but no compatible group-composition cells. No statewide substitute is invented.</span>
+                      </div>
+                    )}
+                  </section>
+
                   <div className="slider-header secondary-slider">
-                    <label htmlFor="pa-new-voter-share">Harris share of added ballots</label>
+                    <label htmlFor="pa-new-voter-share">Shared Harris share of added ballots</label>
                     <strong>{addedVoterHarrisShare.toFixed(0)}%</strong>
                   </div>
                   <input
@@ -2655,14 +3273,58 @@ function ScenarioApp() {
                     type="range"
                     value={addedVoterHarrisShare}
                   />
-                  <div className="range-labels"><span>100% Trump</span><span>Even</span><span>100% Harris</span></div>
+                  <div className="range-labels"><span>100% Trump</span><span>Inherited group default</span><span>100% Harris</span></div>
 
-                  <div className="effect-grid">
+                  <div className="effect-grid turnout-effects">
                     <div><span>Added ballots</span><strong>{formatCompact(behaviorScenario?.turnout.addedVotes ?? 0)}</strong></div>
-                    <div><span>Added vote split</span><strong>H {formatCompact(behaviorScenario?.turnout.harrisVotes ?? 0)} · T {formatCompact(behaviorScenario?.turnout.trumpVotes ?? 0)}</strong></div>
-                    <div><span>{activeDetailedStateCode} result</span><strong>{formatMargin(margin(detailedScenario))}</strong></div>
+                    <div><span>Group-added ballots</span><strong>{formatCompact(behaviorScenario?.demographicTurnout.addedVotes ?? 0)}</strong></div>
+                    <div><span>Added vote ledger</span><strong>H {formatCompact(behaviorScenario?.turnout.harrisVotes ?? 0)} · T {formatCompact(behaviorScenario?.turnout.trumpVotes ?? 0)} · S {formatCompact(behaviorScenario?.turnout.steinVotes ?? 0)} · O {formatCompact(behaviorScenario?.turnout.oliverVotes ?? 0)} · Other {formatCompact(behaviorScenario?.turnout.residualOtherVotes ?? 0)}</strong></div>
+                    <div><span>{activeDetailedStateCode} result</span><strong>{formatResultLead(detailedScenario)}</strong></div>
                   </div>
                   <p className="transfer-explainer"><strong>{formatNumber(behaviorScenario?.turnout.addedVotes ?? 0)} of {formatNumber(behaviorScenario?.turnout.requestedVotes ?? 0)} requested ballots added.</strong>{" "}{formatNumber(behaviorScenario?.turnout.capacity ?? 0)} ballots of documented local capacity are available before this operation.</p>
+                  {demographicGroupTurnoutAvailable && <section className="demographic-impact-panel" aria-label="Demographic contribution and sensitivity">
+                    <div className="demographic-impact-heading">
+                      <div><span className="overline">Exact contribution</span><strong>{demographicGroupLabels[selectedDemographicPreferenceGroup]}</strong></div>
+                      <span>{selectedDemographicTurnoutResult?.candidateShareMode === "custom-five-candidate" ? "Custom choice" : "Shared split"}</span>
+                    </div>
+                    <div className="demographic-impact-metrics">
+                      <div><span>Requested</span><strong>{formatCompact(selectedDemographicTurnoutResult?.requestedVotes ?? 0)}</strong></div>
+                      <div><span>Realized</span><strong>{formatCompact(selectedDemographicTurnoutResult?.addedVotes ?? 0)}</strong></div>
+                      <div><span>Capacity clipped</span><strong>{formatCompact(selectedDemographicTurnoutResult?.clippedVotes ?? 0)}</strong></div>
+                      <div><span>H-T movement</span><strong>{formatSignedCompact(selectedDemographicTurnoutResult?.harrisTrumpMarginVotes ?? 0)}</strong></div>
+                    </div>
+                    <div className="demographic-impact-candidate-ledger" aria-label="Added ballots by candidate">
+                      <span>Harris <strong>{formatCompact(selectedDemographicTurnoutResult?.candidateVotes.harrisVotes ?? 0)}</strong></span>
+                      <span>Trump <strong>{formatCompact(selectedDemographicTurnoutResult?.candidateVotes.trumpVotes ?? 0)}</strong></span>
+                      <span>Stein <strong>{formatCompact(selectedDemographicTurnoutResult?.candidateVotes.steinVotes ?? 0)}</strong></span>
+                      <span>Oliver <strong>{formatCompact(selectedDemographicTurnoutResult?.candidateVotes.oliverVotes ?? 0)}</strong></span>
+                      <span>Other <strong>{formatCompact(selectedDemographicTurnoutResult?.candidateVotes.residualOtherVotes ?? 0)}</strong></span>
+                    </div>
+                    <div className="demographic-sensitivity-note">
+                      <span>Bounded sensitivity</span>
+                      <strong>{formatSignedCompact(selectedDemographicTurnoutResult?.marginVotesPerThousandAdded ?? 0)} H-T margin votes per 1,000 added ballots</strong>
+                      <small>This is deterministic arithmetic from the authored candidate vector, not a probability or forecast.</small>
+                    </div>
+                    <div className="demographic-impact-scope" aria-label="Demographic contribution geography">
+                      <button aria-pressed={demographicContributionScope === "county"} onClick={() => setDemographicContributionScope("county")} type="button">Counties</button>
+                      <button aria-pressed={demographicContributionScope === "vtd"} onClick={() => setDemographicContributionScope("vtd")} type="button">{activeGeographyShortLabel}</button>
+                    </div>
+                    {(demographicContributionScope === "county"
+                      ? demographicContributionSummary.counties
+                      : demographicContributionSummary.units).length > 0 ? <ol className="demographic-impact-list">
+                        {(demographicContributionScope === "county"
+                          ? demographicContributionSummary.counties
+                          : demographicContributionSummary.units).slice(0, 6).map((row) => <li key={row.id}>
+                            <span><strong>{row.name}</strong><small>{row.context}</small></span>
+                            <span><b>{formatCompact(row.ballots)} ballots</b><small>{formatSignedCompact(row.marginVotes)} H-T</small></span>
+                          </li>)}
+                      </ol> : <p className="demographic-impact-empty">Increase this group&apos;s turnout to reveal its exact geographic contribution.</p>}
+                    <div className="demographic-impact-footnote">
+                      <span>{formatNumber(demographicContributionSummary.receivingUnitCount)} mapped units receive added ballots</span>
+                      <strong>{formatNumber(demographicContributionSummary.offMapBallots)} off-map ballots</strong>
+                    </div>
+                    <p className="demographic-impact-sequence">This panel isolates the turnout operation at insertion time. Any statewide preference transfer or named third-party exchange runs afterward and may move those ballots again.</p>
+                  </section>}
                 </>
               ) : behaviorEditorMode === "preference" ? (
                 <>
@@ -2721,11 +3383,11 @@ function ScenarioApp() {
 
                   <div className="effect-grid">
                     <div><span>Ballots transferred</span><strong>{formatCompact(Math.abs(behaviorScenario?.preference.realizedTransfer ?? 0))}</strong></div>
-                    <div><span>State margin movement</span><strong>{formatMarginVotes(contributionSummary.statewideMarginDelta)}</strong></div>
-                    <div><span>{activeDetailedStateCode} result</span><strong>{formatMargin(margin(detailedScenario))}</strong></div>
+                    <div><span>Harris-Trump movement</span><strong>{formatMarginVotes(preferenceMarginDelta)}</strong></div>
+                    <div><span>{activeDetailedStateCode} result</span><strong>{formatResultLead(detailedScenario)}</strong></div>
                   </div>
                   <p className="transfer-explainer">
-                    <strong>{formatNumber(Math.abs(behaviorScenario?.preference.realizedTransfer ?? 0))} of {formatNumber(Math.abs(behaviorScenario?.preference.requestedTransfer ?? 0))} requested ballots transferred → {formatNumber(Math.abs(contributionSummary.statewideMarginDelta))} votes of {effectivePreferenceShiftPoints >= 0 ? "Harris−Trump" : "Trump−Harris"} margin movement.</strong>{" "}
+                    <strong>{formatNumber(Math.abs(behaviorScenario?.preference.realizedTransfer ?? 0))} of {formatNumber(Math.abs(behaviorScenario?.preference.requestedTransfer ?? 0))} requested ballots transferred → {formatNumber(Math.abs(preferenceMarginDelta))} votes of {effectivePreferenceShiftPoints >= 0 ? "Harris−Trump" : "Trump−Harris"} margin movement.</strong>{" "}
                     Each direct Harris↔Trump transfer changes the two-candidate margin by 2 votes.
                   </p>
                 </>
@@ -2831,7 +3493,7 @@ function ScenarioApp() {
                   <div className="effect-grid">
                     <div><span>{thirdPartyLabels[thirdPartyCandidate]} votes</span><strong>{formatCompact(thirdPartyScenarioVotes)}</strong></div>
                     <div><span>Ballots exchanged</span><strong>{formatCompact(Math.abs(behaviorScenario?.thirdParty.realizedCandidateDelta ?? 0))}</strong></div>
-                    <div><span>{activeDetailedStateCode} result</span><strong>{formatMargin(margin(detailedScenario))}</strong></div>
+                    <div><span>{activeDetailedStateCode} result</span><strong>{formatResultLead(detailedScenario)}</strong></div>
                   </div>
                   <p className="transfer-explainer"><strong>{formatNumber(Math.abs(behaviorScenario?.thirdParty.realizedCandidateDelta ?? 0))} of {formatNumber(Math.abs(behaviorScenario?.thirdParty.requestedCandidateDelta ?? 0))} requested ballots exchanged.</strong>{" "}The operation changes Harris by {formatNumber(behaviorScenario?.thirdParty.harrisVoteDelta ?? 0)} and Trump by {formatNumber(behaviorScenario?.thirdParty.trumpVoteDelta ?? 0)} while preserving the statewide ballot total.</p>
                 </>
@@ -2847,45 +3509,55 @@ function ScenarioApp() {
               <div aria-labelledby="laboratory-tab-contributors" className="drawer-panel" data-active={laboratoryDrawerTab === "contributors"} id="laboratory-panel-contributors" role="tabpanel">
           {!selectedStateCode && <section className="national-portfolio-contributors">
             <div className="card-heading compact"><div><span className="overline">National movement</span><strong>Active detailed states</strong></div></div>
-            {electoralConsequences.activeRows.length > 0 ? electoralConsequences.activeRows.map((row) => <button key={row.stateCode} onClick={() => selectState(row.stateCode)} type="button"><span><strong>{row.stateName}</strong><small>{formatMargin(row.actualMargin)} → {formatMargin(row.scenarioMargin)}</small></span><b>{row.targetElectoralDelta === 0 ? "0 EV" : `${row.targetElectoralDelta > 0 ? "+" : "−"}${Math.abs(row.targetElectoralDelta)} EV`}</b></button>) : <p>No detailed state recipe is active. Pennsylvania, Michigan, and Wisconsin are available for modeling.</p>}
+            {electoralConsequences.activeRows.length > 0 ? electoralConsequences.activeRows.map((row) => <button key={row.stateCode} onClick={() => selectState(row.stateCode)} type="button"><span><strong>{row.stateName}</strong><small>{formatPluralityMargin(row.actualWinner, row.actualMargin)} → {formatPluralityMargin(row.scenarioWinner, row.scenarioMargin)}</small></span><b>{row.targetElectoralDelta === 0 ? "0 EV" : `${row.targetElectoralDelta > 0 ? "+" : "−"}${Math.abs(row.targetElectoralDelta)} EV`}</b></button>) : <p>No detailed state recipe is active. Pennsylvania, Michigan, and Wisconsin are available for modeling.</p>}
           </section>}
           <div className={!selectedStateCode ? "national-detail-reference" : undefined}>
           <section className="analytics-editorial-summary" aria-label="Scenario change summary">
             <div className="analytics-summary-copy">
               <span className="overline">What changed?</span>
               <strong>{scenarioDeltaLedger
-                ? scenarioDeltaLedger.delta.harrisTrumpMarginVotes === 0
-                  ? `${activeDetailedStateManifest.name} keeps its certified margin`
-                  : `${activeDetailedStateManifest.name} moves ${formatCompact(Math.abs(scenarioDeltaLedger.delta.harrisTrumpMarginVotes))} margin votes toward ${scenarioDeltaLedger.delta.harrisTrumpMarginVotes > 0 ? "Harris" : "Trump"}`
+                ? scenarioExplanation?.electoral.winnerChanged
+                  ? `${activeDetailedStateManifest.name} changes from ${candidateNames[scenarioExplanation.electoral.actualWinner]} to ${candidateNames[scenarioExplanation.electoral.scenarioWinner]}`
+                  : scenarioDeltaLedger.delta.harrisTrumpMarginVotes === 0
+                    ? `${candidateNames[scenarioExplanation?.electoral.scenarioWinner ?? "tie"]} keeps the ${activeDetailedStateManifest.name} plurality with no Harris-Trump movement`
+                    : `${candidateNames[scenarioExplanation?.electoral.scenarioWinner ?? "tie"]} keeps the ${activeDetailedStateManifest.name} plurality as the Harris-Trump margin moves ${formatCompact(Math.abs(scenarioDeltaLedger.delta.harrisTrumpMarginVotes))} votes toward ${scenarioDeltaLedger.delta.harrisTrumpMarginVotes > 0 ? "Harris" : "Trump"}`
                 : "Waiting for the detailed scenario ledger"}</strong>
               <p>Every figure below comes from the accepted certified-to-scenario ledger. Geography rows and operation rows reconcile to the same endpoint.</p>
             </div>
             <div className="analytics-actual-scenario-delta" role="group" aria-label="Actual scenario and delta">
-              <span><small>Actual</small><strong>{formatMargin(margin(detailedActual))}</strong><em>Certified</em></span>
-              <span><small>Scenario</small><strong>{formatMargin(margin(detailedScenario))}</strong><em>Modeled</em></span>
-              <span data-direction={(scenarioDeltaLedger?.delta.harrisTrumpMarginVotes ?? 0) < 0 ? "republican" : "democratic"}><small>Delta</small><strong>{formatMarginVotes(scenarioDeltaLedger?.delta.harrisTrumpMarginVotes ?? 0)}</strong><em>Harris − Trump</em></span>
+              <span><small>Actual</small><strong>{formatResultLead(detailedActual)}</strong><em>Certified</em></span>
+              <span><small>Scenario</small><strong>{formatResultLead(detailedScenario)}</strong><em>Modeled plurality</em></span>
+              <span data-direction={contributionPluralityCandidate ? "third-party" : (scenarioDeltaLedger?.delta.harrisTrumpMarginVotes ?? 0) < 0 ? "republican" : "democratic"}><small>Decisive delta</small><strong>{formatContributionDelta(contributionSummary.statewideMarginDelta)}</strong><em>{contributionMetricLabel}</em></span>
             </div>
             {scenarioExplanation && <div className="analytics-causal-chain" aria-label="Scenario causal explanation">
               <article data-direction={scenarioExplanation.dominantOperation?.marginVotes === undefined
                 ? "none"
-                : scenarioExplanation.dominantOperation.marginVotes < 0 ? "republican" : "democratic"}>
+                : scenarioExplanation.dominantOperation.basis === "plurality-winner-votes"
+                  ? "third-party"
+                  : scenarioExplanation.dominantOperation.marginVotes < 0 ? "republican" : "democratic"}>
                 <span>01 · Main driver</span>
                 <strong>{scenarioExplanation.dominantOperation
                   ? scenarioOperationLabels[scenarioExplanation.dominantOperation.operationId]
                   : "Certified baseline"}</strong>
                 <p>{scenarioExplanation.dominantOperation
-                  ? `${formatMarginVotes(scenarioExplanation.dominantOperation.marginVotes)} · ${Math.round(scenarioExplanation.dominantOperation.grossShareMillionths / 10_000)}% of gross operation movement`
+                  ? `${scenarioExplanation.dominantOperation.basis === "plurality-winner-votes"
+                    ? `${formatCompact(Math.abs(scenarioExplanation.dominantOperation.decisiveVotes))} ballots toward ${candidateNames[scenarioExplanation.electoral.scenarioWinner]}`
+                    : formatMarginVotes(scenarioExplanation.dominantOperation.marginVotes)} · ${Math.round(scenarioExplanation.dominantOperation.grossShareMillionths / 10_000)}% of decisive operation movement`
                   : "No modeled operation changes the Harris minus Trump margin."}</p>
               </article>
               <article data-direction={scenarioExplanation.largestSupportingCounty?.marginVotes === undefined
                 ? "none"
-                : scenarioExplanation.largestSupportingCounty.marginVotes < 0 ? "republican" : "democratic"}>
+                : scenarioExplanation.largestSupportingCounty.basis === "plurality-winner-votes"
+                  ? "third-party"
+                  : scenarioExplanation.largestSupportingCounty.marginVotes < 0 ? "republican" : "democratic"}>
                 <span>02 · Strongest geography</span>
                 <strong>{scenarioExplanation.largestSupportingCounty
                   ? scenarioExplanation.largestSupportingCounty.name
                   : "No geographic movement"}</strong>
                 <p>{scenarioExplanation.largestSupportingCounty
-                  ? `${formatMarginVotes(scenarioExplanation.largestSupportingCounty.marginVotes)}${scenarioExplanation.largestSupportingUnit
+                  ? `${scenarioExplanation.largestSupportingCounty.basis === "plurality-winner-votes"
+                    ? formatCandidateVoteDelta(scenarioExplanation.largestSupportingCounty.decisiveVotes, contributionPluralityCandidate!)
+                    : formatMarginVotes(scenarioExplanation.largestSupportingCounty.marginVotes)}${scenarioExplanation.largestSupportingUnit
                     ? ` · top ${activeDetailedStateManifest.geography.unitLabel}: ${scenarioExplanation.largestSupportingUnit.name}${scenarioExplanation.largestSupportingUnit.context
                       ? `, ${scenarioExplanation.largestSupportingUnit.context}`
                       : ""}`
@@ -2893,7 +3565,11 @@ function ScenarioApp() {
                   : "The certified and scenario geography are identical."}</p>
               </article>
               <article data-direction={scenarioExplanation.electoral.winnerChanged
-                ? scenarioExplanation.electoral.scenarioWinner === "harris" ? "democratic" : "republican"
+                ? scenarioExplanation.electoral.scenarioWinner === "harris"
+                  ? "democratic"
+                  : scenarioExplanation.electoral.scenarioWinner === "trump"
+                    ? "republican"
+                    : "third-party"
                 : "none"}>
                 <span>03 · Electoral consequence</span>
                 <strong>{scenarioExplanation.electoral.winnerChanged
@@ -2906,76 +3582,140 @@ function ScenarioApp() {
             </div>}
             <div className="analytics-waterfall" aria-label="Signed operation waterfall">
               {(scenarioDeltaLedger?.operations ?? []).map((operation, index) => {
-                const value = operation.delta.harrisTrumpMarginVotes;
+                const value = contributionPluralityCandidate
+                  ? candidateDeltaVotes(operation.delta, contributionPluralityCandidate)
+                  : operation.delta.harrisTrumpMarginVotes;
                 const label = operation.operationId === "turnout"
                   ? "Turnout"
                   : operation.operationId === "preference"
                     ? "Preference"
                     : "Third party";
-                return <div key={operation.operationId} data-direction={value < 0 ? "republican" : "democratic"}>
+                return <div key={operation.operationId} data-direction={contributionPluralityCandidate ? "third-party" : value < 0 ? "republican" : "democratic"}>
                   <span>{String(index + 1).padStart(2, "0")} · {label}</span>
                   <i><b style={{ "--analytics-bar-share": `${Math.abs(value) / operationWaterfallMaximum * 100}%` } as CSSProperties} /></i>
-                  <strong>{formatMarginVotes(value)}</strong>
+                  <strong>{formatContributionDelta(value)}</strong>
                 </div>;
               })}
             </div>
           </section>
           <section className="contribution-card">
             <div className="card-heading compact contribution-heading">
-              <div><span className="overline">Where the result moved</span><strong>Top contributors</strong></div>
-              <span className={`contribution-total ${contributionSummary.displayedMarginDelta < 0 ? "toward-rep" : ""}`}>
-                {formatMarginVotes(contributionSummary.displayedMarginDelta)}
-              </span>
+              <div><span className="overline">{contributionView === "movement" ? "Where the result moved" : "How the result is built"}</span><strong>{contributionView === "movement" ? "Top contributors" : "Certified versus scenario"}</strong></div>
+              {contributionView === "movement" ? <span className={`contribution-total ${contributionPluralityCandidate ? "third-party" : contributionSummary.displayedMarginDelta < 0 ? "toward-rep" : ""}`}>
+                {formatContributionDelta(contributionSummary.displayedMarginDelta)}
+              </span> : contributionComparison && <span className="contribution-total structure-result">
+                {candidateNames[contributionComparison.certified.winner]} → {candidateNames[contributionComparison.scenario.winner]}
+              </span>}
             </div>
             <div className="contribution-body">
-              <p className="contribution-definition">Signed Harris minus Trump margin movement from the accepted scenario ledger.</p>
-              <div className="contribution-operation-tabs" aria-label="Contribution operation">
-                {(["all", "turnout", "preference", "third-party"] as ContributionOperation[]).map((operation) => <button
-                  aria-pressed={contributionOperation === operation}
-                  key={operation}
-                  onClick={() => setContributionOperation(operation)}
-                  type="button"
-                >{operation === "all" ? "All operations" : operation === "third-party" ? "Third party" : operation[0].toUpperCase() + operation.slice(1)}</button>)}
+              <div className="contribution-navigation">
+              <div className="contribution-navigation-field">
+                <span className="overline">Explain</span>
+              <div className="contribution-view-tabs" aria-label="Contribution view" role="group">
+                <button aria-pressed={contributionView === "movement"} onClick={() => setContributionView("movement")} type="button">Movement</button>
+                <button aria-pressed={contributionView === "structure"} onClick={() => setContributionView("structure")} type="button">Result structure</button>
               </div>
-              <div className="contribution-tabs" aria-label="Contribution geography">
+              </div>
+              <div className="contribution-navigation-field">
+                <span className="overline">Geography</span>
+              <div className="contribution-tabs" aria-label="Contribution geography" role="group">
                 <button aria-pressed={contributionScope === "county"} onClick={() => setContributionScope("county")} type="button">Counties</button>
                 <button aria-pressed={contributionScope === "vtd"} onClick={() => setContributionScope("vtd")} type="button">{activeGeographyShortLabel}</button>
               </div>
-              {contributionRows.length > 0 ? (
-                <ol className="contribution-list">
-                  {contributionRows.map((row, index) => (
-                    <li key={row.id}>
-                      <button onClick={() => focusContribution(row)} type="button">
-                        <span className="contribution-rank">{String(index + 1).padStart(2, "0")}</span>
-                        <span className="contribution-name"><strong>{row.name}</strong><small>{row.context}</small></span>
-                        <span className={`contribution-value ${row.marginDelta < 0 ? "toward-rep" : ""}`}>{formatMarginVotes(row.marginDelta)}</span>
-                        <span className="contribution-track" aria-hidden="true">
-                          <i
-                            className={row.marginDelta < 0 ? "toward-rep" : ""}
-                            style={{ "--contribution-share": `${Math.abs(row.marginDelta) / contributionMaximum * 100}%` } as CSSProperties}
-                          />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <div className="contribution-empty">{contributionEmptyText}</div>
-              )}
-              <div className="contribution-footnote">
-                <span>{contributionScope === "county"
-                  ? "County-linked contributions shown"
-                  : `Top mapped ${activeGeographyFullLabel.toLowerCase()} shown`}</span>
-                {contributionScope === "county" && contributionSummary.outsideCountyMarginDelta !== 0 && (
-                  <strong>{formatMarginVotes(contributionSummary.outsideCountyMarginDelta)} statewide-only residual</strong>
-                )}
-                {contributionScope === "vtd" && contributionSummary.outsideTerrainMarginDelta !== 0 && (
-                  <strong>{formatMarginVotes(contributionSummary.outsideTerrainMarginDelta)} outside terrain</strong>
-                )}
               </div>
+              </div>
+              {contributionView === "movement" ? <>
+                <p className="contribution-definition">{contributionPluralityCandidate
+                  ? `Signed ${candidateNames[contributionPluralityCandidate]} vote change from the accepted scenario ledger, ranked to explain the plurality flip.`
+                  : "Signed Harris minus Trump margin movement from the accepted scenario ledger."}</p>
+                <div className="contribution-operation-tabs" aria-label="Contribution operation" role="group">
+                  <span className="overline">Filter by operation</span>
+                  {(["all", "turnout", "preference", "third-party"] as ContributionOperation[]).map((operation) => <button
+                    aria-pressed={contributionOperation === operation}
+                    key={operation}
+                    onClick={() => setContributionOperation(operation)}
+                    type="button"
+                  >{operation === "all" ? "All operations" : operation === "third-party" ? "Third party" : operation[0].toUpperCase() + operation.slice(1)}</button>)}
+                </div>
+                {contributionRows.length > 0 ? (
+                  <ol className="contribution-list">
+                    {contributionRows.map((row, index) => (
+                      <li key={row.id}>
+                        <button aria-current={row.vtdGeoid ? selectedVtdGeoid === row.vtdGeoid ? "location" : undefined : selectedCountyFips === row.countyFips && !selectedVtdGeoid ? "location" : undefined} onClick={() => focusContribution(row)} onKeyDown={handleRankedListKeyDown} type="button">
+                          <span className="contribution-rank">{String(index + 1).padStart(2, "0")}</span>
+                          <span className="contribution-name"><strong>{row.name}</strong><small>{row.context}</small></span>
+                          <span className={`contribution-value ${contributionPluralityCandidate ? "third-party" : row.marginDelta < 0 ? "toward-rep" : ""}`}>{formatContributionDelta(row.marginDelta)}</span>
+                          <span className="contribution-track" aria-hidden="true">
+                            <i
+                              className={contributionPluralityCandidate ? "third-party" : row.marginDelta < 0 ? "toward-rep" : ""}
+                              style={{ "--contribution-share": `${Math.abs(row.marginDelta) / contributionMaximum * 100}%` } as CSSProperties}
+                            />
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <div className="contribution-empty">{contributionEmptyText}</div>
+                )}
+                <div className="contribution-footnote">
+                  <span>{contributionScope === "county"
+                    ? "County-linked movement shown"
+                    : `Top mapped ${activeGeographyFullLabel.toLowerCase()} movement shown`}</span>
+                  {contributionScope === "county" && contributionSummary.outsideCountyMarginDelta !== 0 && (
+                    <strong>{formatContributionDelta(contributionSummary.outsideCountyMarginDelta)} statewide-only residual</strong>
+                  )}
+                  {contributionScope === "vtd" && contributionSummary.outsideTerrainMarginDelta !== 0 && (
+                    <strong>{formatContributionDelta(contributionSummary.outsideTerrainMarginDelta)} outside terrain</strong>
+                  )}
+                </div>
+              </> : contributionComparison ? <>
+                <p className="contribution-definition">Each column ranks the places that give that endpoint’s plurality winner an advantage over its actual runner-up. The rows reconcile to the endpoint matchup, not a two-party proxy.</p>
+                <div className="contribution-structure-comparison" data-winner-changed={contributionComparison.winnerChanged}>
+                  {(["certified", "scenario"] as const).map((endpoint) => {
+                    const structure = contributionComparison[endpoint];
+                    return <article key={endpoint}>
+                      <header data-direction={contributionCandidateClass(structure.winner)}>
+                        <span>{endpoint === "certified" ? "Certified structure" : "Scenario structure"}</span>
+                        <strong>{candidateNames[structure.winner]}</strong>
+                        <small>{structure.winner === "tie"
+                          ? "Exact statewide tie"
+                          : `+${formatCompact(structure.pluralityMarginVotes)} over ${candidateNames[structure.runnerUp]}`}</small>
+                      </header>
+                      {structure.supportingRows.length > 0 ? <ol className="contribution-list contribution-structure-list">
+                        {structure.supportingRows.slice(0, 5).map((row) => <li key={row.id}>
+                          <button aria-current={row.geometryId ? selectedVtdGeoid === row.geometryId ? "location" : undefined : selectedCountyFips === row.countyFips && !selectedVtdGeoid ? "location" : undefined} onClick={() => focusStructureContribution(row)} onKeyDown={handleRankedListKeyDown} type="button">
+                            <span className="contribution-rank">{String(row.rank).padStart(2, "0")}</span>
+                            <span className="contribution-name"><strong>{row.name}</strong><small>{row.context}</small></span>
+                            <span className="contribution-value">+{formatCompact(row.contributionVotes)}</span>
+                            <span className="contribution-track" aria-hidden="true"><i
+                              data-direction={contributionCandidateClass(structure.winner)}
+                              style={{ "--contribution-share": `${row.contributionVotes / comparisonMaximum[endpoint] * 100}%` } as CSSProperties}
+                            /></span>
+                          </button>
+                        </li>)}
+                      </ol> : <div className="contribution-empty">A tied endpoint has no honest winner contribution hierarchy.</div>}
+                      {structure.strongestResistance && <button className="contribution-resistance" onClick={() => focusStructureContribution(structure.strongestResistance!)} type="button">
+                        <span>Largest resistance</span><strong>{structure.strongestResistance.name}</strong><b>{formatCompact(Math.abs(structure.strongestResistance.contributionVotes))} against</b>
+                      </button>}
+                    </article>;
+                  })}
+                </div>
+                {(contributionComparison.certified.unmappedContributionVotes !== 0
+                  || contributionComparison.scenario.unmappedContributionVotes !== 0) && <div className="contribution-structure-residuals">
+                  <span>Certified outside selectable terrain <strong>{formatSignedCompact(contributionComparison.certified.unmappedContributionVotes)}</strong></span>
+                  <span>Scenario outside selectable terrain <strong>{formatSignedCompact(contributionComparison.scenario.unmappedContributionVotes)}</strong></span>
+                </div>}
+                <div className="contribution-footnote">
+                  <span>{contributionComparison.winnerChanged
+                    ? `${candidateNames[contributionComparison.certified.winner]} and ${candidateNames[contributionComparison.scenario.winner]} are compared against their own runner-up.`
+                    : `Both structures explain ${candidateNames[contributionComparison.scenario.winner]}’s plurality.`}</span>
+                  <strong>{contributionComparison.sharedTopIds.length} shared top-five anchor{contributionComparison.sharedTopIds.length === 1 ? "" : "s"}</strong>
+                </div>
+              </> : <div className="contribution-empty">Waiting for the certified-to-scenario comparison.</div>}
               <details className="analytics-methodology-drawer">
                 <summary>How this explanation is calculated</summary>
-                <p>Certified and scenario candidate vectors are subtracted once at reporting-unit level. Unit rows rebuild counties, mapped and off-map partitions, the statewide residual, and the state total. Rankings change only the order in which those exact signed contributions are shown.</p>
+                <p>Movement subtracts certified from scenario once at reporting-unit level. Result structure separately ranks each endpoint winner’s signed advantage over that endpoint’s statewide runner-up. Changing winners are never forced into a misleading Harris-Trump comparison.</p>
               </details>
             </div>
           </section>
@@ -2985,17 +3725,21 @@ function ScenarioApp() {
               <div aria-labelledby="laboratory-tab-assumptions" className="drawer-panel" data-active={laboratoryDrawerTab === "assumptions"} id="laboratory-panel-assumptions" role="tabpanel">
           <section className="ledger-card">
             <div className="card-heading compact">
-              <div><span className="overline">Assumption ledger</span><strong>3 ordered operations</strong></div>
+              <div><span className="overline">Assumption ledger</span><strong>3 ordered operations · turnout has two layers</strong></div>
             </div>
             <div className="ledger-line locked">
               <span className="ledger-index">00</span>
               <div><strong>Certified state baseline</strong><span>Locked · FEC 2024</span></div>
               <b>✓</b>
             </div>
-            <div className={`ledger-line ${turnoutIncreasePoints === 0 ? "inactive" : ""}`}>
+            <div className={`ledger-line ${turnoutIncreasePoints === 0 && !demographicTurnoutActive ? "inactive" : ""}`}>
               <span className="ledger-index">01</span>
-              <div><strong>VAP turnout addition</strong><span>Ballots created · Harris share explicit</span></div>
-              <b>{turnoutIncreasePoints === 0 ? "Off" : `+${turnoutIncreasePoints.toFixed(1)}`}</b>
+              <div><strong>VAP turnout addition</strong><span>Statewide then group assumptions · five-candidate choice available for new group ballots</span></div>
+              <b>{turnoutIncreasePoints === 0 && !demographicTurnoutActive
+                ? "Off"
+                : demographicTurnoutActive
+                  ? `${DEMOGRAPHIC_GROUP_IDS.filter((groupId) => demographicTurnoutIncreasePoints[groupId] > 0).length} groups`
+                  : `+${turnoutIncreasePoints.toFixed(1)}`}</b>
             </div>
             <div className={`ledger-line ${effectivePreferenceShiftPoints === 0 ? "inactive" : ""}`}>
               <span className="ledger-index">02</span>
@@ -3038,52 +3782,14 @@ function ScenarioApp() {
           )}
               </div>
             </div>
-          </div>}
-        </aside>
-      </div>
+          </WorkspaceDock>}
+      </>}
 
-      {workspaceMode === "home" && <div className="home-product-story">
-        <section className="home-capabilities" aria-labelledby="home-capabilities-heading">
-          <div className="home-section-heading">
-            <span className="overline">One continuous workflow</span>
-            <h2 id="home-capabilities-heading">Model the result. Direct the night. Understand the change.</h2>
-            <p>The scenario engine, reporting-unit map, and replay timeline share one deterministic election foundation.</p>
-          </div>
-          <div className="home-capability-grid">
-            <article><span>01</span><strong>Model</strong><p>Change turnout, two-party preference, and third-party support across detailed local geography.</p><small>Swingometer</small></article>
-            <article><span>02</span><strong>Direct</strong><p>Choose reporting order, pace, volatility, stalls, and state activation without changing the final result.</p><small>Election Night</small></article>
-            <article><span>03</span><strong>Understand</strong><p>Follow the counties and reporting units responsible for every statewide and Electoral College consequence.</p><small>Contribution ledger</small></article>
-          </div>
-        </section>
-
-        <section className="home-workflow" aria-labelledby="home-workflow-heading">
-          <div className="home-workflow-copy">
-            <span className="overline">Analyst workflow</span>
-            <h2 id="home-workflow-heading">From certified baseline to a replayable election.</h2>
-            <p>Every scenario is constructed in a visible order, preserved as a compact recipe, and rebuilt through the same state-specific evidence contracts.</p>
-            <button onClick={() => navigateWorkspace("laboratory")} type="button">Start with Pennsylvania <span>→</span></button>
-          </div>
-          <ol>
-            <li><b>01</b><div><strong>Select detailed geography</strong><p>Begin nationally, enter a supported state, then drill through county and reporting-unit terrain.</p></div></li>
-            <li><b>02</b><div><strong>Change voter behavior</strong><p>Separate participation, preference, and third-party operations keep the arithmetic understandable.</p></div></li>
-            <li><b>03</b><div><strong>Inspect the consequence</strong><p>See which places moved the margin and whether the Electoral College result changed.</p></div></li>
-            <li><b>04</b><div><strong>Run election night</strong><p>Reuse the scenario on the same map and publish local returns through a user-directed chronology.</p></div></li>
-          </ol>
-        </section>
-
-        <section className="home-foundation" aria-labelledby="home-foundation-heading">
-          <div className="home-section-heading compact">
-            <span className="overline">Evidence before spectacle</span>
-            <h2 id="home-foundation-heading">Different state data models, one honest interface.</h2>
-          </div>
-          <div className="home-foundation-grid">
-            <article><strong>Pennsylvania</strong><span>VTD-linked model units</span><p>Official 2024 reporting units linked to Census voting-district terrain with unmatched coverage retained explicitly.</p></article>
-            <article><strong>Michigan</strong><span>Exact-cycle precincts</span><p>2024 precinct reporting units use their corresponding local geometry, including explicit off-map structures.</p></article>
-            <article><strong>Wisconsin</strong><span>Detailed wards</span><p>Ward-level reconstructed values remain labeled as reconstruction and reconcile to the certified statewide result.</p></article>
-          </div>
-          <div className="home-final-cta"><div><span className="overline">American electorate laboratory</span><strong>A scenario should be reproducible before it is persuasive.</strong></div><button onClick={() => navigateWorkspace("laboratory")} type="button">Open Sandbox 2.0</button></div>
-        </section>
-      </div>}
+      {workspaceMode === "home" && <HomeSections
+        onEnter={() => navigateWorkspace("laboratory")}
+        onState={selectMapState}
+        onReplay={() => { navigateWorkspace("laboratory"); beginElectionNight(); }}
+      />}
 
       <footer className="methodology-footer" id="methodology">
         <div>
@@ -3092,9 +3798,9 @@ function ScenarioApp() {
           <a href="https://www.census.gov/programs-surveys/decennial-census/about/rdo/summary-files.html" rel="noreferrer" target="_blank">Census 2020 P.L. 94-171 P4</a>
         </div>
         <div><span className="overline">Actual national vote</span><strong>{formatNumber(actualNational.totalVotes)} ballots</strong></div>
-        <div><span className="overline">Product status</span><strong>PA + MI geography audit · not a forecast</strong></div>
+        <div><span className="overline">Product status</span><strong>Historical scenarios · not a forecast</strong></div>
       </footer>
-    </main>
+    </AppShell>
   );
 }
 

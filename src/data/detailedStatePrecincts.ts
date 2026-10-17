@@ -19,6 +19,9 @@ export interface DetailedPrecinctResultProperties {
   resultQuality: string;
   harrisVotes: number;
   trumpVotes: number;
+  steinVotes?: number;
+  oliverVotes?: number;
+  residualOtherVotes?: number;
   otherVotes: number;
   totalVotes: number;
 }

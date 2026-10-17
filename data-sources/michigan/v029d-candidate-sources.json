@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "mi-2020-block-2024-precinct-diagnostic-v1",
+  "retrievedAt": "2026-09-07",
+  "scope": "Statewide Michigan: all 83 counties and 4,340 original 2024 precinct polygons",
+  "sourceUrls": {
+    "census": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Michigan/mi2020.pl.zip",
+    "blocks": "https://www2.census.gov/geo/tiger/TIGER2020PL/STATE/26_MICHIGAN/26/tl_2020_26_tabblock20.zip",
+    "precincts": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/9"
+  },
+  "files": {
+    "work/mi-2024-source/mi2020.pl.zip": "971bd53abeb1d905bb9b09bfe4dc1afe8514a916f24d285b289e0f66ec5cfb62",
+    "work/mi-2024-source/pl94/migeo2020.pl": "9d19835294d8d7b445bd19d98cde9bf730896eea901e26620415f20dbd7f2347",
+    "work/mi-2024-source/pl94/mi000022020.pl": "0f1be71ee174c89227d7b9d62ff79064384f01a2d90fc690f2a0e9c74322fc4e",
+    "work/mi-2024-source/mi-2024-precincts.geojson": "bbc331967ac5e2e1293e581bcdd9c0fa7c5c556faa1b6caaa5d984720be90c4b",
+    "work/v029d/tl_2020_26_tabblock20.zip": "047ed7d25f944bccc23cb03ffb7b816efbd6a02a936ede8c2edcdae6a5d17674",
+    "work/v029d/blocks/tl_2020_26_tabblock20.shp": "fff2201e7458fcbf9324ce9a190d3c1c9d43049bc11ac86758f0192826393d88",
+    "work/v029d/blocks/tl_2020_26_tabblock20.dbf": "ba4435fc8d315a374a55f8bd63b7cc57d78961dbb1ffcd7f249f0607558327bf",
+    "work/v029d/blocks/tl_2020_26_tabblock20.prj": "0b9041e921d9ebb43247d314608fe9e38a0b008ee793067fc1806199ea1fb9dd",
+    "public/data/mi/2020/precinct-demographics.json": "2072a732924b5b6dec8da1822bfc8e4eb042e0c3fa22a411eed8d790ae5151e0",
+    "public/data/mi/2024/reporting-units.json": "0270c0a35636d1bf6cccb8a5e20c27dbdb40a318dd8390f9ea1d68ca70acca19",
+    "public/data/mi/2024/precinct-geometry-manifest.json": "ae6c16a25631bb0ca56f1846ce2b2680bfd20562c36405a8d4cf78334091e86c",
+    "data-sources/michigan/2024-precinct-crosswalk.json": "db3b8581209de40412d57a5ba0bded9237371024f6b8491f514f296b54754366"
+  }
+}

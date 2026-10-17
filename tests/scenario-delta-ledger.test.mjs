@@ -277,7 +277,7 @@ test("canonical scenario delta fixture retains its frozen fingerprint", async ()
   });
   assert.equal(
     (await fingerprintScenarioDeltaLedger(ledger)).fingerprint,
-    "sha256:62c4527528a1e42dc0de2c0a7ef3bd7fb47783cc7e5a66c8f11b4241dfa9a312",
+    "sha256:fec099fe4ec34c9b12d46681c777567502a3750f73f6d794a45100819872308d",
   );
 });
 
@@ -387,7 +387,7 @@ test("mismatched endpoints, geography, identities, and electoral allocations fai
   assert.throws(() => createScenarioDeltaLedger({
     ...valid,
     scenarioState: { ...valid.scenarioState, harrisElectoralVotes: 1 },
-  }), /allocation does not reconcile/);
+  }), /allocation does not (?:reconcile|match)/);
 
   const invalidOperation = structuredClone(buildToyLedger());
   invalidOperation.operations.find((operation) => operation.operationId === "preference").requestedVolume = 0;

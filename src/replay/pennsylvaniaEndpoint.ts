@@ -225,7 +225,7 @@ function baselineJurisdiction(
   return {
     jurisdictionId: state.code,
     name: state.name,
-    electoralVotes: state.harrisElectoralVotes + state.trumpElectoralVotes,
+    electoralVotes: state.harrisElectoralVotes + state.trumpElectoralVotes + (state.otherElectoralVotes ?? 0),
     candidateVotes: votes,
     totalVotes: state.totalVotes,
     counties: [],
@@ -250,17 +250,15 @@ function electoralAllocation(
   const allocations: ElectoralAllocationEntry[] = [];
   for (const jurisdiction of jurisdictions) {
     if (jurisdiction.jurisdictionId === "PA") {
-      const byCandidate = new Map(
-        jurisdiction.candidateVotes.map((candidate) => [candidate.candidateId, candidate.votes]),
-      );
-      const harrisVotes = byCandidate.get(HARRIS_ID) ?? 0;
-      const trumpVotes = byCandidate.get(TRUMP_ID) ?? 0;
-      if (harrisVotes === trumpVotes) {
+      const ranked = [...jurisdiction.candidateVotes].sort((left, right) => (
+        right.votes - left.votes || left.candidateId.localeCompare(right.candidateId)
+      ));
+      if (ranked[0].votes === ranked[1].votes) {
         throw new Error("Pennsylvania electoral allocation is undefined for a tied endpoint");
       }
       allocations.push({
         jurisdictionId: "PA",
-        candidateId: harrisVotes > trumpVotes ? HARRIS_ID : TRUMP_ID,
+        candidateId: ranked[0].candidateId,
         electoralVotes: jurisdiction.electoralVotes,
         allocationDistrict: null,
       });
@@ -294,6 +292,7 @@ export interface PennsylvaniaEndpointOptions {
   scenarioId: string;
   scenarioFingerprint: string;
   createdAt: string;
+  scenarioEngineVersion?: string;
 }
 
 export function buildPennsylvaniaElectionEndpointInput(
@@ -314,7 +313,8 @@ export function buildPennsylvaniaElectionEndpointInput(
     content: {
       electionId: "us-president-2024",
       dataCompatibilityVersion: pennsylvaniaDetailedStateManifest.compatibility.dataVersion,
-      scenarioEngineVersion: pennsylvaniaDetailedStateManifest.compatibility.engineVersion,
+      scenarioEngineVersion: options.scenarioEngineVersion
+        ?? pennsylvaniaDetailedStateManifest.compatibility.engineVersion,
       candidates: replayCandidateDefinitions,
       evidence: evidenceFromPennsylvania(options.foundation),
       jurisdictions,

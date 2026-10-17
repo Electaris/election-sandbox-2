@@ -50,12 +50,16 @@ function recipeSettings(settings) {
 
 function endpointInput(fixture, createdAt = fixture.createdAt) {
   const scenario = applyBehaviorScenario(baselineUnits, fixture.settings);
-  const recipe = createStateScenarioRecipe("PA", recipeSettings(fixture.settings));
+  const recipe = {
+    ...createStateScenarioRecipe("PA", recipeSettings(fixture.settings)),
+    engineVersion: fixture.engineVersion,
+  };
   return buildPennsylvaniaElectionEndpointInput({
     foundation,
     scenario,
     scenarioId: fixture.scenarioId,
     scenarioFingerprint: stateScenarioRecipeFingerprint(recipe),
+    scenarioEngineVersion: fixture.engineVersion,
     createdAt,
   });
 }

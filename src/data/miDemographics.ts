@@ -603,6 +603,15 @@ export function toMichiganBehaviorModelUnits(
       turnoutCapacity: precinct.denominatorStatus === "available"
         ? precinct.turnoutCapacity
         : 0,
+      demographicComposition: precinct.demographicMatchMethod === "unavailable"
+        ? null
+        : {
+            hispanic_any_race: precinct.hispanicAnyRace,
+            non_hispanic_white: precinct.nonHispanicWhite,
+            non_hispanic_black: precinct.nonHispanicBlack,
+            non_hispanic_asian: precinct.nonHispanicAsian,
+            non_hispanic_other: precinct.nonHispanicOther,
+          },
     }));
   const residuals: BehaviorModelUnit[] = foundation.residualUnits.map((unit) => ({
     id: unit.id,
@@ -617,6 +626,7 @@ export function toMichiganBehaviorModelUnits(
     totalVotes: unit.totalVotes,
     turnoutDenominator: null,
     turnoutCapacity: 0,
+    demographicComposition: null,
   }));
   return [...mappedPrecincts, ...residuals];
 }

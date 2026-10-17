@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "mi-evidence-quality-review-v1",
+  "reviewedAt": "2026-09-08",
+  "scope": "Frozen evidence triage and bounded PA/MI/WI foundation retention; no source edits or candidate admission",
+  "inputs": {
+    "candidate": "docs/review/v0.29d1-michigan-normalization/candidate.json",
+    "originalCandidate": "docs/review/v0.29d-michigan-comparison/candidate.json",
+    "comparison": "docs/review/v0.29d1-michigan-normalization/comparison.json",
+    "trace": "docs/review/v0.29d1-michigan-normalization/block-trace.json.gz",
+    "geography": "work/mi-2024-source/pl94/migeo2020.pl",
+    "foundation": "public/data/mi/2020/precinct-demographics.json"
+  },
+  "files": {
+    "data-sources/michigan/2020-pl94-precinct-demographics.json": "0d41a2f1896ffc6a98b72fe6ddc14eb1efa9e79b74e2d887f1b1c1c284df53c2",
+    "data-sources/michigan/2024-precinct-crosswalk.json": "db3b8581209de40412d57a5ba0bded9237371024f6b8491f514f296b54754366",
+    "data-sources/michigan/v029d1-normalization-sources.json": "c917434afa65ca0a95133b4b6980677655094f47ab71bcadd19bb23e714954d7",
+    "data-sources/pennsylvania/2020-pl94-vtd-demographics.json": "62acc4a53ff1431f8646cef67007da646963f2b6845d15711050dd72597679fd",
+    "data-sources/wisconsin/2020-vap-ward-denominator.json": "08ff95fe182d1a917f6164ca62b488d2d2430ccb1ed861578456e708f70fed26",
+    "docs/review/v0.29c-pennsylvania-comparison/comparison.json": "8f183ab264f5ec8280f9a21071a0e21a73ade41321f5056d70a7ff3eb71da537",
+    "docs/review/v0.29d-michigan-comparison/candidate.json": "ed2c94740c25468bd72d404bfa450b81f6f3652f76bf9a0de5080c1135ccee13",
+    "docs/review/v0.29d1-michigan-normalization/block-trace.json.gz": "0c1dfe8ca21de68b4d2d07f9eea2cca42290b42d1a5ebd5dd582c46f58a8e009",
+    "docs/review/v0.29d1-michigan-normalization/candidate.json": "78f4ea07490427bef2f4cfc9c6f7a8fc794074fbfee8dbe70e49093ec6d1acee",
+    "docs/review/v0.29d1-michigan-normalization/comparison.json": "a3b2e0dd9a9af5a81200025dcb9f4608685a25b455eeec1502d863a4be664cc3",
+    "docs/review/v0.29d2-sturgis-source-review/partial-evidence-review.json": "9b0d2b0fb334cbd1b31fb4b67017c06714dfb8f7dd6b21c1d23f774736021f82",
+    "docs/review/v0.29d2-sturgis-source-review/source-review.json": "c7f0073220f7d4ec2e9bab349185aee5da1432bcbb48aedfbc8fc97a91433b80",
+    "packages/data-contracts/src/precinctDemographicArtifact.ts": "e8a2f02c477f496d6afbec5eb4656e6a6ae90ce1ab5a43f2f04a350b65e585eb",
+    "public/data/mi/2020/precinct-demographics.json": "2072a732924b5b6dec8da1822bfc8e4eb042e0c3fa22a411eed8d790ae5151e0",
+    "public/data/mi/2024/reporting-units.json": "0270c0a35636d1bf6cccb8a5e20c27dbdb40a318dd8390f9ea1d68ca70acca19",
+    "public/data/pa/2020/vtd-demographics.json": "639341193ee9b44d25a1712d2e02979f54db41a312baa7df992db44df0e790f0",
+    "public/data/wi/2020/ward-demographics.json": "ea77ada6a292fcd3c468c06a9ea2042c7d6dbe39fc05befc3613910202e8f575",
+    "scripts/lib/michigan_candidate.py": "fc63124634373b866ed7cbc8b99b3bc0e952f7ce9127dde65fe5c9cc90df2f62",
+    "work/mi-2024-source/pl94/migeo2020.pl": "9d19835294d8d7b445bd19d98cde9bf730896eea901e26620415f20dbd7f2347"
+  },
+  "retentionDecisions": [
+    {
+      "state": "PA",
+      "decision": "retain_existing",
+      "artifact": "public/data/pa/2020/vtd-demographics.json",
+      "basis": "Adams-only comparison is identical; statewide replacement quality unproven",
+      "replacementAdmitted": false
+    },
+    {
+      "state": "MI",
+      "decision": "retain_existing",
+      "artifact": "public/data/mi/2020/precinct-demographics.json",
+      "basis": "Replacement has unresolved topology, positive evidence gaps, and local boundary validation needs; existing approximate VTD bridge limitations remain",
+      "replacementAdmitted": false
+    },
+    {
+      "state": "WI",
+      "decision": "retain_existing",
+      "artifact": "public/data/wi/2020/ward-demographics.json",
+      "basis": "Existing LTSB 2020 VAP aggregated to 2025 wards retained; no replacement comparison in this phase",
+      "replacementAdmitted": false
+    }
+  ]
+}

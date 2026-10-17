@@ -73,6 +73,7 @@ function endpointInput(nationalFixture, paFixture, miFixture) {
     scenarioId: nationalFixture.scenarioId,
     scenarioFingerprint: nationalFixture.scenarioFingerprint,
     createdAt: nationalFixture.createdAt,
+    scenarioEngineVersion: paFixture.engineVersion,
   });
 }
 

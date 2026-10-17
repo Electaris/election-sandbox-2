@@ -12,6 +12,12 @@ export const SCENARIO_DELTA_LEDGER_TRANSFORM_VERSION = "sandbox-scenario-delta-l
 
 export type ScenarioDeltaOperationId = "turnout" | "preference" | "third-party";
 export type ScenarioDeltaMapStatus = "mapped" | "off-map" | "mixed";
+export type ScenarioElectoralTargetCandidate =
+  | "harris"
+  | "trump"
+  | "stein"
+  | "oliver"
+  | "residual_other";
 
 export interface ScenarioCandidateVector {
   harrisVotes: number;
@@ -77,11 +83,13 @@ export interface ScenarioDeltaPartition {
 }
 
 export interface ScenarioElectoralConsequence {
-  targetCandidate: "harris" | "trump";
+  targetCandidate: ScenarioElectoralTargetCandidate;
   actualHarrisElectoralVotes: number;
   actualTrumpElectoralVotes: number;
+  actualOtherElectoralVotes: number;
   scenarioHarrisElectoralVotes: number;
   scenarioTrumpElectoralVotes: number;
+  scenarioOtherElectoralVotes: number;
   targetElectoralDelta: number;
   winnerChanged: boolean;
 }
@@ -115,6 +123,6 @@ export interface CreateScenarioDeltaLedgerInput {
   scenarioState: StatewidePresidentialResult;
   baselineUnits: readonly BehaviorModelUnit[];
   scenario: BehaviorScenarioResult;
-  targetCandidate: "harris" | "trump";
+  targetCandidate: ScenarioElectoralTargetCandidate;
   sourceIds: readonly string[];
 }

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const DATA_VERSION = "us2024-pa-vtd2020-mi-precinct2024-wi-ward2025-v1";
-const ENGINE_VERSION = "pa-behavior-v1";
+const ENGINE_VERSION = "electaris-behavior-v2";
 const STRESS_CYCLES = Number(process.env.SANDBOX_STRESS_CYCLES ?? 6);
 const WARMUP_CYCLES = Math.min(5, Math.max(2, Math.floor(STRESS_CYCLES / 3)));
 const MEBIBYTE = 1024 * 1024;

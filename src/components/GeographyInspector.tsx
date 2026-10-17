@@ -4,6 +4,7 @@ import type { GeographyInspectorModel } from "../data/detailedStateInspector.ts"
 type GeographyInspectorProps = {
   model: GeographyInspectorModel;
   onClearVtd: () => void;
+  onReturnToContributors: () => void;
 };
 
 const thirdPartyLabels: Record<ThirdPartyCandidate, string> = {
@@ -68,7 +69,7 @@ function matchLabel(model: GeographyInspectorModel) {
   return demographicMatch ? `${electionMatch} · ${demographicMatch}` : electionMatch;
 }
 
-export function GeographyInspector({ model, onClearVtd }: GeographyInspectorProps) {
+export function GeographyInspector({ model, onClearVtd, onReturnToContributors }: GeographyInspectorProps) {
   const candidateRows = [
     { key: "harris", label: "Harris", actual: model.actualVotes.harrisVotes, scenario: model.scenarioVotes.harrisVotes },
     { key: "trump", label: "Trump", actual: model.actualVotes.trumpVotes, scenario: model.scenarioVotes.trumpVotes },
@@ -76,6 +77,16 @@ export function GeographyInspector({ model, onClearVtd }: GeographyInspectorProp
     { key: "oliver", label: "Oliver", actual: model.actualVotes.oliverVotes, scenario: model.scenarioVotes.oliverVotes },
     { key: "other", label: "Other/write-in", actual: model.actualVotes.residualOtherVotes, scenario: model.scenarioVotes.residualOtherVotes },
   ];
+  const plurality = (endpoint: "actual" | "scenario") => {
+    const ranked = [...candidateRows].sort((left, right) => (
+      right[endpoint] - left[endpoint] || left.key.localeCompare(right.key)
+    ));
+    return ranked[0][endpoint] === ranked[1][endpoint]
+      ? "Tie"
+      : `${ranked[0].label} +${formatNumber(ranked[0][endpoint] - ranked[1][endpoint])}`;
+  };
+  const actualPlurality = plurality("actual");
+  const scenarioPlurality = plurality("scenario");
   const thirdPartyDelta = model.operations.thirdPartyCandidateDelta;
   const matchSummary = matchLabel(model);
 
@@ -87,9 +98,12 @@ export function GeographyInspector({ model, onClearVtd }: GeographyInspectorProp
           <strong>{model.name}</strong>
           <small>{model.context}</small>
         </div>
-        {model.kind === "precinct" && (
-          <button onClick={onClearVtd} type="button">County</button>
-        )}
+        <div className="inspector-actions">
+          {model.kind === "precinct" && (
+            <button onClick={onClearVtd} type="button">County</button>
+          )}
+          <button onClick={onReturnToContributors} type="button">Contributors</button>
+        </div>
       </div>
 
       <div className="inspector-section">
@@ -98,6 +112,9 @@ export function GeographyInspector({ model, onClearVtd }: GeographyInspectorProp
           <span>Baseline → scenario</span>
         </div>
         <div className="candidate-ledger">
+          <div className="candidate-ledger-columns" aria-hidden="true">
+            <span>Candidate</span><span>Actual</span><span /><span>Scenario</span><span>Change</span>
+          </div>
           {candidateRows.map((candidate) => (
             <div className="candidate-ledger-row" data-candidate={candidate.key} key={candidate.key}>
               <span>{candidate.label}</span>
@@ -134,10 +151,12 @@ export function GeographyInspector({ model, onClearVtd }: GeographyInspectorProp
           <span>Operation audit</span>
         </div>
         <div className="operation-audit">
+          <div><span>Certified plurality</span><strong>{actualPlurality}</strong></div>
+          <div><span>Scenario plurality</span><strong>{scenarioPlurality}</strong></div>
           <div><span>Turnout addition</span><strong>{formatDelta(model.operations.turnoutAddedVotes)}</strong></div>
           <div><span>Two-party transfer</span><strong>{formatPreference(model.operations.preferenceNetHarrisGain)}</strong></div>
           <div><span>{thirdPartyLabels[model.operations.thirdPartyCandidate]} exchange</span><strong>{thirdPartyDelta === 0 ? "Off" : `${formatDelta(thirdPartyDelta)} votes`}</strong></div>
-          <div className="operation-total"><span>Harris minus Trump</span><strong>{formatMarginContribution(model.operations.marginDelta)}</strong></div>
+          <div className="operation-total"><span>H-T movement diagnostic</span><strong>{formatMarginContribution(model.operations.marginDelta)}</strong></div>
         </div>
       </div>
 

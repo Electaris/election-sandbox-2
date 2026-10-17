@@ -6,10 +6,23 @@ import type {
 
 const STATE_CODES: readonly DetailedStateCode[] = ["PA", "MI", "WI"];
 const DEFAULT_MAX_POINTS = 320;
+export const NIGHT_TIMELINE_CANDIDATE_IDS = [
+  "harris",
+  "trump",
+  "stein",
+  "oliver",
+  "other-residual",
+] as const;
+
+export type NightTimelineCandidateId = (typeof NIGHT_TIMELINE_CANDIDATE_IDS)[number];
+export type NightCandidateShareRecord = Readonly<Record<NightTimelineCandidateId, number | null>>;
 
 interface MutableMarginAggregate {
   harrisVotes: number;
   trumpVotes: number;
+  steinVotes: number;
+  oliverVotes: number;
+  residualOtherVotes: number;
   totalVotes: number;
 }
 
@@ -23,6 +36,8 @@ export interface NightMarginTimelinePoint {
   ballotsPublished: number;
   nationalMarginPartsPerMillion: number | null;
   jurisdictionMarginPartsPerMillion: Readonly<Record<DetailedStateCode, number | null>>;
+  nationalCandidateSharePartsPerMillion: NightCandidateShareRecord;
+  jurisdictionCandidateSharePartsPerMillion: Readonly<Record<DetailedStateCode, NightCandidateShareRecord>>;
 }
 
 export interface NightMarginTimeline {
@@ -41,18 +56,54 @@ export interface NightMarginTimelineIndex {
 }
 
 function zeroAggregate(): MutableMarginAggregate {
-  return { harrisVotes: 0, trumpVotes: 0, totalVotes: 0 };
+  return {
+    harrisVotes: 0,
+    trumpVotes: 0,
+    steinVotes: 0,
+    oliverVotes: 0,
+    residualOtherVotes: 0,
+    totalVotes: 0,
+  };
 }
 
 function addReturn(target: MutableMarginAggregate, event: ThreeStateReturnEvent) {
   target.harrisVotes += event.harrisVotes;
   target.trumpVotes += event.trumpVotes;
+  target.steinVotes += event.steinVotes;
+  target.oliverVotes += event.oliverVotes;
+  target.residualOtherVotes += event.residualOtherVotes;
   target.totalVotes += event.totalVotes;
 }
 
 function marginPartsPerMillion(value: MutableMarginAggregate): number | null {
   if (value.totalVotes === 0) return null;
   return Math.round((value.harrisVotes - value.trumpVotes) * 1_000_000 / value.totalVotes);
+}
+
+function candidateShares(value: MutableMarginAggregate): NightCandidateShareRecord {
+  const votes: Record<NightTimelineCandidateId, number> = {
+    harris: value.harrisVotes,
+    trump: value.trumpVotes,
+    stein: value.steinVotes,
+    oliver: value.oliverVotes,
+    "other-residual": value.residualOtherVotes,
+  };
+  return Object.freeze(Object.fromEntries(NIGHT_TIMELINE_CANDIDATE_IDS.map((candidateId) => [
+    candidateId,
+    value.totalVotes === 0
+      ? null
+      : Math.round(votes[candidateId] * 1_000_000 / value.totalVotes),
+  ])) as Record<NightTimelineCandidateId, number | null>);
+}
+
+function pluralityKey(shares: NightCandidateShareRecord) {
+  const ranked = NIGHT_TIMELINE_CANDIDATE_IDS
+    .map((candidateId) => ({ candidateId, share: shares[candidateId] }))
+    .filter((candidate): candidate is { candidateId: NightTimelineCandidateId; share: number } => candidate.share !== null)
+    .sort((left, right) => right.share - left.share || left.candidateId.localeCompare(right.candidateId));
+  if (ranked.length === 0) return "none";
+  if (ranked[0].share === ranked[1]?.share) return `tie:${ranked[0].share}`;
+  return ranked[0].candidateId;
 }
 
 function progressMillionths(atMs: number, startsAtMs: number, endsAtMs: number) {
@@ -89,6 +140,13 @@ export function buildNightMarginTimelineIndex(
           marginPartsPerMillion(jurisdictions.get(stateCode)!),
         ]),
       ) as Record<DetailedStateCode, number | null>),
+      nationalCandidateSharePartsPerMillion: candidateShares(national),
+      jurisdictionCandidateSharePartsPerMillion: Object.freeze(Object.fromEntries(
+        STATE_CODES.map((stateCode) => [
+          stateCode,
+          candidateShares(jurisdictions.get(stateCode)!),
+        ]),
+      ) as Record<DetailedStateCode, NightCandidateShareRecord>),
     });
   });
   return Object.freeze({
@@ -117,7 +175,15 @@ function sampledPoints(
         && currentMargin !== null
         && Math.sign(previousMargin) !== Math.sign(currentMargin);
     });
-    if (nationalChangedLead || stateChangedLead) leadChanges.add(index);
+    const nationalChangedPlurality = pluralityKey(previous.nationalCandidateSharePartsPerMillion)
+      !== pluralityKey(current.nationalCandidateSharePartsPerMillion);
+    const stateChangedPlurality = STATE_CODES.some((stateCode) => (
+      pluralityKey(previous.jurisdictionCandidateSharePartsPerMillion[stateCode])
+      !== pluralityKey(current.jurisdictionCandidateSharePartsPerMillion[stateCode])
+    ));
+    if (nationalChangedLead || stateChangedLead || nationalChangedPlurality || stateChangedPlurality) {
+      leadChanges.add(index);
+    }
   }
   const selected = new Set<number>();
   const orderedLeadChanges = [...leadChanges].sort((left, right) => left - right);

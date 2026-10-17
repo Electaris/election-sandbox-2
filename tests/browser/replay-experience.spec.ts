@@ -2,7 +2,9 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
-const screenshotDirectory = resolve(
+const screenshotDirectory = process.env.SANDBOX_REVIEW_SCREENSHOT_DIR
+  ? resolve(process.env.SANDBOX_REVIEW_SCREENSHOT_DIR)
+  : resolve(
   import.meta.dirname,
   "../../docs/review/v0.26b-reporting-velocity/screenshots",
 );
@@ -41,7 +43,7 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   await expect(page.locator(".night-initialization")).toBeHidden();
   await expect(page.getByRole("region", { name: "Three-state election night desk" })).toContainText("WI");
   await expect(page.getByText(/No statewide fallback returns/)).toBeVisible();
-  await expect(page.getByText("Pennsylvania, county by county", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Workspace context" })).toContainText("Pennsylvania");
 
   const consoleRegion = page.getByRole("region", { name: "Election night controls" });
   const consoleHandle = page.getByRole("button", { name: "Resize Election Night dock" });
@@ -58,8 +60,8 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
 
   await page.getByRole("button", { name: "Next return", exact: true }).click();
   await expect(page.locator(".night-dock-clock small")).not.toContainText(/^0 returns/);
-  await expect(page.locator(".night-return-tape li").first()).toContainText(/Net|takes the|exact tie|No two-party/);
-  await expect(page.locator(".night-live-lead")).toContainText("What is happening?");
+  await expect(page.locator(".night-return-tape li").first()).toContainText("in this return");
+  await expect(page.locator(".night-live-lead")).toContainText("Three-state reported plurality");
   await expect(page.locator(".night-window-headlines")).toContainText("5 minute pace");
 
   await page.getByLabel("Election night timeline").fill("250000");
@@ -67,18 +69,19 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   await expect(page.locator(".night-live-lead")).toContainText("published local units");
   await page.getByRole("tab", { name: "Returns", exact: true }).click();
   await expect(page.getByRole("region", { name: "Logical return windows" })).toContainText("15 min");
-  await expect(page.getByRole("region", { name: "Recent geographic movers" })).toContainText("County movers");
+  await expect(page.getByRole("region", { name: "Recent geographic movers" })).toContainText("County H-T movers");
   await page.getByRole("tab", { name: "Live", exact: true }).click();
   const pennsylvaniaMarginAtQuarter = await page.locator(".night-state-ledger .night-state-row").first().locator("b").textContent();
   await page.getByLabel("Election night timeline").fill("420000");
   await expect(page.locator(".night-state-ledger .night-state-row").first().locator("b")).not.toHaveText(pennsylvaniaMarginAtQuarter ?? "", { timeout: 30_000 });
   await page.getByRole("tab", { name: "Timeline", exact: true }).click();
   await expect(page.getByText("How the count moved", { exact: true })).toBeVisible();
-  const marginTimeline = page.getByRole("img", { name: "Reported margin timeline. Click to seek the count." });
+  const marginTimeline = page.getByRole("img", { name: "Reported candidate share timeline. Click to seek the count." });
   await expect(marginTimeline).toBeVisible();
   await expect(marginTimeline.locator("canvas")).toHaveCount(1);
   await expect(page.locator(".night-timeline-readout")).toContainText("Visible prefix");
   const timelineProgressBeforeClick = await page.getByLabel("Election night timeline").inputValue();
+  await marginTimeline.scrollIntoViewIfNeeded();
   const timelineBox = await marginTimeline.boundingBox();
   expect(timelineBox).not.toBeNull();
   await page.mouse.click(timelineBox!.x + timelineBox!.width * 0.74, timelineBox!.y + timelineBox!.height * 0.54);
@@ -103,6 +106,7 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   const returnsVelocityTimeline = page.getByRole("img", { name: /Reporting velocity timeline showing returns/ });
   await expect(returnsVelocityTimeline).toBeVisible();
   const velocityProgressBeforeClick = await page.getByLabel("Election night timeline").inputValue();
+  await returnsVelocityTimeline.scrollIntoViewIfNeeded();
   const velocityBox = await returnsVelocityTimeline.boundingBox();
   expect(velocityBox).not.toBeNull();
   await page.mouse.click(velocityBox!.x + velocityBox!.width * 0.61, velocityBox!.y + velocityBox!.height * 0.48);
@@ -121,7 +125,7 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
     path: resolve(screenshotDirectory, "state-reporting-comparison-desktop.png"),
     fullPage: true,
   });
-  await page.getByRole("tab", { name: "Margin", exact: true }).click();
+  await page.getByRole("tab", { name: "Vote share", exact: true }).click();
   await expect(page.locator(".night-margin-timeline-chart canvas")).toHaveCount(1);
   await page.getByRole("tab", { name: "Live", exact: true }).click();
   await expect(page.locator(".night-return-tape")).toContainText("Local return tape");
@@ -164,6 +168,12 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
   await page.waitForTimeout(1_000);
   await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await expect(play).toBeVisible();
+  const pausedProgress = await page.getByLabel("Election night timeline").inputValue();
+  // Allow multiple timer opportunities to catch a queued tick resuming playback.
+  await page.waitForTimeout(1_000);
+  await expect(play).toBeVisible();
+  await expect(page.getByLabel("Election night timeline")).toHaveValue(pausedProgress);
   await page.getByRole("button", { name: "collapsed", exact: true }).click();
   await expect(consoleRegion).toHaveAttribute("data-snap", "collapsed");
 
@@ -173,6 +183,8 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(play).toBeVisible();
+  await expect(page.getByLabel("Election night timeline")).toHaveValue(pausedProgress);
   await expect(page.getByLabel("Election night speed")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({
@@ -218,7 +230,7 @@ test("Editorial home introduces the model before entering the laboratory", async
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Build the electorate. Then watch it count." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The result is only the beginning." })).toBeVisible();
   await expect(page.locator(".home-capabilities")).toContainText("Model");
   await expect(page.locator(".home-workflow")).toContainText("Analyst workflow");
   await expect(page.locator(".home-foundation")).toContainText("Pennsylvania");

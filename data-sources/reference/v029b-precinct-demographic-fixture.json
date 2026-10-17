@@ -1,0 +1,228 @@
+{
+  "definition": {
+    "artifactId": "pa-synthetic-reference-2024-precinct-demographics-v1",
+    "stateCode": "PA",
+    "stateFips": "42",
+    "electionId": "2024-president-synthetic-reference",
+    "transformVersion": "reference-block-to-election-unit-v1",
+    "coordinateReferenceSystem": "OGC:CRS84",
+    "mapUnit": "precinct",
+    "source": {
+      "demographicSourceId": "synthetic-census-2020-pl94-block-p4",
+      "precinctGeometrySourceId": "synthetic-2024-precinct-geometry",
+      "electionResultSourceId": "synthetic-2024-reporting-units",
+      "demographicVintage": "synthetic 2020 Census reference",
+      "mapVintage": "synthetic 2024 election reference",
+      "electionVintage": "synthetic 2024 general reference",
+      "sourceTable": "P4 synthetic reference",
+      "checksums": {
+        "demographic": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "precinctGeometry": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "electionResults": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    "allocationProfileId": "reference-census-block-population-evidence-v1",
+    "offMapElectionUnitCount": 2,
+    "limitations": [
+      "Synthetic reference fixture only; it is not Pennsylvania demographic evidence",
+      "Unavailable blocks remain outside modeled composition",
+      "Aggregate population composition does not identify individual voter behavior"
+    ]
+  },
+  "mapUnits": [
+    {
+      "unitId": "42001-P1",
+      "countyFips": "42001",
+      "geometryId": "geometry-42001-P1",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]]
+      }
+    },
+    {
+      "unitId": "42001-P2",
+      "countyFips": "42001",
+      "geometryId": "geometry-42001-P2",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[10, 0], [20, 0], [20, 10], [10, 10], [10, 0]]]
+      }
+    },
+    {
+      "unitId": "42001-P3",
+      "countyFips": "42001",
+      "geometryId": "geometry-42001-P3",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 0], [30, 0], [30, 10], [20, 10], [20, 0]]]
+      }
+    },
+    {
+      "unitId": "42003-P4",
+      "countyFips": "42003",
+      "geometryId": "geometry-42003-P4",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0, 20], [10, 20], [10, 30], [0, 30], [0, 20]]]
+      }
+    }
+  ],
+  "sourceBlocks": [
+    {
+      "blockGeoid": "420010001001001",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 40,
+        "hispanic_any_race": 10,
+        "non_hispanic_white": 20,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 2,
+        "non_hispanic_other": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[1, 1], [3, 1], [3, 3], [1, 3], [1, 1]]]
+      },
+      "internalPoint": [2, 2],
+      "splitEvidence": null
+    },
+    {
+      "blockGeoid": "420010001001002",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 20,
+        "hispanic_any_race": 4,
+        "non_hispanic_white": 8,
+        "non_hispanic_black": 4,
+        "non_hispanic_asian": 2,
+        "non_hispanic_other": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[8, 2], [12, 2], [12, 4], [8, 4], [8, 2]]]
+      },
+      "internalPoint": [9, 3],
+      "splitEvidence": null
+    },
+    {
+      "blockGeoid": "420010001001003",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 25,
+        "hispanic_any_race": 5,
+        "non_hispanic_white": 10,
+        "non_hispanic_black": 5,
+        "non_hispanic_asian": 2,
+        "non_hispanic_other": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[8, 5], [12, 5], [12, 7], [8, 7], [8, 5]]]
+      },
+      "internalPoint": null,
+      "splitEvidence": {
+        "basis": "population",
+        "points": [
+          { "position": [9, 6], "weight": 2 },
+          { "position": [11, 6], "weight": 3 }
+        ]
+      }
+    },
+    {
+      "blockGeoid": "420010001001004",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 10,
+        "hispanic_any_race": 2,
+        "non_hispanic_white": 4,
+        "non_hispanic_black": 2,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[8, 7], [12, 7], [12, 9], [8, 9], [8, 7]]]
+      },
+      "internalPoint": null,
+      "splitEvidence": {
+        "basis": "housing",
+        "points": [
+          { "position": [9, 8], "weight": 1 },
+          { "position": [11, 8], "weight": 1 }
+        ]
+      }
+    },
+    {
+      "blockGeoid": "420010001001005",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 10,
+        "hispanic_any_race": 1,
+        "non_hispanic_white": 4,
+        "non_hispanic_black": 2,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[8, 0.5], [12, 0.5], [12, 1.5], [8, 1.5], [8, 0.5]]]
+      },
+      "internalPoint": null,
+      "splitEvidence": null
+    },
+    {
+      "blockGeoid": "420010001001006",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 8,
+        "hispanic_any_race": 1,
+        "non_hispanic_white": 3,
+        "non_hispanic_black": 2,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[40, 0], [42, 0], [42, 2], [40, 2], [40, 0]]]
+      },
+      "internalPoint": null,
+      "splitEvidence": null
+    },
+    {
+      "blockGeoid": "420010001001007",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 7,
+        "hispanic_any_race": 1,
+        "non_hispanic_white": 2,
+        "non_hispanic_black": 2,
+        "non_hispanic_asian": 1,
+        "non_hispanic_other": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[1, 21], [3, 21], [3, 23], [1, 23], [1, 21]]]
+      },
+      "internalPoint": [2, 22],
+      "splitEvidence": null
+    },
+    {
+      "blockGeoid": "420010001001008",
+      "countyFips": "42001",
+      "profile": {
+        "totalVotingAgePopulation": 5,
+        "hispanic_any_race": 1,
+        "non_hispanic_white": 2,
+        "non_hispanic_black": 1,
+        "non_hispanic_asian": 0,
+        "non_hispanic_other": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[1, 12], [3, 12], [3, 14], [1, 14]]]
+      },
+      "internalPoint": null,
+      "splitEvidence": null
+    }
+  ]
+}

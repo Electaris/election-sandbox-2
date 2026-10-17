@@ -44,7 +44,15 @@ import {
   stateFipsByCode,
   type AtlasViewState,
 } from "./atlasGeometry.ts";
-import { ATLAS_NEUTRAL, atlasMarginColor, hexToDeckColor } from "./atlasPalette.ts";
+import {
+  ATLAS_NEUTRAL,
+  atlasMarginColor,
+  atlasPlurality,
+  atlasPluralityMargin,
+  atlasResultColor,
+  hexToDeckColor,
+  type AtlasCandidateResult,
+} from "./atlasPalette.ts";
 
 type ViewMode = "actual" | "scenario" | "difference";
 
@@ -76,16 +84,28 @@ type AtlasMapSceneProps = {
   onActivePrecinctChange: (geoid: string | null) => void;
 };
 
-type VoteResult = Pick<StatewidePresidentialResult, "harrisVotes" | "trumpVotes" | "totalVotes">;
+type VoteResult = AtlasCandidateResult;
 
 function signedMargin(result: VoteResult) {
   return ((result.harrisVotes - result.trumpVotes) / result.totalVotes) * 100;
 }
 
-function resultColor(result: VoteResult | undefined) {
-  if (!result) return ATLAS_NEUTRAL;
-  const resultMargin = signedMargin(result);
-  return atlasMarginColor(Math.abs(resultMargin), resultMargin > 0 ? "DEM" : "GOP");
+function resultLabel(result: VoteResult | undefined) {
+  if (!result || result.totalVotes <= 0) return "No return";
+  const plurality = atlasPlurality(result);
+  if (plurality === "TIE") return "Tie";
+  const resultMargin = atlasPluralityMargin(result);
+  if (plurality === "DEM" || plurality === "GOP") {
+    return Math.abs(resultMargin) < 0.005
+      ? "Even"
+      : `${plurality === "DEM" ? "D" : "R"} +${resultMargin.toFixed(1)}`;
+  }
+  const label = plurality === "GRN"
+    ? "Stein"
+    : plurality === "LIB"
+      ? "Oliver"
+      : "Aggregate other";
+  return `${label} +${resultMargin.toFixed(1)}`;
 }
 
 export function AtlasMapScene({
@@ -114,6 +134,8 @@ export function AtlasMapScene({
     : `Verified ${activeDetailedStateManifest?.geography.unitLabel ?? "reporting unit"} returns`;
   const diagnosticTokenRef = useRef(Symbol("atlas-map"));
   const shellRef = useRef<HTMLDivElement>(null);
+  const initialLayoutRef = useRef(false);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const closeTimerRef = useRef<number | null>(null);
   const viewFrameRef = useRef<number | null>(null);
   const layoutFrameRef = useRef<number | null>(null);
@@ -194,6 +216,9 @@ export function AtlasMapScene({
         ...actual,
         harrisVotes: scenario.harrisVotes,
         trumpVotes: scenario.trumpVotes,
+        steinVotes: scenario.steinVotes,
+        oliverVotes: scenario.oliverVotes,
+        residualOtherVotes: scenario.residualOtherVotes,
         otherVotes: scenario.otherVotes,
         totalVotes: scenario.totalVotes,
         netHarrisGain: scenario.netHarrisGain,
@@ -283,7 +308,9 @@ export function AtlasMapScene({
     );
     return {
       target: [(bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2, 0],
-      zoom: Math.min(options.maxZoom, Math.max(options.minZoom, Math.log2(scale) + 0.18)),
+      // A docked workspace can be much shorter than the original full-page map.
+      // Fit the whole geography even when that requires zooming below the old floor.
+      zoom: Math.min(options.maxZoom, Math.log2(Math.max(scale, 0.01)) + 0.18),
       rotationX: options.rotationX,
       rotationOrbit: 0,
     };
@@ -416,16 +443,20 @@ export function AtlasMapScene({
 
   useEffect(() => {
     const shell = shellRef.current;
-    if (!shell || activeStateCode) return;
+    if (!shell) return;
     const diagnosticToken = diagnosticTokenRef.current;
     const updateNationalView = () => {
       if (layoutFrameRef.current != null) window.cancelAnimationFrame(layoutFrameRef.current);
       setMapAnimation(diagnosticToken, "layout", true);
       layoutFrameRef.current = window.requestAnimationFrame(() => {
-        const next = nationalDestination();
-        cameraRef.current = next;
-        publishView(next);
-        setViewState(next);
+        setViewportSize({ width: shell.clientWidth, height: shell.clientHeight });
+        if (!initialLayoutRef.current && !activeStateCode) {
+          const next = nationalDestination();
+          cameraRef.current = next;
+          publishView(next);
+          setViewState(next);
+        }
+        initialLayoutRef.current = true;
         layoutFrameRef.current = null;
         setMapAnimation(diagnosticToken, "layout", false);
       });
@@ -540,13 +571,15 @@ export function AtlasMapScene({
           if (Math.abs(difference) < 0.05) return hexToDeckColor(ATLAS_NEUTRAL, activeStateCode ? 0 : 255);
           return hexToDeckColor(atlasMarginColor(Math.abs(difference), difference > 0 ? "DEM" : "GOP"), activeStateCode ? 0 : 255);
         }
-        return hexToDeckColor(resultColor(viewMode === "actual" ? actual : scenario), activeStateCode ? 0 : 255);
+        return hexToDeckColor(atlasResultColor(viewMode === "actual" ? actual : scenario), activeStateCode ? 0 : 255);
       },
       getElevation: (item: Feature) => {
         if (activeStateCode) return 0;
         const code = stateCodeByFips[featureFips(item, 2)];
         const result = actualByCode.get(code);
-        const electoralVotes = (result?.harrisElectoralVotes ?? 0) + (result?.trumpElectoralVotes ?? 0);
+        const electoralVotes = (result?.harrisElectoralVotes ?? 0)
+          + (result?.trumpElectoralVotes ?? 0)
+          + (result?.otherElectoralVotes ?? 0);
         return 12 + Math.max(3, electoralVotes) * 1.15;
       },
       material: { ambient: 0.72, diffuse: 0.52, shininess: 5, specularColor: [18, 20, 18] },
@@ -577,7 +610,9 @@ export function AtlasMapScene({
       if (!item) return [];
       const bounds = featureBounds(item);
       const result = actualByCode.get(indicator.stateCode);
-      const electoralVotes = (result?.harrisElectoralVotes ?? 0) + (result?.trumpElectoralVotes ?? 0);
+      const electoralVotes = (result?.harrisElectoralVotes ?? 0)
+        + (result?.trumpElectoralVotes ?? 0)
+        + (result?.otherElectoralVotes ?? 0);
       return [{
         ...indicator,
         position: [
@@ -633,7 +668,7 @@ export function AtlasMapScene({
           if (Math.abs(difference) < 0.05) return hexToDeckColor(ATLAS_NEUTRAL, 255);
           return hexToDeckColor(atlasMarginColor(Math.abs(difference), difference > 0 ? "DEM" : "GOP"), 255);
         }
-        return hexToDeckColor(resultColor(viewMode === "actual" ? actual : scenario), 255);
+        return hexToDeckColor(atlasResultColor(viewMode === "actual" ? actual : scenario), 255);
       },
       getElevation: (item: Feature) => {
         const actual = actualCountyByFips.get(featureFips(item, 5));
@@ -701,7 +736,7 @@ export function AtlasMapScene({
               255,
             );
           }
-          return hexToDeckColor(resultColor(viewMode === "actual" ? actual : scenario), 255);
+          return hexToDeckColor(atlasResultColor(viewMode === "actual" ? actual : scenario), 255);
         },
         getElevation: (item: Feature) => {
           const actual = item.properties as unknown as DetailedPrecinctResultProperties;
@@ -783,7 +818,7 @@ export function AtlasMapScene({
   const inspectedCountyFips = hoveredCountyFips;
   const inspectedActualCounty = inspectedCountyFips ? actualCountyByFips.get(inspectedCountyFips) : undefined;
   const inspectedScenarioCounty = inspectedCountyFips ? scenarioCountyByFips.get(inspectedCountyFips) : undefined;
-  const inspectedScenarioMargin = inspectedScenarioCounty ? signedMargin(inspectedScenarioCounty) : null;
+  const inspectedScenarioLabel = resultLabel(inspectedScenarioCounty);
   const inspectedPrecinctGeoid = hoveredPrecinctGeoid ?? activePrecinctGeoid;
   const inspectedActualPrecinct = inspectedPrecinctGeoid
     ? precinctCounty?.features.features.find(
@@ -793,13 +828,19 @@ export function AtlasMapScene({
   const inspectedScenarioPrecinct = inspectedPrecinctGeoid
     ? scenarioPrecinctByGeoid.get(inspectedPrecinctGeoid)
     : undefined;
-  const inspectedPrecinctMargin = inspectedScenarioPrecinct && inspectedScenarioPrecinct.totalVotes > 0
-    ? signedMargin(inspectedScenarioPrecinct)
-    : null;
+  const inspectedPrecinctLabel = resultLabel(inspectedScenarioPrecinct);
+  const hoveredStateResult = hoveredStateCode
+    ? viewMode === "actual"
+      ? actualByCode.get(hoveredStateCode)
+      : scenarioByCode.get(hoveredStateCode)
+    : undefined;
 
   return (
-    <div className="atlas-map-scene" ref={shellRef}>
+    <div className="atlas-map-scene">
+      <div className="atlas-map-viewport" ref={shellRef}>
       <DeckGL
+        width={viewportSize.width || "100%"}
+        height={viewportSize.height || "100%"}
         controller={atlasController}
         effects={atlasEffects}
         getCursor={({ isDragging, isHovering }) => isDragging ? "grabbing" : isHovering ? "pointer" : "grab"}
@@ -837,8 +878,9 @@ export function AtlasMapScene({
       />
 
       {!activeStateCode && hoveredStateCode && (
-        <div className="atlas-hover-label">{actualByCode.get(hoveredStateCode)?.name ?? hoveredStateCode}</div>
+        <div className="atlas-hover-label">{actualByCode.get(hoveredStateCode)?.name ?? hoveredStateCode} · {resultLabel(hoveredStateResult)}</div>
       )}
+      </div>
 
       {activeStateCode && (
         <>
@@ -889,7 +931,7 @@ export function AtlasMapScene({
               <strong>{inspectedActualCounty.name}</strong>
               <div>
                 <span>{inspectedActualCounty.totalVotes.toLocaleString()} named votes</span>
-                <span>{inspectedScenarioMargin != null && Math.abs(inspectedScenarioMargin) >= 0.005 ? `${inspectedScenarioMargin >= 0 ? "D" : "R"} +${Math.abs(inspectedScenarioMargin).toFixed(1)}` : "Even"}</span>
+                <span>{inspectedScenarioLabel}</span>
               </div>
               <p>{inspectedScenarioCounty.netHarrisGain === 0 ? "No scenario change" : `${inspectedScenarioCounty.netHarrisGain.toLocaleString()} votes transferred toward Harris`}</p>
             </div>
@@ -901,11 +943,9 @@ export function AtlasMapScene({
               <div>
                 <span>{inspectedActualPrecinct.totalVotes.toLocaleString()} named votes</span>
                 <span>
-                  {inspectedPrecinctMargin == null
+                  {inspectedActualPrecinct.resultQuality === "unmatched_geometry"
                     ? "No matched return"
-                    : Math.abs(inspectedPrecinctMargin) < 0.005
-                      ? "Even"
-                      : `${inspectedPrecinctMargin >= 0 ? "D" : "R"} +${Math.abs(inspectedPrecinctMargin).toFixed(1)}`}
+                    : inspectedPrecinctLabel}
                 </span>
               </div>
               <p>

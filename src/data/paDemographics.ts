@@ -679,6 +679,13 @@ export function toBehaviorModelUnits(
       turnoutCapacity: vtd.denominatorStatus === "available"
         ? vtd.turnoutCapacity
         : 0,
+      demographicComposition: {
+        hispanic_any_race: vtd.hispanicAnyRace,
+        non_hispanic_white: vtd.nonHispanicWhite,
+        non_hispanic_black: vtd.nonHispanicBlack,
+        non_hispanic_asian: vtd.nonHispanicAsian,
+        non_hispanic_other: vtd.nonHispanicOther,
+      },
     }));
   const residuals: BehaviorModelUnit[] = foundation.residualUnits.map((unit) => ({
     id: unit.id,
@@ -693,6 +700,7 @@ export function toBehaviorModelUnits(
     totalVotes: unit.totalVotes,
     turnoutDenominator: null,
     turnoutCapacity: 0,
+    demographicComposition: null,
   }));
   return [...mappedVtds, ...residuals];
 }

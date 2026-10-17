@@ -1,5 +1,6 @@
 export const MICHIGAN_BASELINE_REPLAY_FIXTURE = Object.freeze({
   scenarioId: "mi-certified-baseline-v1",
+  engineVersion: "pa-behavior-v1",
   createdAt: "2026-08-21T00:02:00.000Z",
   expectedContentFingerprint: "sha256:4a9bb791497c487eea16c7fcab13af628afff27c6bf1f9c9ba91f8c82b7612c1",
   expectedEventStreamFingerprint: "sha256:61aa67ca75647c66da60b8bdfd296ff54b499cabd681184df95a017455deb484",
@@ -15,6 +16,7 @@ export const MICHIGAN_BASELINE_REPLAY_FIXTURE = Object.freeze({
 
 export const MICHIGAN_COMPLEX_REPLAY_FIXTURE = Object.freeze({
   scenarioId: "mi-complex-counterfactual-v1",
+  engineVersion: "pa-behavior-v1",
   createdAt: "2026-08-21T00:03:00.000Z",
   expectedContentFingerprint: "sha256:2a81ff04b0ad19c583ce805f0af09455d227ece17151ba196caa87307c2b5e24",
   expectedEventStreamFingerprint: "sha256:a5391fbda94477926d06f90885e22120d4e8801e8fdcd49e9063d55f1461dba6",

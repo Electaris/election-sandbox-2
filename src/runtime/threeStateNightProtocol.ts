@@ -63,6 +63,9 @@ export interface NightCurrentReturn {
   totalVotes: number;
   harrisVotes: number;
   trumpVotes: number;
+  steinVotes: number;
+  oliverVotes: number;
+  residualOtherVotes: number;
   netHarrisMarginVotes: number;
   stateMarginBeforeVotes: number;
   stateMarginAfterVotes: number;

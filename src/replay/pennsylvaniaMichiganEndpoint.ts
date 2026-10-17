@@ -17,6 +17,7 @@ export interface PennsylvaniaMichiganEndpointOptions {
   scenarioId: string;
   scenarioFingerprint: string;
   createdAt: string;
+  scenarioEngineVersion?: string;
 }
 
 function addCandidateVotes(target: Map<string, number>, votes: readonly CandidateVote[]) {
@@ -36,11 +37,13 @@ export function buildPennsylvaniaMichiganElectionEndpointInput(
   const pennsylvaniaInput = buildPennsylvaniaElectionEndpointInput({
     foundation: options.pennsylvaniaFoundation,
     scenario: options.pennsylvaniaScenario,
+    scenarioEngineVersion: options.scenarioEngineVersion,
     ...commonMetadata,
   });
   const michiganInput = buildMichiganElectionEndpointInput({
     foundation: options.michiganFoundation,
     scenario: options.michiganScenario,
+    scenarioEngineVersion: options.scenarioEngineVersion,
     ...commonMetadata,
   });
   const detailedMichigan = michiganInput.content.jurisdictions.find(

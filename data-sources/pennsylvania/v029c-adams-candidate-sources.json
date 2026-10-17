@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "pa-adams-2020-block-vtd-comparison-v1",
+  "countyFips": "42001",
+  "countyName": "Adams",
+  "scope": "Complete Adams County pilot; not statewide Pennsylvania",
+  "retrievedAt": "2026-09-07",
+  "sourceUrls": {
+    "demographic": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Pennsylvania/pa2020.pl.zip",
+    "blocks": "https://www2.census.gov/geo/tiger/TIGER2020PL/STATE/42_PENNSYLVANIA/42/tl_2020_42_tabblock20.zip",
+    "vtd": "https://www2.census.gov/geo/tiger/TIGER2020PL/STATE/42_PENNSYLVANIA/42/tl_2020_42_vtd20.zip"
+  },
+  "rawFiles": {
+    "pa2020.pl.zip": "2d33a7dab29c8dd5692bbde203d253e06eebbc44fcbaa96b1caa958d454026ae",
+    "tl_2020_42_tabblock20.zip": "f2afff2b2a84170a3cf16bca52137562828d2811133419f22981ec790b2fbebb",
+    "tl_2020_42_vtd20.zip": "a2568ba2a1143341031d11482fd179be838f91dbdf0425ed024a378f8cc5ed79",
+    "pl94/pageo2020.pl": "f35aeff584746a27db4e8e928f987506c69a20b6f464865b9f43c741536f832f",
+    "pl94/pa000022020.pl": "1fec8ec4dc0b2e514c98620714572092c986d918620cd728aa577612647dbbac",
+    "vtd/tl_2020_42_vtd20.shp": "10f113221cc93330d82d7c266b30b92a484340c5a1bec5eb831975cf5b386e44",
+    "vtd/tl_2020_42_vtd20.dbf": "fd6fd939558aa7d112e8513af31d58315e3e6b1e0d3c583a2434e6d3efc8d949",
+    "vtd/tl_2020_42_vtd20.prj": "0b9041e921d9ebb43247d314608fe9e38a0b008ee793067fc1806199ea1fb9dd",
+    "blocks/tl_2020_42_tabblock20.shp": "dde93c9134ddcfe9de8ed10b5ad42720063030a41104627c68f6a34a390f8476",
+    "blocks/tl_2020_42_tabblock20.dbf": "eeb49b6314a3fbfc264b6251d67973a32606f321badf1417c54341f6ddf318cc",
+    "blocks/tl_2020_42_tabblock20.prj": "0b9041e921d9ebb43247d314608fe9e38a0b008ee793067fc1806199ea1fb9dd"
+  },
+  "repositoryFiles": {
+    "public/data/pa/2020/vtd-demographics.json": "639341193ee9b44d25a1712d2e02979f54db41a312baa7df992db44df0e790f0",
+    "public/data/pa/2024/reporting-units.json": "88857f3dafb4fd1b3419e22cd0c1c4aba2eca662f2c080fa542429e2d3f7c106",
+    "public/data/pa/2024/precinct-geometry-manifest.json": "82224138bb6483b985bac14953e3fd4f7f6c290d6db7d2f563cdc53695bca8d7",
+    "data-sources/pennsylvania/2024-vtd-crosswalk.json": "c8875ee7b369a38a1784630c39a02d2d9817e730f52f8f403a794bff533f2109"
+  },
+  "normalizedInput": {
+    "path": "data-sources/pennsylvania/v029c-adams-normalized-input.json.gz",
+    "sha256": "e5607e09d96e5811f2f3740fdcd78fab2f709dfb82cbd7c4e9bdf1cfb6ccddfe",
+    "compressedSha256": "e8f783fab1329bb7c0457fb593985935737a9dd90cec3ec21c60165ae21a7f70",
+    "byteSize": 7430532,
+    "compressedByteSize": 1320990
+  }
+}

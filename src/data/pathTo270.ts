@@ -1,4 +1,7 @@
-import type { StatewidePresidentialResult } from "../../packages/election-model/src/scenario.ts";
+import {
+  stateElectoralVotes,
+  type StatewidePresidentialResult,
+} from "../../packages/election-model/src/scenario.ts";
 import type { MajorCandidate } from "./electoralConsequences.ts";
 
 export type RouteMetric = "fewest-states" | "margin-movement" | "margin-votes";
@@ -91,15 +94,30 @@ const MAX_PARTIALS_PER_EV = 48;
 const SPLIT_ALLOCATION_STATES = new Set(["ME", "NE"]);
 
 function targetVotes(state: StatewidePresidentialResult, target: MajorCandidate) {
-  return target === "harris" ? state.harrisVotes : state.trumpVotes;
+  if (target === "harris") return state.harrisVotes;
+  if (target === "trump") return state.trumpVotes;
+  if (target === "stein") return state.steinVotes ?? 0;
+  if (target === "oliver") return state.oliverVotes ?? 0;
+  return state.residualOtherVotes ?? state.otherVotes;
 }
 
 function opponentVotes(state: StatewidePresidentialResult, target: MajorCandidate) {
-  return target === "harris" ? state.trumpVotes : state.harrisVotes;
+  const candidates: Record<MajorCandidate, number> = {
+    harris: state.harrisVotes,
+    trump: state.trumpVotes,
+    stein: state.steinVotes ?? 0,
+    oliver: state.oliverVotes ?? 0,
+    residual_other: state.residualOtherVotes ?? state.otherVotes,
+  };
+  return Math.max(...Object.entries(candidates)
+    .filter(([candidate]) => candidate !== target)
+    .map(([, votes]) => votes));
 }
 
 function targetElectoralVotes(state: StatewidePresidentialResult, target: MajorCandidate) {
-  return target === "harris" ? state.harrisElectoralVotes : state.trumpElectoralVotes;
+  if (target === "harris") return state.harrisElectoralVotes;
+  if (target === "trump") return state.trumpElectoralVotes;
+  return targetMarginVotes(state, target) > 0 ? (state.otherElectoralVotes ?? 0) : 0;
 }
 
 function targetMarginVotes(state: StatewidePresidentialResult, target: MajorCandidate) {
@@ -129,13 +147,8 @@ export function buildStateFlipRequirement(
   };
 }
 
-function stateMargin(state: StatewidePresidentialResult) {
-  return (state.harrisVotes - state.trumpVotes) / state.totalVotes * 100;
-}
-
 function targetSignedMargin(state: StatewidePresidentialResult, target: MajorCandidate) {
-  const margin = stateMargin(state);
-  return target === "harris" ? margin : -margin;
+  return targetMarginVotes(state, target) / state.totalVotes * 100;
 }
 
 function routeKey(route: PartialRoute) {
@@ -162,7 +175,7 @@ function comparePartial(left: PartialRoute, right: PartialRoute) {
     || routeKey(left).localeCompare(routeKey(right));
 }
 
-function boundedPareto(routes: PartialRoute[]) {
+function boundedPareto(routes: PartialRoute[], maximumPartials = MAX_PARTIALS_PER_EV) {
   const deduplicated = [...new Map(routes.map((route) => [routeKey(route), route])).values()];
   const frontier = deduplicated.filter((candidate, index) => (
     !deduplicated.some((other, otherIndex) => otherIndex !== index && dominates(other, candidate))
@@ -179,12 +192,14 @@ function boundedPareto(routes: PartialRoute[]) {
     for (const route of [...deduplicated].sort(ordering).slice(0, 12)) selected.set(routeKey(route), route);
   }
   const candidates = [...selected.values()];
-  if (candidates.length <= MAX_PARTIALS_PER_EV) return candidates.sort(comparePartial);
+  if (candidates.length <= maximumPartials) return candidates.sort(comparePartial);
   const bounded = new Map<string, PartialRoute>();
   for (const ordering of orderings) {
-    for (const route of [...candidates].sort(ordering).slice(0, 16)) bounded.set(routeKey(route), route);
+    for (const route of [...candidates].sort(ordering).slice(0, Math.max(4, Math.floor(maximumPartials / 3)))) {
+      bounded.set(routeKey(route), route);
+    }
   }
-  return [...bounded.values()].sort(comparePartial);
+  return [...bounded.values()].sort(comparePartial).slice(0, maximumPartials);
 }
 
 function compareRoutes(metric: RouteMetric) {
@@ -222,7 +237,7 @@ export function buildPathTo270Model(
   routeLimit = 5,
 ): PathTo270Model {
   const totalElectoralVotes = scenarioStates.reduce(
-    (sum, state) => sum + state.harrisElectoralVotes + state.trumpElectoralVotes,
+    (sum, state) => sum + stateElectoralVotes(state),
     0,
   );
   const majorityThreshold = Math.floor(totalElectoralVotes / 2) + 1;
@@ -231,6 +246,12 @@ export function buildPathTo270Model(
     0,
   );
   const electoralVotesNeeded = Math.max(0, majorityThreshold - targetCurrentElectoralVotes);
+  // A third-party target generally starts near zero EV. Keep its much wider
+  // subset search bounded so changing the explanatory candidate cannot freeze
+  // the browser while preserving deterministic routes across all metrics.
+  const maximumPartials = targetCandidate === "harris" || targetCandidate === "trump"
+    ? MAX_PARTIALS_PER_EV
+    : 4;
   const active = new Set(activeStateCodes);
   const detailed = new Set(detailedStateCodes);
   const hasModeledTargetGain = modeledTargetGainStateCodes.length > 0;
@@ -249,7 +270,7 @@ export function buildPathTo270Model(
   }
 
   const requirements = scenarioStates.flatMap((state): RouteStateRequirement[] => {
-    const totalStateElectoralVotes = state.harrisElectoralVotes + state.trumpElectoralVotes;
+    const totalStateElectoralVotes = stateElectoralVotes(state);
     const targetStateElectoralVotes = targetElectoralVotes(state, targetCandidate);
     if (targetStateElectoralVotes >= totalStateElectoralVotes) return [];
     if (SPLIT_ALLOCATION_STATES.has(state.code)) {
@@ -290,7 +311,10 @@ export function buildPathTo270Model(
         marginPoints: route.marginPoints + requirement.requiredMarginPoints,
         marginVotes: route.marginVotes + requirement.requiredNetMarginVotes,
       }));
-      buckets[nextElectoralVotes] = boundedPareto([...buckets[nextElectoralVotes], ...additions]);
+      buckets[nextElectoralVotes] = boundedPareto(
+        [...buckets[nextElectoralVotes], ...additions],
+        maximumPartials,
+      );
     }
   }
 
@@ -342,7 +366,7 @@ export function buildRouteConstructionPlan(
     const actual = actualByCode.get(stateCode);
     const scenario = scenarioByCode.get(stateCode);
     if (!actual || !scenario) throw new Error(`Route construction state ${stateCode} is unavailable`);
-    const totalElectoralVotes = scenario.harrisElectoralVotes + scenario.trumpElectoralVotes;
+    const totalElectoralVotes = stateElectoralVotes(scenario);
     const flipRequirement = buildStateFlipRequirement(actual, scenario, targetCandidate);
     const satisfied = targetElectoralVotes(scenario, targetCandidate) === totalElectoralVotes;
     const isModeled = active.has(stateCode);
@@ -366,7 +390,7 @@ export function buildRouteConstructionPlan(
     };
   });
   const totalElectoralVotes = scenarioStates.reduce(
-    (sum, state) => sum + state.harrisElectoralVotes + state.trumpElectoralVotes,
+    (sum, state) => sum + stateElectoralVotes(state),
     0,
   );
   const majorityThreshold = Math.floor(totalElectoralVotes / 2) + 1;

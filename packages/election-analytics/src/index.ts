@@ -6,3 +6,4 @@ export * from "./replayDescriptiveAnalytics.ts";
 export * from "./scenarioDeltaContracts.ts";
 export * from "./scenarioDeltaLedger.ts";
 export * from "./scenarioExplanation.ts";
+export * from "./scenarioContributionComparison.ts";

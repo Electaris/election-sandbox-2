@@ -10,7 +10,11 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import type { DetailedStateCode } from "../data/detailedStateManifest.ts";
-import type { NightMarginTimeline } from "../replay/visibleReplayTimeline.ts";
+import {
+  NIGHT_TIMELINE_CANDIDATE_IDS,
+  type NightMarginTimeline,
+  type NightTimelineCandidateId,
+} from "../replay/visibleReplayTimeline.ts";
 
 echarts.use([
   AriaComponent,
@@ -22,12 +26,19 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-const STATE_CODES: readonly DetailedStateCode[] = ["PA", "MI", "WI"];
-const SERIES_COLORS = {
-  National: "#173b4c",
-  PA: "#2e83a4",
-  MI: "#9b8347",
-  WI: "#c05f49",
+const CANDIDATE_LABELS: Readonly<Record<NightTimelineCandidateId, string>> = {
+  harris: "Harris",
+  trump: "Trump",
+  stein: "Stein",
+  oliver: "Oliver",
+  "other-residual": "Other/write-in",
+};
+const SERIES_COLORS: Readonly<Record<NightTimelineCandidateId, string>> = {
+  harris: "#2f82ad",
+  trump: "#c5563f",
+  stein: "#4f865f",
+  oliver: "#b38b2b",
+  "other-residual": "#7a8587",
 } as const;
 
 interface ElectionNightMarginTimelineProps {
@@ -36,24 +47,24 @@ interface ElectionNightMarginTimelineProps {
   onSeek: (progressMillionths: number) => void;
 }
 
-function marginPercent(partsPerMillion: number | null) {
+function sharePercent(partsPerMillion: number | null) {
   return partsPerMillion === null ? null : partsPerMillion / 10_000;
 }
 
-function formatMargin(value: number) {
-  if (Math.abs(value) < 0.005) return "Even";
-  return `${value > 0 ? "D" : "R"} +${Math.abs(value).toFixed(1)}`;
+function formatShare(value: number) {
+  return `${value.toFixed(1)}%`;
 }
 
 function seriesData(
   timeline: NightMarginTimeline,
+  candidateId: NightTimelineCandidateId,
   stateCode: DetailedStateCode | null,
 ) {
   return timeline.points.map((point) => [
     point.atMs,
-    marginPercent(stateCode === null
-      ? point.nationalMarginPartsPerMillion
-      : point.jurisdictionMarginPartsPerMillion[stateCode]),
+    sharePercent(stateCode === null
+      ? point.nationalCandidateSharePartsPerMillion[candidateId]
+      : point.jurisdictionCandidateSharePartsPerMillion[stateCode][candidateId]),
     point.eventId,
     point.returningJurisdictionId,
     point.ballotsPublished,
@@ -105,28 +116,25 @@ export default function ElectionNightMarginTimeline({
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart) return;
-    const series = [
-      { name: "National", stateCode: null },
-      ...STATE_CODES.map((stateCode) => ({ name: stateCode, stateCode })),
-    ].map(({ name, stateCode }) => {
-      const isFocused = focusStateCode === null || stateCode === null || stateCode === focusStateCode;
+    const series = NIGHT_TIMELINE_CANDIDATE_IDS.map((candidateId) => {
+      const isMinorCandidate = candidateId === "oliver" || candidateId === "other-residual";
       return {
-        name,
+        name: CANDIDATE_LABELS[candidateId],
         type: "line",
-        data: seriesData(timeline, stateCode),
+        data: seriesData(timeline, candidateId, focusStateCode),
         showSymbol: false,
         connectNulls: false,
         sampling: "lttb",
         animation: false,
         silent: false,
         lineStyle: {
-          width: stateCode === null ? 2.4 : 1.55,
-          color: SERIES_COLORS[name as keyof typeof SERIES_COLORS],
-          opacity: isFocused ? 0.95 : 0.22,
+          width: isMinorCandidate ? 1.25 : 2.15,
+          color: SERIES_COLORS[candidateId],
+          opacity: isMinorCandidate ? 0.7 : 0.95,
         },
-        itemStyle: { color: SERIES_COLORS[name as keyof typeof SERIES_COLORS] },
+        itemStyle: { color: SERIES_COLORS[candidateId] },
         emphasis: { focus: "series" },
-        markLine: stateCode === null ? {
+        markLine: candidateId === "harris" ? {
           silent: true,
           symbol: ["none", "none"],
           label: { show: false },
@@ -139,7 +147,7 @@ export default function ElectionNightMarginTimeline({
       animation: false,
       aria: {
         enabled: true,
-        description: "Reported Democratic minus Republican margin over logical election-night time for the three-state count.",
+        description: `Reported five-candidate vote shares over logical election-night time for ${focusStateCode ?? "the three-state count"}.`,
       },
       color: Object.values(SERIES_COLORS),
       legend: {
@@ -157,9 +165,9 @@ export default function ElectionNightMarginTimeline({
         axisPointer: { type: "line", lineStyle: { color: "#9a8245", width: 1 } },
         formatter: (raw: unknown) => {
           const params = Array.isArray(raw) ? raw as Array<{ seriesName: string; value: unknown[] }> : [];
-          if (!params.length) return "No reported margin";
+          if (!params.length) return "No reported candidate share";
           const atMs = Number(params[0].value[0]);
-          const lines = [new Date(atMs).toLocaleString("en-US", {
+          const lines = [focusStateCode ?? "Three-state total", new Date(atMs).toLocaleString("en-US", {
             timeZone: "America/New_York",
             weekday: "short",
             hour: "numeric",
@@ -167,7 +175,7 @@ export default function ElectionNightMarginTimeline({
           })];
           for (const entry of params) {
             const value = Number(entry.value[1]);
-            if (Number.isFinite(value)) lines.push(`${entry.seriesName}  ${formatMargin(value)}`);
+            if (Number.isFinite(value)) lines.push(`${entry.seriesName}  ${formatShare(value)}`);
           }
           return lines.join("\n");
         },
@@ -199,11 +207,12 @@ export default function ElectionNightMarginTimeline({
       yAxis: {
         type: "value",
         scale: true,
+        min: 0,
         axisLabel: {
           color: "#7a8c92",
           fontFamily: "DM Mono",
           fontSize: 7,
-          formatter: (value: number) => formatMargin(value),
+          formatter: (value: number) => `${value.toFixed(0)}%`,
         },
         axisLine: { show: false },
         axisTick: { show: false },
@@ -214,7 +223,7 @@ export default function ElectionNightMarginTimeline({
   }, [focusStateCode, timeline]);
 
   return <figure
-    aria-label="Reported margin timeline. Click to seek the count."
+    aria-label="Reported candidate share timeline. Click to seek the count."
     data-observed-returns={timeline.observedReturnCount}
     className="night-margin-timeline-figure"
     role="img"

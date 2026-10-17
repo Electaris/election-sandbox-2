@@ -1,0 +1,119 @@
+/* Shared reading and control scale; election colors remain defined by the model. */
+.premium-shell {
+  --font-editorial: "Newsreader", Georgia, serif;
+  --font-interface: "Libre Franklin", Arial, sans-serif;
+  --font-numeric: "DM Mono", monospace;
+  --text-meta: 11px;
+  --text-label: 12px;
+  --text-body: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --control-height: 36px;
+  --radius-control: 8px;
+}
+
+.premium-shell button:focus-visible,
+.premium-shell summary:focus-visible,
+.premium-shell input:focus-visible,
+.premium-shell select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.premium-shell button:disabled { cursor: not-allowed; opacity: .55; }
+.premium-shell .overline { font-size: var(--text-meta); line-height: 1.4; }
+.premium-shell .card-heading strong { font-size: 20px; line-height: 1.2; }
+.premium-shell .target-selector { gap: var(--space-2); font-size: var(--text-label); }
+.premium-shell .target-selector button {
+  min-height: var(--control-height);
+  padding: 6px 10px;
+  font-size: var(--text-meta);
+  border-radius: var(--radius-control);
+}
+.premium-shell .scenario-score { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-2); }
+.premium-shell .scenario-score > div { grid-column: span 2; padding: var(--space-3) var(--space-2); }
+.premium-shell .scenario-score > div[data-candidate="harris"],
+.premium-shell .scenario-score > div[data-candidate="trump"] { grid-column: span 3; }
+.premium-shell .scenario-score span { font-size: var(--text-meta); line-height: 1.35; }
+.premium-shell .scenario-score strong { font-size: 24px; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.premium-shell .scenario-score > div[data-candidate="harris"] strong,
+.premium-shell .scenario-score > div[data-candidate="trump"] strong { font-size: 40px; }
+.premium-shell .electoral-majority-marker,
+.premium-shell .threshold-lockup > span,
+.premium-shell .threshold-lockup p,
+.premium-shell .threshold-lockup,
+.premium-shell .scenario-version-row { font-size: var(--text-meta); line-height: 1.5; }
+.premium-shell .consequence-summary { font-size: var(--text-body); line-height: 1.5; }
+.premium-shell .consequence-ledger-heading,
+.premium-shell .consequence-ledger-columns,
+.premium-shell .consequence-row { font-size: var(--text-meta); line-height: 1.4; }
+.premium-shell .consequence-row { min-height: var(--control-height); }
+.premium-shell .consequence-row small { font-size: var(--text-meta); white-space: normal; color: var(--ink-soft); }
+.premium-shell .consequence-row strong { font-size: var(--text-label); white-space: normal; overflow-wrap: anywhere; }
+.premium-shell .inspector-disclosure { border-top: 1px solid var(--line); margin-top: var(--space-3); }
+.premium-shell .inspector-disclosure summary {
+  cursor: pointer;
+  padding: var(--space-3) 0;
+  font-size: var(--text-label);
+  font-weight: 600;
+  min-height: var(--control-height);
+}
+.premium-shell .national-candidate-vote-grid small { font-size: var(--text-meta); }
+.premium-shell .national-candidate-vote-grid strong { font-size: 18px; font-variant-numeric: tabular-nums; }
+.premium-shell .national-candidate-vote-grid p { font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .state-flip-card p,
+.premium-shell .route-lab-card p { font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .state-flip-metrics small { font-size: var(--text-meta); line-height: 1.4; }
+.premium-shell .state-flip-metrics strong { font-size: var(--text-label); line-height: 1.4; }
+.premium-shell .slider-header { font-size: var(--text-label); line-height: 1.4; }
+.premium-shell .slider-header strong { font-size: var(--text-body); font-variant-numeric: tabular-nums; }
+.premium-shell .effect-grid span { font-size: var(--text-meta); line-height: 1.4; }
+.premium-shell .effect-grid strong { font-size: var(--text-label); font-variant-numeric: tabular-nums; }
+.premium-shell .inspector-heading strong { font-size: 22px; line-height: 1.2; }
+.premium-shell .inspector-heading small { font-size: var(--text-label); line-height: 1.5; }
+.premium-shell .inspector-actions button { min-height: var(--control-height); font-size: var(--text-label); }
+.premium-shell .inspector-section-title strong,
+.premium-shell .inspector-section-title span { font-size: var(--text-meta); line-height: 1.4; }
+.premium-shell .candidate-ledger-row,
+.premium-shell .candidate-ledger-columns {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) minmax(60px, .8fr) 8px minmax(60px, .8fr) minmax(70px, .8fr);
+  gap: 6px;
+  align-items: center;
+  font-size: var(--text-label);
+  line-height: 1.5;
+}
+.premium-shell .candidate-ledger-columns { padding: 8px 0; color: var(--ink-soft); font-size: var(--text-meta); }
+.premium-shell .candidate-ledger-row { padding: 6px 0; }
+.premium-shell .candidate-ledger-row span { white-space: normal; overflow-wrap: anywhere; }
+.premium-shell .candidate-ledger-row b { color: var(--ink-soft); }
+.premium-shell .candidate-ledger-columns span:not(:first-child) { text-align: right; }
+.premium-shell .candidate-ledger-row b,
+.premium-shell .candidate-ledger-row strong,
+.premium-shell .candidate-ledger-row em,
+.premium-shell .candidate-ledger-total strong,
+.premium-shell .candidate-ledger-total em { font-size: var(--text-label); font-variant-numeric: tabular-nums; }
+.premium-shell .candidate-ledger-total { font-size: var(--text-label); }
+.premium-shell .inspector-metrics span,
+.premium-shell .operation-audit span { font-size: var(--text-meta); line-height: 1.5; }
+.premium-shell .inspector-metrics strong,
+.premium-shell .operation-audit strong {
+  font-size: var(--text-label);
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.premium-shell .inspector-coverage p,
+.premium-shell .inspector-coverage small { font-size: var(--text-label); line-height: 1.5; }
+
+@media (max-width: 800px) {
+  .premium-shell { --control-height: 44px; }
+  .premium-shell .candidate-ledger-row,
+  .premium-shell .candidate-ledger-columns {
+    grid-template-columns: minmax(68px, 1fr) minmax(52px, .8fr) 8px minmax(52px, .8fr) minmax(62px, .8fr);
+    gap: 4px;
+  }
+}

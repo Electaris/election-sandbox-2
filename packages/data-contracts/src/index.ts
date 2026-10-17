@@ -143,3 +143,6 @@ export interface SourceRegistryEntry {
   pipelineVersion: string;
   limitations: string[];
 }
+
+export * from "./demographicEvidence.ts";
+export * from "./precinctDemographicArtifact.ts";
