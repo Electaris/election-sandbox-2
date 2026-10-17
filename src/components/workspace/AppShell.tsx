@@ -10,7 +10,7 @@ export function AppShell({ children, workspaceMode, experienceMode, geographyLev
   dragHeight: number | null;
   inspectorOpen: boolean;
 }) {
-  return <main className="application-shell premium-shell" data-workspace-mode={workspaceMode}
+  return <main className={`application-shell premium-shell${workspaceMode === "laboratory" && experienceMode === "swingometer" ? " editorial-swingometer" : ""}`} data-workspace-mode={workspaceMode}
     data-experience-mode={experienceMode} data-geography-level={geographyLevel}
     data-dock-snap={snap} data-inspector-open={inspectorOpen} data-dock-resizing={dragHeight != null}
     style={dragHeight == null ? undefined : { "--workspace-dock-size": `${dragHeight}px` } as CSSProperties}>

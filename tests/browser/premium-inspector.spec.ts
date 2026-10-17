@@ -21,7 +21,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.keyboard.press("Space");
     await expect(votes).toBeHidden();
     expect(page.url()).toBe(recipe);
-    expect(await page.getByTestId("candidate-electoral-votes-harris").locator("strong").evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(40);
+    expect(await page.getByTestId("candidate-electoral-votes-harris").locator("strong").evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(56);
     expect(await page.locator(".target-selector button").first().evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(viewport.width < 800 ? 44 : 36);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     const folder = resolve("docs/review/v0.31b-inspector/screenshots");

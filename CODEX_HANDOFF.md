@@ -1,6 +1,6 @@
 # Codex handoff: Sandbox 2.0
 
-Last updated: 2026-10-12
+Last updated: 2026-10-17
 
 ## 1. Product boundary
 
@@ -1117,6 +1117,8 @@ Re-run the commands before publishing if any model, data, or renderer file chang
 14. **Michigan's statewide candidate remains a diagnostic, not an admitted bundle.** v0.29D.1's native-source policy normalizes 20 invalid rings and excludes six bounded overlap strips. Flint has a documented effective-cycle interpretation with raw attributes preserved. One Sturgis overlap still quarantines two targets; 382 precincts are partial and two unavailable. Never promote partial profiles or the diagnostic schema to runtime denominators. Decisions 0059 and 0060 preserve the source-map admission hold.
 
 ## 10. Exact next phase
+
+Latest owner direction: a product-wide original editorial redesign, beginning with the homepage and then Swingometer. `docs/review/v0.32-editorial-swingometer/REVIEW.md` records the new Swingometer masthead, geography hierarchy, map composition, editorial scoreboard/analysis rail, and restyled overlay dock. The owner explicitly authorized GitHub pushes as work progresses. Use branch `codex/editorial-swingometer`; source checkpoint `4796581` was pushed first, and the UI overhaul is a separate subsequent commit. Generated review packages and screenshot archives remain outside these commits. The active localhost dev frontend is port 4173, serving working source rather than the older immutable candidate below. Continue with Election Night's editorial overhaul, then a cross-page consistency pass. Preserve the original slide-up dock behavior.
 
 Current UI phase: `docs/review/v0.31c-swingometer/REVIEW.md` records the Swingometer editor and contributor-navigation polish: shared reading/control sizes, expanded slider hit areas, labeled filter groups, selected-geography rows, repaired editor collapse, and expandable operation evidence. The local candidate is `eadf5c162bc2de7f8031824832513972439df66125d63e3365765e00f8ea906f`, served on port 4173. The owner's restored overlay drawer is preserved. Continue with Election Night's returns-desk and replay-control visual pass. This is a local UI milestone, not completion of the entire premium design or human usability validation. The earlier reading/inspector phase remains documented in `docs/review/v0.31b-inspector/REVIEW.md`.
 

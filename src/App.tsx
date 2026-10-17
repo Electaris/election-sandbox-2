@@ -1978,6 +1978,7 @@ function ScenarioApp() {
     }, 140);
   }
 
+  const editorialMasthead = workspaceMode === "home" || experienceMode === "swingometer";
   const scenarioShareButton = <button className="share-button" disabled={!demographicFoundation || scenarioPending}
     onClick={copyScenarioLink} type="button">
     {shareStatus === "copied" ? "Scenario link copied" : shareStatus === "error" ? "Try copy" : "Copy scenario link"}
@@ -1991,8 +1992,8 @@ function ScenarioApp() {
         <button className="brand" onClick={() => navigateWorkspace("home")} type="button" aria-label="Sandbox 2.0 editorial home">
           <span className="brand-rule" aria-hidden="true"><i /><i /></span>
           <span>
-            <span className="overline">{workspaceMode === "home" ? "THE ELECTION EXPLORATION STUDIO" : "American electorate laboratory"}</span>
-            <strong>{workspaceMode === "home" ? "American Electorate" : "Sandbox 2.0"}</strong>
+            <span className="overline">{editorialMasthead ? "THE ELECTION EXPLORATION STUDIO" : "American electorate laboratory"}</span>
+            <strong>{editorialMasthead ? "American Electorate" : "Sandbox 2.0"}</strong>
           </span>
         </button>
 
@@ -2024,7 +2025,7 @@ function ScenarioApp() {
       {workspaceMode === "laboratory" && <WorkspaceHeader inspectorOpen={dock.inspectorOpen} onToggleInspector={dock.toggleInspector}>
           <div className="map-toolbar">
             <div>
-              <span className="overline">Geographic scope</span>
+              <span className="overline">{experienceMode === "swingometer" ? "SWINGOMETER / 2024 PRESIDENTIAL" : "Geographic scope"}</span>
               <div className="breadcrumb">
                 {!selectedStateCode
                   ? <strong aria-current="location">United States</strong>
