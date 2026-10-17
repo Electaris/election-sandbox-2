@@ -42,6 +42,8 @@ test("Election Night runs the Swingometer result on the persistent atlas map", a
   await expect(play).toBeEnabled({ timeout: 100_000 });
   await expect(page.locator(".night-initialization")).toBeHidden();
   await expect(page.getByRole("region", { name: "Three-state election night desk" })).toContainText("WI");
+  await expect(page.getByRole("region", { name: "Three-state election night desk" })).toContainText("Synthetic timing and reporting order");
+  await expect(page.getByRole("region", { name: "Three-state election night desk" })).toContainText("not the actual election-night chronology");
   await expect(page.getByText(/No statewide fallback returns/)).toBeVisible();
   await expect(page.getByRole("region", { name: "Workspace context" })).toContainText("Pennsylvania");
 

@@ -1,5 +1,7 @@
 # v0.36 — Local usability review readiness
 
+**Later technical review:** the [v0.37 informed review](../v0.37-technical-review/REVIEW.md) found and corrected a national-readout binding defect and clarified replay/route meaning. Use its corrected candidate on port **4175** for new sessions. The package identity and port 4174 below describe the original v0.36 evidence and remain historical.
+
 Date: 2026-10-17. Human acceptance: **NOT RUN**. Unfamiliar-user sessions: **0**. This phase prepares and technically checks a candidate; it does not turn automated results into human evidence.
 
 ## Start here

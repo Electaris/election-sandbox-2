@@ -1578,12 +1578,12 @@ function ScenarioApp() {
   const presentedShift = presentedActualMargin == null || presentedScenarioMargin == null
     ? null
     : presentedScenarioMargin - presentedActualMargin;
-  const presentedActualResult: AtlasCandidateResult = workspaceMode === "home"
+  const presentedActualResult: AtlasCandidateResult = workspaceMode === "home" || !selectedStateCode
     ? actualNational
     : selectedVtd?.baselineVotes
       ?? selectedActualCounty
       ?? selectedActual;
-  const presentedScenarioResult: AtlasCandidateResult = workspaceMode === "home"
+  const presentedScenarioResult: AtlasCandidateResult = workspaceMode === "home" || !selectedStateCode
     ? scenarioNational
     : selectedVtdScenario
       ?? selectedScenarioCounty
@@ -2238,7 +2238,7 @@ function ScenarioApp() {
           {experienceMode === "election-night" && (
             <section className="night-three-state-card" aria-label="Three-state election night desk">
               <div className="card-heading"><div><span className="overline">Historical scenario replay</span><strong>Returns desk</strong></div><span className="year-chip">2024</span></div>
-              <p>Pennsylvania, Michigan, and Wisconsin. Only published local returns enter this count.</p>
+              <p>Pennsylvania, Michigan, and Wisconsin. Synthetic timing and reporting order reveal your modeled votes, not the actual election-night chronology.</p>
               <div className="night-reported-total"><span>Ballots reported</span><strong data-testid="night-reported-total">{formatNumber(replayNational?.totalReportedVotes ?? 0)}</strong><small>{replay.current?.controller.status === "complete" ? "Count complete" : replay.current?.controller.status === "playing" ? "Replay running" : replay.phase === "ready" ? "Replay paused" : "Preparing the count"}</small></div>
               <ol className="night-reported-candidates" aria-label="Three-state reported votes by candidate">
                 {electoralTargetCandidates.map(candidate => {
@@ -2524,7 +2524,7 @@ function ScenarioApp() {
                 </div>
                 <div className="route-term-guide" aria-label="Route status definitions">
                   <span><strong>Required</strong>Statewide movement is still needed. Not a forecast.</span>
-                  <span><strong>Modeled</strong>A detailed PA or MI scenario is active.</span>
+                  <span><strong>Modeled</strong>A detailed PA, MI, or WI scenario is active.</span>
                   <span><strong>Satisfied</strong>The detailed scenario changes the state&apos;s electoral winner.</span>
                 </div>
               </div>
@@ -2592,7 +2592,7 @@ function ScenarioApp() {
               </div>
             )}
             <p className="route-disclosure">
-              Required means statewide mathematical movement still needed, not a forecast. Modeled means a detailed PA or MI recipe exists. Satisfied means that recipe changes the state&apos;s electoral winner. Maine and Nebraska are excluded until district allocation is supported.
+              Required means statewide mathematical movement still needed, not a forecast. Modeled means a detailed PA, MI, or WI recipe exists. Satisfied means that recipe changes the state&apos;s electoral winner. Maine and Nebraska are excluded until district allocation is supported.
               {targetCandidate !== "harris" && targetCandidate !== "trump" && " Named candidate baselines are exact in supported detailed states; unseparated minor-candidate votes in unsupported states remain in Aggregate other."}
             </p>
           </section>

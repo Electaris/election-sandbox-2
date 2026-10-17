@@ -2,6 +2,8 @@
 
 Last updated: 2026-10-17
 
+Latest review: [v0.37 informed technical review](docs/review/v0.37-technical-review/REVIEW.md). Actual browser walkthrough found and fixed national readout margins falling back to the active detailed state after returning to United States. Replay now explicitly identifies synthetic chronology; both route definitions include WI. New national/state regression and full replay/release acceptance checks pass 6/6 against corrected immutable candidate `5250e5c7203b3168be988b89df21c1f10e8f406a4751f34bac035184e04339a8` on port **4175**. Build/type/foundation/package verification and lint pass. Original v0.36 package stays on 4174; development stays on 4173. Remaining reviewer findings: turnout density, statewide edit scope inside county context, geography terminology, and repeated/truncated phone identity. Next is a bounded interaction refinement, then genuine human testing under the recorded delivery disposition. This is AI technical evidence, not owner acceptance or unfamiliar-human validation. Human rows remain NOT RUN; external-delivery and migration holds remain intact.
+
 ## 1. Product boundary
 
 Sandbox 2.0 is a standalone historical election counterfactual laboratory. It is not a route, package, or backend inside the older Sandbox or the Presidential Atlas. The product borrows proven editorial and deck.gl interaction patterns, but this repository owns its application, data contracts, generated artifacts, tests, deployment, and future backend.
