@@ -282,7 +282,7 @@ test("an active state that does not flip remains visible with zero EV consequenc
 test("a Required Michigan route becomes Modeled, Satisfied, replayable, and reversible", async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto("/");
-  await page.getByRole("button", { name: "Open Sandbox", exact: true }).first().click();
+  await page.getByRole("button", { name: "Enter the laboratory", exact: true }).first().click();
   await expect(page.locator('.application-shell[data-workspace-mode="laboratory"][data-geography-level="national"]')).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy scenario link" })).toBeEnabled();
   await page.getByRole("button", { name: "Compare alternative routes" }).click();

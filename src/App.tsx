@@ -2317,8 +2317,8 @@ function ScenarioApp() {
                     type="button"
                   >
                     <span className="consequence-state"><strong>{row.stateName}</strong><small>{row.stateCode} · Modeled</small></span>
-                    <span><small>{candidateNames[row.actualWinner]}</small><strong>{formatPluralityMargin(row.actualWinner, row.actualMargin)}</strong></span>
-                    <span><small>{candidateNames[row.scenarioWinner]}</small><strong>{scenarioPending ? "Updating" : formatPluralityMargin(row.scenarioWinner, row.scenarioMargin)}</strong></span>
+                    <span><small>Actual · {candidateNames[row.actualWinner]}</small><strong>{formatPluralityMargin(row.actualWinner, row.actualMargin)}</strong></span>
+                    <span><small>Scenario · {candidateNames[row.scenarioWinner]}</small><strong>{scenarioPending ? "Updating" : formatPluralityMargin(row.scenarioWinner, row.scenarioMargin)}</strong></span>
                     <span className={electoralDeltaClass(row.targetElectoralDelta, targetCandidate)}>
                       <small>{candidateNames[targetCandidate]}</small>
                       <strong>{row.targetElectoralDelta === 0
@@ -2385,7 +2385,7 @@ function ScenarioApp() {
                   <span className="overline">To flip {selectedStateFlipRequirement.stateName}</span>
                   <strong>{selectedStateFlipRequirement.satisfied
                     ? `${candidateNames[targetCandidate]} now leads this state`
-                    : `${candidateNames[targetCandidate]} needs ${formatNumber(selectedStateFlipRequirement.remainingNetMarginVotes)} net margin votes`}</strong>
+                    : <>{candidateNames[targetCandidate]} needs <span className="flip-requirement-number">{formatNumber(selectedStateFlipRequirement.remainingNetMarginVotes)}</span> net margin votes</>}</strong>
                 </div>
                 <span className="state-fact-chip">State fact</span>
               </div>
@@ -2441,7 +2441,7 @@ function ScenarioApp() {
 
           <section className="path-card" aria-label="Path to 270" data-alternatives-open={routeAlternativesOpen}>
             <div className="card-heading compact">
-              <div><span className="overline">Path to {pathTo270.majorityThreshold}</span><strong>Closest mathematical routes</strong></div>
+              <div><span className="overline">Path to {pathTo270.majorityThreshold}</span><strong>Routes to a majority</strong></div>
               <span className="route-needed">{pathTo270.electoralVotesNeeded === 0
                 ? "Majority reached"
                 : `${pathTo270.electoralVotesNeeded} EV needed`}</span>

@@ -23,4 +23,6 @@ Production build, including PA/MI/WI foundation retention, and lint passed. Scre
 
 ## Next
 
+Owner follow-up: [sidebar readability correction](SIDEBAR_FIX.md) replaces compressed route tables and three-column state metrics with readable narrow-column layouts.
+
 Bring Election Night's returns desk and replay controls into the same original editorial system, followed by cross-page desktop/mobile consistency review. No hosted deployment, public participant delivery, demographic migration, or human usability validation is implied by these source pushes.
