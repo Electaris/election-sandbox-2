@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculations & methodology | American Electorate</title>
+<style>
+:root{color-scheme:light;background:#f8f7f1;color:#183e4d;font:16px/1.7 system-ui,sans-serif}body{max-width:860px;margin:auto;padding:36px 24px 80px}a{color:#285f73;text-underline-offset:4px}a:focus-visible{outline:2px solid #285f73;outline-offset:4px}header{border-bottom:1px solid #bdcbc5;padding-bottom:24px;margin-bottom:36px}small{font-size:12px;letter-spacing:.09em;text-transform:uppercase}h1,h2{font-family:Georgia,serif;font-weight:400;line-height:1.15}h1{font-size:clamp(38px,7vw,64px);margin:18px 0}h2{font-size:28px;margin:40px 0 16px}p,li{max-width:76ch}code{font-size:.92em;white-space:normal}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:12px 8px;border-bottom:1px solid #bdcbc5;vertical-align:top}th{font-weight:600}.formula{border-left:2px solid #285f73;padding:12px 18px;background:#edf0e8}footer{margin-top:48px;border-top:1px solid #bdcbc5;padding-top:20px}@media(max-width:480px){body{padding-inline:18px}td,th{padding-inline:4px;font-size:12px}}
+</style></head><body>
+<header><a href="./">American Electorate</a><p><small>2024 historical counterfactual laboratory</small></p><h1>Calculations &amp; methodology</h1><p>Certified endpoints, explicit assumptions, and reproducible arithmetic. These scenarios do not predict individual voting behavior or future elections.</p></header>
+<main>
+<h2>The foundation</h2>
+<p>The national baseline contains 155,238,302 presidential ballots and 538 electoral votes: Harris 226, Trump 312. Detailed local operations are available for Pennsylvania, Michigan, and Wisconsin. Other states retain their certified statewide result.</p>
+<table><thead><tr><th>State</th><th>Baseline ballots</th><th>Local evidence</th><th>Ballots outside terrain</th></tr></thead><tbody>
+<tr><td>Pennsylvania</td><td>7,058,732</td><td>2024 returns linked to 2020 Census voting districts</td><td>125,172</td></tr>
+<tr><td>Michigan</td><td>5,664,186</td><td>2024 precinct returns; 2020 VAP bridged to 2024 precincts</td><td>142,574</td></tr>
+<tr><td>Wisconsin</td><td>3,422,918</td><td>LTSB population-disaggregated ward reconstruction; estimated local values</td><td>0</td></tr></tbody></table>
+<p>Ballots without an audited polygon remain in aggregate results. We do not invent their location. Voting-age population (VAP) is not citizen VAP, registration, or a 2024 eligibility estimate. Group-composition controls are available only in PA and MI; Wisconsin has no admitted compatible group cells.</p>
+<h2>The operation order matters</h2>
+<p>Each recipe starts from the baseline and runs statewide turnout, group turnout in canonical group order, two-party preference, then the selected third-party exchange. Changing the order can change the outcome. The interface reports requested, realized, and capacity-clipped quantities.</p>
+<h2>Turnout additions</h2>
+<p class="formula">Requested new ballots = round(sum of admitted local VAP × turnout points ÷ 100).</p>
+<p>The statewide setting adds Harris and Trump ballots using the authored split. Allocation uses VAP weights, documented local capacity, and integer apportionment. Total realized additions cannot exceed capacity. Existing ballots stay fixed. The editor exposes 0 to +1.5 points; these are model bounds, not an estimate of feasible political turnout.</p>
+<p>Optional group settings use aggregate group VAP and share remaining local capacity. Custom group choices can add ballots to Harris, Trump, Stein, Oliver, or Other, with shares summing to 100%. Group order resolves capacity competition. A group's aggregate geography does not identify how individuals voted.</p>
+<h2>Two-party preference</h2>
+<p class="formula">Requested Trump-to-Harris transfer = round(current scenario ballots × preference points ÷ 200).</p>
+<p>Negative values transfer toward Trump. Each transferred ballot changes the Harris-minus-Trump margin by two votes. Supply limits can clip transfers. Total ballots and third-party counts stay fixed during this operation. “Current ballots” includes earlier turnout additions; it is not a two-party-share denominator.</p>
+<h2>Third-party exchange</h2>
+<p class="formula">Requested change in the selected bucket = round(current scenario ballots × third-party points ÷ 100).</p>
+<p>Stein, Oliver, or residual Other exchanges ballots with the major parties using an authored source/destination split. Candidate supply constrains the exchange; total ballots remain fixed. Local distribution uses the versioned allocation profile stored with the scenario, including legacy-compatible recipes. Local support affinity is a modeling rule, not evidence of voter migration.</p>
+<h2>Margins, rounding, and electoral votes</h2>
+<p>A Harris–Trump margin is <code>100 × (Harris − Trump) / all presidential ballots</code>. A plurality margin compares the largest and second-largest candidate totals using all ballots. These are different metrics when another candidate leads. The national H–T readout uses the national aggregate.</p>
+<p>Counts remain nonnegative safe integers. Requests use JavaScript <code>Math.round</code>; exact half ties round toward positive infinity. Capped integer apportionment conserves the realized total. Display rounding never changes underlying votes.</p>
+<p>For an outright win, the net margin requirement is <code>max(0, strongest opponent − target + 1)</code>. A tied state has no outright scenario winner. Flipping a winner-take-all state changes its entire electoral allocation; improving a losing margin alone changes no electoral votes. Existing Maine/Nebraska baseline district allocations are preserved; counterfactual route construction excludes those states until district modeling is supported.</p>
+<h2>Routes to 270</h2>
+<p>Routes sum state net-margin requirements, margin points, and electoral allocations. They describe mathematical requirements, not forecasts or interchangeable ballot transfers. The solver retains a bounded set of candidate combinations; displayed rankings are not an exhaustive proof of the globally cheapest route. Unsupported states have mathematical requirements without invented county or precinct behavior.</p>
+<h2>Election Night</h2>
+<p>Timing and reporting order are synthetic. Only the current published prefix supplies reported candidate shares and movement. The replay covers PA, MI, and WI, excludes the other 48 jurisdictions, and does not provide national projections, race calls, or actual 2024 reporting chronology. Its completed count reconciles to the modeled endpoint.</p>
+<h2>Sources and audit limits</h2>
+<p>State-specific Data panels expose source links, matching methods, coverage, and denominator limitations. National certified totals are compiled from FEC results. Sources include the <a href="https://www.fec.gov/resources/cms-content/documents/2024presgeresults.pdf">FEC official 2024 presidential results</a>, <a href="https://www.census.gov/programs-surveys/decennial-census/about/rdo/summary-files.html">Census P.L. 94-171 documentation</a>, and the official state sources linked in the application.</p>
+<p>Technical reconciliation establishes arithmetic consistency with the admitted artifacts. It does not independently recertify election returns, validate reconstructed ward accuracy, infer demographic preference, or resolve source redistribution rights. Unfamiliar-user validation is not complete. This public review build is not a paid service or a claim of production readiness.</p>
+</main><footer><a href="./app/">Open the laboratory</a> · <a href="./">Return to the atlas</a></footer>
+</body></html>

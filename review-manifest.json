@@ -1,0 +1,1241 @@
+{
+  "sourceCommit": "701318fbd0a44061c89e07835015de1d087df430",
+  "contentId": "c8ae3e2c0cd63b2d3e3bd2414bd5e4cd411939b8e6710a2fdfa82eb8fdea20fe",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": ".nojekyll",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app/index.html",
+      "bytes": 654,
+      "sha256": "d03731dfa20d3306e269ca1a1dfa2e6a1781a582073f1b42110033cfe382053f"
+    },
+    {
+      "path": "assets/AtlasMapScene-CVFL97Fs.js",
+      "bytes": 1605945,
+      "sha256": "83d62770228fb49034b36d73ef2cab72d4b4a827965daf19e90ab6deaf448342"
+    },
+    {
+      "path": "assets/detailedStateScenario.worker-D11xX9uz.js",
+      "bytes": 43671,
+      "sha256": "f49dc450b27d139111b263aad39bc85f40e9b4b022548477aa854be983734b30"
+    },
+    {
+      "path": "assets/ElectionNightMarginTimeline-CSHYKhlS.js",
+      "bytes": 3834,
+      "sha256": "1f0f9ecb2b30bb7995f624eb88dff6fddc225a7158d0219e365e7d883f83f7df"
+    },
+    {
+      "path": "assets/ElectionNightReportingVelocity-BgKW2Ip-.js",
+      "bytes": 3771,
+      "sha256": "bfdfcf43ff2611c04ddddb410348dc390e9eca5afd7a3bb7a29f081b224fe347"
+    },
+    {
+      "path": "assets/installCanvasRenderer-CrjXfg8z.js",
+      "bytes": 532575,
+      "sha256": "318b79a98288e7600a4ec47ea3475d368d94277e03df5da45e90a72f4ac8489a"
+    },
+    {
+      "path": "assets/main-BSMjp6LR.css",
+      "bytes": 217388,
+      "sha256": "04e35f98f6ebf525d0f1ac68fb47ca6c91a2129947af64240f7fe6c2be555170"
+    },
+    {
+      "path": "assets/main-CMN4B5j0.js",
+      "bytes": 651282,
+      "sha256": "e2b660d18fc1aef9c3143ec5bf64c41227522d2f45503acacca009ab6a6dcb0b"
+    },
+    {
+      "path": "assets/scenarioPortfolio.worker-AN_ogrzU.js",
+      "bytes": 49524,
+      "sha256": "11e16ab3d0aa39d3d885c594ea5fa7fba650d9b5b632a41f34facfe4da371df1"
+    },
+    {
+      "path": "assets/threeStateNight.worker-Bix2zVEz.js",
+      "bytes": 109155,
+      "sha256": "39f98ddc9d99c5822d4d61c84763f2b30a0208539ea365859809f663fe5e355c"
+    },
+    {
+      "path": "assets/webgl-device-CgE2sL3x.js",
+      "bytes": 73,
+      "sha256": "093553290991476c97653b0865b6c93669daa4ccf425614e69e080e8e41e4579"
+    },
+    {
+      "path": "build-info.json",
+      "bytes": 299,
+      "sha256": "cfccbbddc7ce18b11cfef2879a357d80615b9bf2758e189031c0de810d362ad0"
+    },
+    {
+      "path": "data/mi/2020/precinct-demographics.json",
+      "bytes": 628735,
+      "sha256": "2072a732924b5b6dec8da1822bfc8e4eb042e0c3fa22a411eed8d790ae5151e0"
+    },
+    {
+      "path": "data/mi/2024/precinct-geometry-manifest.json",
+      "bytes": 73822,
+      "sha256": "ae6c16a25631bb0ca56f1846ce2b2680bfd20562c36405a8d4cf78334091e86c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26001.topo.json",
+      "bytes": 28643,
+      "sha256": "f23977fc533e8bbe6679cc53581b0ad7624502bf1ea1d4e0cbb1c33f3bd89060"
+    },
+    {
+      "path": "data/mi/2024/precincts/26003.topo.json",
+      "bytes": 58313,
+      "sha256": "eae307503fa6d09a3f5eac1427a1f2ba6b7616604eae0be4d1b1ea30d17bc584"
+    },
+    {
+      "path": "data/mi/2024/precincts/26005.topo.json",
+      "bytes": 70606,
+      "sha256": "9413b45e26791f8c563c38898fff6d071b88c4975ff01e2e2c75f60f6c7059d5"
+    },
+    {
+      "path": "data/mi/2024/precincts/26007.topo.json",
+      "bytes": 81522,
+      "sha256": "a38ba85c5b60d88f681246ed8c23ff3b7e91cd4dbf35688f0c1d8039dd06f03c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26009.topo.json",
+      "bytes": 33956,
+      "sha256": "c64248a5345de1d4cecb1d720545f31c27eccad2846af6ac6781c206c0bd1f72"
+    },
+    {
+      "path": "data/mi/2024/precincts/26011.topo.json",
+      "bytes": 57835,
+      "sha256": "9791159f274108e8735bb55eb7b4c4807a0e8556df7d8b14da0d8779ddd4a873"
+    },
+    {
+      "path": "data/mi/2024/precincts/26013.topo.json",
+      "bytes": 40614,
+      "sha256": "baf691ee13fa8a908802bacb5b56a5824eee7b8d174df426cfd81121c33d7d1d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26015.topo.json",
+      "bytes": 36413,
+      "sha256": "d5d4a930c3b80375488a61f0f88119aa2534f0759dcc40fdf647512418a99c19"
+    },
+    {
+      "path": "data/mi/2024/precincts/26017.topo.json",
+      "bytes": 93148,
+      "sha256": "d75600dd6a4f98353123c344c6ce4396a1848b490df5a73f18e7653114dae892"
+    },
+    {
+      "path": "data/mi/2024/precincts/26019.topo.json",
+      "bytes": 23062,
+      "sha256": "a573a83adda36dbec3057e7ac0c25a79a0934dd11c4669eae0eed008091e7b57"
+    },
+    {
+      "path": "data/mi/2024/precincts/26021.topo.json",
+      "bytes": 99748,
+      "sha256": "3e19705d542f69b66e5b580121d0bdff2655edb58080f549e9485444dd75a0a1"
+    },
+    {
+      "path": "data/mi/2024/precincts/26023.topo.json",
+      "bytes": 32309,
+      "sha256": "64d8baca9b3cea3bc2548c18d560309ec25f5418f9d86c70e0b0335e92d35474"
+    },
+    {
+      "path": "data/mi/2024/precincts/26025.topo.json",
+      "bytes": 97664,
+      "sha256": "dac3125880983ea3ce5ded6506f0938aa96dee122bfda9fc8c1ce3adabb25ceb"
+    },
+    {
+      "path": "data/mi/2024/precincts/26027.topo.json",
+      "bytes": 37921,
+      "sha256": "46bb9c3ba38a88922150b8ccb4696a1df7f44ee346624ffb19e30f6a89c94b78"
+    },
+    {
+      "path": "data/mi/2024/precincts/26029.topo.json",
+      "bytes": 100836,
+      "sha256": "a48eb01dc1f921e809aeb9b56f9e4b3e22ff5bc03d75d72dbfb8db6488377ca7"
+    },
+    {
+      "path": "data/mi/2024/precincts/26031.topo.json",
+      "bytes": 42711,
+      "sha256": "a8f4edf60a1cbdce169e2c29409024c1da8b4e6e758dcc5428d89ccca7c5910c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26033.topo.json",
+      "bytes": 93661,
+      "sha256": "7e2e016d0be29018100ecd7310936174a83330a25e4dd5b8c8510a5a1b22b81f"
+    },
+    {
+      "path": "data/mi/2024/precincts/26035.topo.json",
+      "bytes": 29252,
+      "sha256": "a23d5dff32b45d45e1462eed558c3285e7a06f7887325785bd387f4418185cfe"
+    },
+    {
+      "path": "data/mi/2024/precincts/26037.topo.json",
+      "bytes": 48242,
+      "sha256": "24f44d221f8d7c888f6699c36ad253832c6ef314f702c9a0a334fc5af64f027e"
+    },
+    {
+      "path": "data/mi/2024/precincts/26039.topo.json",
+      "bytes": 26030,
+      "sha256": "bf50fe050f56bb8e2273d6156bd1329cbba6d865f1e3d19d5c111cf92197f46b"
+    },
+    {
+      "path": "data/mi/2024/precincts/26041.topo.json",
+      "bytes": 137056,
+      "sha256": "492d1725bb0a78eb87645c87d26404b197da9623a37013ea5802f2d9119c17da"
+    },
+    {
+      "path": "data/mi/2024/precincts/26043.topo.json",
+      "bytes": 37332,
+      "sha256": "541853c4a5a352abf01c4208218c4304a0e89741c7c9d989a4754f6377daf761"
+    },
+    {
+      "path": "data/mi/2024/precincts/26045.topo.json",
+      "bytes": 64591,
+      "sha256": "b238be593e614bd297ae5de7fb56020cd423dfdd6f8aaafb510a2db1564e36c0"
+    },
+    {
+      "path": "data/mi/2024/precincts/26047.topo.json",
+      "bytes": 51623,
+      "sha256": "d1d3bf390e07e5e95272034248bdabca0c9fc16d52cbe604db10476de92ffe03"
+    },
+    {
+      "path": "data/mi/2024/precincts/26049.topo.json",
+      "bytes": 201629,
+      "sha256": "5cba795b86c3a1cd85b2290d275eb66fe55d3bcf67e3c3d9e82b07808dcd58a8"
+    },
+    {
+      "path": "data/mi/2024/precincts/26051.topo.json",
+      "bytes": 26304,
+      "sha256": "a37aac8fce49cb914f86c7505763605c1d3a5163b601581ffa21422a393faffd"
+    },
+    {
+      "path": "data/mi/2024/precincts/26053.topo.json",
+      "bytes": 50434,
+      "sha256": "7bbc5e4a945696082dd09089ff8e97e10e87427bd32bcf1487620b7e655fd8f3"
+    },
+    {
+      "path": "data/mi/2024/precincts/26055.topo.json",
+      "bytes": 63542,
+      "sha256": "0a56c023a5d2000ffbce9df7445677a59324f36b3d39ebef93697e9a718b74e5"
+    },
+    {
+      "path": "data/mi/2024/precincts/26057.topo.json",
+      "bytes": 33409,
+      "sha256": "ea2bebd0b1681f1f94964c592a8210eff2339740fd936fe2b5698893e589b51d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26059.topo.json",
+      "bytes": 41020,
+      "sha256": "00b415603cd62f46b746789bfc595ac8a0ece58d09d9de67524938ea00d9cce7"
+    },
+    {
+      "path": "data/mi/2024/precincts/26061.topo.json",
+      "bytes": 78421,
+      "sha256": "01de6566c176c8a353f0d2425cad3130ab47e7b59ae824fd8a02dd828fb9ef86"
+    },
+    {
+      "path": "data/mi/2024/precincts/26063.topo.json",
+      "bytes": 168234,
+      "sha256": "b6832fa3ad95c3c94d82b0c136ba62b78a8f7480bfbe234802816ce6aad1adea"
+    },
+    {
+      "path": "data/mi/2024/precincts/26065.topo.json",
+      "bytes": 125616,
+      "sha256": "31fb5d5561b03387bdb209fbace006e83b46907ae6ba8572111dd6ac33707aa1"
+    },
+    {
+      "path": "data/mi/2024/precincts/26067.topo.json",
+      "bytes": 46427,
+      "sha256": "6886371b75cb254be92215d3c0c870cc8973b045135255353aac649821120507"
+    },
+    {
+      "path": "data/mi/2024/precincts/26069.topo.json",
+      "bytes": 46777,
+      "sha256": "dfcdf4ee9f15e8154eb04c8a0a4bb2653e486f4d5b68487353de4dc0b9e3e2c1"
+    },
+    {
+      "path": "data/mi/2024/precincts/26071.topo.json",
+      "bytes": 42941,
+      "sha256": "e5456662134482ecb0f0bae4db49252218628094e8e02d0a4f44bd577b5badc3"
+    },
+    {
+      "path": "data/mi/2024/precincts/26073.topo.json",
+      "bytes": 31308,
+      "sha256": "93dbef634eb2fc8f8d6e6ec5b1e69a9e6981ab87785a186a2c62780e62fc4708"
+    },
+    {
+      "path": "data/mi/2024/precincts/26075.topo.json",
+      "bytes": 83272,
+      "sha256": "fc501b5ae5562118f234258bf4cafe784b4ca2900ee46fe80561edfc48076b0c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26077.topo.json",
+      "bytes": 129530,
+      "sha256": "091d16918373f4afbb45878beda6fe69dd41f23a658347749c53d904450a5436"
+    },
+    {
+      "path": "data/mi/2024/precincts/26079.topo.json",
+      "bytes": 22832,
+      "sha256": "1ef84add4df2bd87b1d63e1cc6d372491a2ff798cc50b9272274aa959aaea3a6"
+    },
+    {
+      "path": "data/mi/2024/precincts/26081.topo.json",
+      "bytes": 298960,
+      "sha256": "a22522ca2ac38fc2f7ef3a60a256143adf449008247d23c0fb376bc090ede85f"
+    },
+    {
+      "path": "data/mi/2024/precincts/26083.topo.json",
+      "bytes": 211685,
+      "sha256": "28438939c8663cb56a2a54a19b6f9c916a3c6c06e4a9ea3ea36922a52405f127"
+    },
+    {
+      "path": "data/mi/2024/precincts/26085.topo.json",
+      "bytes": 23134,
+      "sha256": "584572c00d6af714355b025ac6a9607d19f2e93f4fd89746faf0ddd9db3c86e3"
+    },
+    {
+      "path": "data/mi/2024/precincts/26087.topo.json",
+      "bytes": 48221,
+      "sha256": "8e77684123f7a33b6ff8eb7c596dd2a92ae96c25422cef6a59017e78018e97d5"
+    },
+    {
+      "path": "data/mi/2024/precincts/26089.topo.json",
+      "bytes": 66472,
+      "sha256": "1bb63698f89b63306f188bb3bf90f3b8f488d4b7d4f2fb36c5789043f3cefac5"
+    },
+    {
+      "path": "data/mi/2024/precincts/26091.topo.json",
+      "bytes": 61355,
+      "sha256": "4e8ac0df0623d0d98cca4dd06c8e5c4e9d564cfc1f37f95f36ec048473a08eb9"
+    },
+    {
+      "path": "data/mi/2024/precincts/26093.topo.json",
+      "bytes": 108873,
+      "sha256": "1b4f341f2cd2438433004e9416bf219fd75b334391ef9423293b60a0fdcd083a"
+    },
+    {
+      "path": "data/mi/2024/precincts/26095.topo.json",
+      "bytes": 11995,
+      "sha256": "08f4e3f32d4ec2b57023cd0f364b4f6ffbd3f231a8835b44da18d5cbfb72b894"
+    },
+    {
+      "path": "data/mi/2024/precincts/26097.topo.json",
+      "bytes": 195331,
+      "sha256": "57bdf0da56a285b7fb974e31f59c31002311b45fc669ccd6a84679fe807d8325"
+    },
+    {
+      "path": "data/mi/2024/precincts/26099.topo.json",
+      "bytes": 350113,
+      "sha256": "a8295a8e855b0e013101aae653383ede670a9cbd58e00a28122cdf118bb9fe61"
+    },
+    {
+      "path": "data/mi/2024/precincts/26101.topo.json",
+      "bytes": 27746,
+      "sha256": "14e4bf4d9cfdc80cd2ea4e4391372586738f945269558cb0be9805e7403f6193"
+    },
+    {
+      "path": "data/mi/2024/precincts/26103.topo.json",
+      "bytes": 97187,
+      "sha256": "3750327096337dc8f06e52e9a8b0b8be7bebfa56279ceb60c5143eba5af0bc8c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26105.topo.json",
+      "bytes": 50801,
+      "sha256": "d8a628ea9f99d73d378a4000b725e3a91554ac51c36eae9d2b9383ca2ae6a250"
+    },
+    {
+      "path": "data/mi/2024/precincts/26107.topo.json",
+      "bytes": 28561,
+      "sha256": "66855d7fc065f599b4c451d3a1fbefe562a681942e9a090649e6482f77714829"
+    },
+    {
+      "path": "data/mi/2024/precincts/26109.topo.json",
+      "bytes": 69925,
+      "sha256": "0a3ce690bf0d241d08c057c37c547d3dfc8b3610fca2e4a186e863e3c52e983b"
+    },
+    {
+      "path": "data/mi/2024/precincts/26111.topo.json",
+      "bytes": 52133,
+      "sha256": "7408d29c7670f89151eb86c005991599520afd16f433a57366961dd6621fffec"
+    },
+    {
+      "path": "data/mi/2024/precincts/26113.topo.json",
+      "bytes": 25294,
+      "sha256": "2e6e04abc419f1f75d55bc2cccb20b12dc9e905100439041b86e25550ea7694d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26115.topo.json",
+      "bytes": 103454,
+      "sha256": "3fb7ec2cac526a237cef64ba389b58f34eed194c9dd1e54a18c17587bc0470e1"
+    },
+    {
+      "path": "data/mi/2024/precincts/26117.topo.json",
+      "bytes": 39190,
+      "sha256": "cb5d955b2dbbdf1338829b12fc2199ab55b013472500c8c92954170dd1654532"
+    },
+    {
+      "path": "data/mi/2024/precincts/26119.topo.json",
+      "bytes": 18793,
+      "sha256": "99c959cb7717aea678e068db4e45f8b54539d0e2fc225eae6384aebe3a082ed9"
+    },
+    {
+      "path": "data/mi/2024/precincts/26121.topo.json",
+      "bytes": 77665,
+      "sha256": "0aebcc30fa01101d65c9c20136097df0ee552a522024e776f7373e7bc73d358d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26123.topo.json",
+      "bytes": 45872,
+      "sha256": "a182c1752686864acef731237112deaa45c75db790befe8af6523516692ea028"
+    },
+    {
+      "path": "data/mi/2024/precincts/26125.topo.json",
+      "bytes": 637627,
+      "sha256": "d222e44568f88b2c79a2a88cc2a4a630c6cad8533c7cb7504e94b521553fb06c"
+    },
+    {
+      "path": "data/mi/2024/precincts/26127.topo.json",
+      "bytes": 31354,
+      "sha256": "462b8a40599616073a2a2430f7d688b1885e01d34522262feb20957786ae02d0"
+    },
+    {
+      "path": "data/mi/2024/precincts/26129.topo.json",
+      "bytes": 26656,
+      "sha256": "32cf2da91bedd11b4cee36251e247a9ab97b398c388ae0e463ecc5c4e53e9921"
+    },
+    {
+      "path": "data/mi/2024/precincts/26131.topo.json",
+      "bytes": 32147,
+      "sha256": "be8a2e89fc6209fc5e44ab9cfb1718c02822bbf7208c4cae744b471e7968eedf"
+    },
+    {
+      "path": "data/mi/2024/precincts/26133.topo.json",
+      "bytes": 31001,
+      "sha256": "92703e88578854f57e1498e85fb1e3109d56c374bd3f87d2c03b217f6a8e085d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26135.topo.json",
+      "bytes": 20343,
+      "sha256": "edd1b1e47c8181bb9fdf557210b6d9173b310a25113af73ff3f4cc2b710f5315"
+    },
+    {
+      "path": "data/mi/2024/precincts/26137.topo.json",
+      "bytes": 27147,
+      "sha256": "10ea00cf2197ddd79630615449853a8a70e6a7543aee0623d4e05ead036fcb03"
+    },
+    {
+      "path": "data/mi/2024/precincts/26139.topo.json",
+      "bytes": 135323,
+      "sha256": "edbef56174739ebd0781e42e166daae00dfe7bcc9394b6ed2716becec286b222"
+    },
+    {
+      "path": "data/mi/2024/precincts/26141.topo.json",
+      "bytes": 46792,
+      "sha256": "8cac5b6777367051e0e51dc67e187912fc3dcd317f1ff9ae303e537c82ee9f9d"
+    },
+    {
+      "path": "data/mi/2024/precincts/26143.topo.json",
+      "bytes": 22097,
+      "sha256": "76bed3110661fbf6966b92ef64881e2c82ec01596b28cfb9bad1ad8275b3131e"
+    },
+    {
+      "path": "data/mi/2024/precincts/26145.topo.json",
+      "bytes": 106734,
+      "sha256": "455c6455db5f0dbac3dbabd5f490f8d87a319aa860068716bfb7c4102b890b85"
+    },
+    {
+      "path": "data/mi/2024/precincts/26147.topo.json",
+      "bytes": 150418,
+      "sha256": "a6009c56f4eed072073c842bd270d7bf77bfca36892079213fc49afab744e318"
+    },
+    {
+      "path": "data/mi/2024/precincts/26149.topo.json",
+      "bytes": 48228,
+      "sha256": "cfc77a8d174aeb5c53d0bd02c99003533452e68284e72c9331e5bc7a16d9ad33"
+    },
+    {
+      "path": "data/mi/2024/precincts/26151.topo.json",
+      "bytes": 54906,
+      "sha256": "cd10709a031bdf13ad2b81c8cd6f64ff15dedc8fa20ea0c9bc86c1939b1559d0"
+    },
+    {
+      "path": "data/mi/2024/precincts/26153.topo.json",
+      "bytes": 36864,
+      "sha256": "76719a4a7726e5e96a334446cb824ffe14cd82227b3097d033bec9979357a8a0"
+    },
+    {
+      "path": "data/mi/2024/precincts/26155.topo.json",
+      "bytes": 44237,
+      "sha256": "b476b75fc21d770a5928e2a221562224fbe9582f329fa7ce89b379d857a2c94a"
+    },
+    {
+      "path": "data/mi/2024/precincts/26157.topo.json",
+      "bytes": 50966,
+      "sha256": "522116f1780d82bf11a0b716b1d320e73531bb8f7d977bc271454a590c2947df"
+    },
+    {
+      "path": "data/mi/2024/precincts/26159.topo.json",
+      "bytes": 51415,
+      "sha256": "99635dd2dc94eca2793ff70ff94ba6d6ce762b5dcbb1b2b7595b47b0e11bc939"
+    },
+    {
+      "path": "data/mi/2024/precincts/26161.topo.json",
+      "bytes": 192003,
+      "sha256": "8533770c7b60b3b7fa88cb0fa9dfccae901ffb6302ce20f8756cff266ff03b92"
+    },
+    {
+      "path": "data/mi/2024/precincts/26163.topo.json",
+      "bytes": 837620,
+      "sha256": "cc7b5056fdc813a0220e5895735498c4ee4df9c0fd71dc1ff69f30323c5da3ec"
+    },
+    {
+      "path": "data/mi/2024/precincts/26165.topo.json",
+      "bytes": 36897,
+      "sha256": "c3fc3c998eb7be5530025d299daacff334e33b9007b22698d047cae2bf62ffd8"
+    },
+    {
+      "path": "data/mi/2024/reporting-units.json",
+      "bytes": 2258986,
+      "sha256": "0270c0a35636d1bf6cccb8a5e20c27dbdb40a318dd8390f9ea1d68ca70acca19"
+    },
+    {
+      "path": "data/pa/2020/vtd-demographics.json",
+      "bytes": 874568,
+      "sha256": "639341193ee9b44d25a1712d2e02979f54db41a312baa7df992db44df0e790f0"
+    },
+    {
+      "path": "data/pa/2024/precinct-geometry-manifest.json",
+      "bytes": 62717,
+      "sha256": "82224138bb6483b985bac14953e3fd4f7f6c290d6db7d2f563cdc53695bca8d7"
+    },
+    {
+      "path": "data/pa/2024/precincts/42001.topo.json",
+      "bytes": 121140,
+      "sha256": "271b078492aae88cefd82f2f1bd468e0ca18522f2cf23090ce196d2b1e87d288"
+    },
+    {
+      "path": "data/pa/2024/precincts/42003.topo.json",
+      "bytes": 1605317,
+      "sha256": "1522b4f51b0d3be80383f9adb3841ed96eb0836381a6a9235aeb5933d0d12856"
+    },
+    {
+      "path": "data/pa/2024/precincts/42005.topo.json",
+      "bytes": 116445,
+      "sha256": "3e82952166972d048ab0896e8c344ec316f33cb127f8d701836239df8702084f"
+    },
+    {
+      "path": "data/pa/2024/precincts/42007.topo.json",
+      "bytes": 176088,
+      "sha256": "404ad08aa9a5e83073f6a2a94647a5497ef178854005a946e5d16d3e026d9002"
+    },
+    {
+      "path": "data/pa/2024/precincts/42009.topo.json",
+      "bytes": 79630,
+      "sha256": "0c26dcecdac581cfd84154d914841b120e25310bda1a38ffed0dfbb20686bd7c"
+    },
+    {
+      "path": "data/pa/2024/precincts/42011.topo.json",
+      "bytes": 307418,
+      "sha256": "80f726e5c9705f1567fc1f1499cae1a8a9b2d3807d3baf53cb71d9de4f33ae70"
+    },
+    {
+      "path": "data/pa/2024/precincts/42013.topo.json",
+      "bytes": 139744,
+      "sha256": "ded9b0790337df745a01a66d91393ce0a0b26e0e3fcdcb887952189e3c18e5ea"
+    },
+    {
+      "path": "data/pa/2024/precincts/42015.topo.json",
+      "bytes": 67637,
+      "sha256": "0c7c74f3f4e3ed2dadd77f04e353b69e5e289ab69ff04a20f5a99d7a721aac9e"
+    },
+    {
+      "path": "data/pa/2024/precincts/42017.topo.json",
+      "bytes": 375399,
+      "sha256": "569cc2a9aec3784d4c8d84b8f11b7532e5b77cc9a3800f3ae4cad9c0c35feb48"
+    },
+    {
+      "path": "data/pa/2024/precincts/42019.topo.json",
+      "bytes": 145058,
+      "sha256": "bafb914d87cf4c1a5b8b3626f05e1237cd997f15966079e4a76c2256aed96c57"
+    },
+    {
+      "path": "data/pa/2024/precincts/42021.topo.json",
+      "bytes": 204740,
+      "sha256": "308afb0d9fa7cdc50dd9abbdeed4b90fc156e589b0a760a740cebbf41dbbc987"
+    },
+    {
+      "path": "data/pa/2024/precincts/42023.topo.json",
+      "bytes": 18149,
+      "sha256": "d4e285dabfb8a88d2c77f139416133b9de17318e3783551f0411a27a4fef54a1"
+    },
+    {
+      "path": "data/pa/2024/precincts/42025.topo.json",
+      "bytes": 109100,
+      "sha256": "25fd7693fa42ee51debc72b6083885e2bb3be7c416b34675006572dcc6539fad"
+    },
+    {
+      "path": "data/pa/2024/precincts/42027.topo.json",
+      "bytes": 121409,
+      "sha256": "1be5a4d82dd43788ebf8470ca99024303bf96cd5a5487f01de31479e97a5736b"
+    },
+    {
+      "path": "data/pa/2024/precincts/42029.topo.json",
+      "bytes": 384728,
+      "sha256": "23d1895405d9f51983a7b53676bf6efe543eebf8eae37c088bddec5ec0dc2a16"
+    },
+    {
+      "path": "data/pa/2024/precincts/42031.topo.json",
+      "bytes": 78952,
+      "sha256": "19d3d728c439c9c841347eeef5d7ad6501bd2888021421fdeef9d8afdb3428fd"
+    },
+    {
+      "path": "data/pa/2024/precincts/42033.topo.json",
+      "bytes": 138328,
+      "sha256": "bf0a73e45ba4ff1c276e9c0f1b44e51120632420ce1d8eaf5f94d9f98cfeda66"
+    },
+    {
+      "path": "data/pa/2024/precincts/42035.topo.json",
+      "bytes": 54569,
+      "sha256": "e69bac79ad1bc7fea6dcb3019cb669006ec8405c073ffec6873e7547fab4b8f5"
+    },
+    {
+      "path": "data/pa/2024/precincts/42037.topo.json",
+      "bytes": 81645,
+      "sha256": "ed164088ed579e5a8dada8a31cb52846c3387a60a8e11e8638fa6ad5432297c4"
+    },
+    {
+      "path": "data/pa/2024/precincts/42039.topo.json",
+      "bytes": 134220,
+      "sha256": "9389e83da0ce3cc476a005ea35c3dd081855cfdc1db85ac5148b3f9d9cc7d6e8"
+    },
+    {
+      "path": "data/pa/2024/precincts/42041.topo.json",
+      "bytes": 222906,
+      "sha256": "692caa04ae2596c68e5419b0288e0ef4cc6dba728c7690fefd8d471a989bdbf8"
+    },
+    {
+      "path": "data/pa/2024/precincts/42043.topo.json",
+      "bytes": 248744,
+      "sha256": "70e29653165d2716aaad26c367bc5a4162f4fb3a5f5a3c6aff88d335a4869c01"
+    },
+    {
+      "path": "data/pa/2024/precincts/42045.topo.json",
+      "bytes": 483421,
+      "sha256": "0d7f2b026200e8ae2e333d9dc95b2bb8a18c2b80ab06e96d07d006395793bc9a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42047.topo.json",
+      "bytes": 56766,
+      "sha256": "1cd11746d92fd7a81e51efae52686ea71786cae8770f1a1a6fa0c3004046df46"
+    },
+    {
+      "path": "data/pa/2024/precincts/42049.topo.json",
+      "bytes": 188810,
+      "sha256": "da47a18cde374682efaf7615b8a7d972ac40302b4a4e425ab8f471fc0cfd38d6"
+    },
+    {
+      "path": "data/pa/2024/precincts/42051.topo.json",
+      "bytes": 197352,
+      "sha256": "a502fe450a464a37cbfeedb86bc7fa49aac89c92d2d5ad745438ca9a5a2fcc61"
+    },
+    {
+      "path": "data/pa/2024/precincts/42053.topo.json",
+      "bytes": 19996,
+      "sha256": "a0090ada913b74b428a59b693595a3098c03188aa5809e1ca00d17d2853e92ea"
+    },
+    {
+      "path": "data/pa/2024/precincts/42055.topo.json",
+      "bytes": 156028,
+      "sha256": "92933f41f8d7d095610b7f372945c23b265f102b2a1257bdc2c6c246f3a21fb1"
+    },
+    {
+      "path": "data/pa/2024/precincts/42057.topo.json",
+      "bytes": 28117,
+      "sha256": "773e5025856c46cb803fb0912960b0c14c73260991b7a5866b6f78127da95765"
+    },
+    {
+      "path": "data/pa/2024/precincts/42059.topo.json",
+      "bytes": 74637,
+      "sha256": "23aada057b879721ac32bac80b2c60f6a209b4297210cbe013f8d6d11a329d8a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42061.topo.json",
+      "bytes": 84390,
+      "sha256": "5d657f099e455bf9da5c6c47487d6e320afa04030130ae54c5a037488544531b"
+    },
+    {
+      "path": "data/pa/2024/precincts/42063.topo.json",
+      "bytes": 103624,
+      "sha256": "41372237d4a507451ff6229b9e1c4c5b21f517381053b6181c25264412e1be1d"
+    },
+    {
+      "path": "data/pa/2024/precincts/42065.topo.json",
+      "bytes": 71462,
+      "sha256": "c92a3a3099e861c13a4a26ac037cc1a7c2ffc49dbdf89af826cfca4c19f19c3a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42067.topo.json",
+      "bytes": 41440,
+      "sha256": "11c96311d97a2f35ea5fbe5f123b56eaf8bed1d4ad91ecdca0ae92def0ece6a0"
+    },
+    {
+      "path": "data/pa/2024/precincts/42069.topo.json",
+      "bytes": 215453,
+      "sha256": "fb39dbf32cab9885ebf53978de9dcee3cb32d38a0716ed1aa06148c8d1a75264"
+    },
+    {
+      "path": "data/pa/2024/precincts/42071.topo.json",
+      "bytes": 500850,
+      "sha256": "077b8f40af5409a7b0917aad16b91b7781ae73a8e8fcda606a14ce6b2efdb5df"
+    },
+    {
+      "path": "data/pa/2024/precincts/42073.topo.json",
+      "bytes": 108572,
+      "sha256": "a58e9fb5eef8689b7e42b1d67b19ab9109e801696672d9c7d45bc12e1600c61b"
+    },
+    {
+      "path": "data/pa/2024/precincts/42075.topo.json",
+      "bytes": 94736,
+      "sha256": "e57c2fee37accfda68cd2a35c33516f07b4225858d8497b70ddedd46c43e909e"
+    },
+    {
+      "path": "data/pa/2024/precincts/42077.topo.json",
+      "bytes": 182557,
+      "sha256": "d2217f52fc4da1365889e2dd0f6a7dd7ad0a6e05546fcf8a958f80ec1b077c2f"
+    },
+    {
+      "path": "data/pa/2024/precincts/42079.topo.json",
+      "bytes": 276055,
+      "sha256": "38d7d5ff77bc97de502758a930d7d4efa957f4b686a7095a4849e89de9a54396"
+    },
+    {
+      "path": "data/pa/2024/precincts/42081.topo.json",
+      "bytes": 117142,
+      "sha256": "e1543ce62f30312baff75970a23d43360f603199f1f50c4abae4b311aad420c5"
+    },
+    {
+      "path": "data/pa/2024/precincts/42083.topo.json",
+      "bytes": 60083,
+      "sha256": "18285e1c657533e3536df0e06900c5e2afcaa6f5c33e979d211ec52cb0a9cca3"
+    },
+    {
+      "path": "data/pa/2024/precincts/42085.topo.json",
+      "bytes": 125469,
+      "sha256": "4e37d5ec50c345a36ce61e3099d2c7188b6ac70d5ba7d04fbd5961ecd07ec239"
+    },
+    {
+      "path": "data/pa/2024/precincts/42087.topo.json",
+      "bytes": 42722,
+      "sha256": "5728a3108f6197c46036c8690f7f048361421e425446fbf7310464d845ef06a7"
+    },
+    {
+      "path": "data/pa/2024/precincts/42089.topo.json",
+      "bytes": 119326,
+      "sha256": "d72d249f0ff043a74983cdfb0725c5b692b83bcaf92cc494a11d8c8bce5ed76a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42091.topo.json",
+      "bytes": 498810,
+      "sha256": "b31653dd8ea4a10d9ddd69de9fae87e141a7011d4b7fc13b43347dbfa0074814"
+    },
+    {
+      "path": "data/pa/2024/precincts/42093.topo.json",
+      "bytes": 34949,
+      "sha256": "be12fc04669626b04695d9f940ddda35b7a5451d974b0d5556b467319b0445ec"
+    },
+    {
+      "path": "data/pa/2024/precincts/42095.topo.json",
+      "bytes": 188409,
+      "sha256": "28326084ac9a02c817e5157f7c0c0170d45b503bbd8cbdfbb33ccdb50793f9d7"
+    },
+    {
+      "path": "data/pa/2024/precincts/42097.topo.json",
+      "bytes": 136573,
+      "sha256": "99a9319bb53e0f49a975c3b51cb2645e764acc4caffca429440e67c256716519"
+    },
+    {
+      "path": "data/pa/2024/precincts/42099.topo.json",
+      "bytes": 80034,
+      "sha256": "926ae4de743290f1ec6aeec5815e2cb25c26d448e4c0063535c1600630db3b8e"
+    },
+    {
+      "path": "data/pa/2024/precincts/42101.topo.json",
+      "bytes": 1181309,
+      "sha256": "a4fb3722de0ba514e794df4d0544368e9dfe178ecdc8bd105821e868c3cb0193"
+    },
+    {
+      "path": "data/pa/2024/precincts/42103.topo.json",
+      "bytes": 56922,
+      "sha256": "84e01ece8d9c91e0facb3ce4b1ac63cc63475d82c8b7872affb19ff66059e3c6"
+    },
+    {
+      "path": "data/pa/2024/precincts/42105.topo.json",
+      "bytes": 33127,
+      "sha256": "118079d9488c286a0003d9c3e23f0df7c29477a1fc5cd16a5988b114500d43cd"
+    },
+    {
+      "path": "data/pa/2024/precincts/42107.topo.json",
+      "bytes": 158581,
+      "sha256": "75bc64c294b8b7b9eae6965df036d9e92a4eeebff58d7c7807abbebc3343848f"
+    },
+    {
+      "path": "data/pa/2024/precincts/42109.topo.json",
+      "bytes": 59089,
+      "sha256": "ec07b87dbb7c3a3a18b0ed18ebd072c9310802b1a4b5b5ff634e4eee4804bb39"
+    },
+    {
+      "path": "data/pa/2024/precincts/42111.topo.json",
+      "bytes": 171560,
+      "sha256": "8bd7f1f2c90ce373afd9e12f47ea83ab9cfd09e13b95f12f1e01030c161f9ee7"
+    },
+    {
+      "path": "data/pa/2024/precincts/42113.topo.json",
+      "bytes": 21822,
+      "sha256": "3b6ca716e8399079404497232e22e331d03ea3009587caf600072dc1f2a436c4"
+    },
+    {
+      "path": "data/pa/2024/precincts/42115.topo.json",
+      "bytes": 46498,
+      "sha256": "450af6eb23a56c003e0af0bf7193e72ec2bfc77e55f13f34f804678bc3506d44"
+    },
+    {
+      "path": "data/pa/2024/precincts/42117.topo.json",
+      "bytes": 51411,
+      "sha256": "61bb9c4d27a53678041a3db50bc2cea787a4ddf92a63b80d5d180a913623821a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42119.topo.json",
+      "bytes": 60264,
+      "sha256": "deb873567a834b396773696e5749fb0ad44950a91934cb73bbfc22983493e9a0"
+    },
+    {
+      "path": "data/pa/2024/precincts/42121.topo.json",
+      "bytes": 112214,
+      "sha256": "a7b7bea95fbef380ca6461b55845abe893a40955cbd9c45949d16e6b8176226a"
+    },
+    {
+      "path": "data/pa/2024/precincts/42123.topo.json",
+      "bytes": 49408,
+      "sha256": "44b4cf6a638ae38d35c11b4263f5f8011fdc3c46a18f847260f4b54dfc11fab6"
+    },
+    {
+      "path": "data/pa/2024/precincts/42125.topo.json",
+      "bytes": 360997,
+      "sha256": "90a251e0aef9c312e39e0a91d56017de9597920abdd8e32704af0349c72a6009"
+    },
+    {
+      "path": "data/pa/2024/precincts/42127.topo.json",
+      "bytes": 74385,
+      "sha256": "f6fece912326c78be74e7cb47aa8064a3a28524a49e67f12a1d5a16b00f9f0ad"
+    },
+    {
+      "path": "data/pa/2024/precincts/42129.topo.json",
+      "bytes": 575665,
+      "sha256": "5de7de6e86860354f4fbdd2289f63d52b70836d9058532b103cd0e3860d92690"
+    },
+    {
+      "path": "data/pa/2024/precincts/42131.topo.json",
+      "bytes": 38945,
+      "sha256": "0048b4f5557e8e5b56a2a29df170002a61d541894f1154cbb0b0bb1b5e7a066b"
+    },
+    {
+      "path": "data/pa/2024/precincts/42133.topo.json",
+      "bytes": 306740,
+      "sha256": "6989f9d706f606db0928cefac5e325c2eac1c83764f356e3e6bedf41f2a8cb7a"
+    },
+    {
+      "path": "data/pa/2024/reporting-units.json",
+      "bytes": 5468866,
+      "sha256": "88857f3dafb4fd1b3419e22cd0c1c4aba2eca662f2c080fa542429e2d3f7c106"
+    },
+    {
+      "path": "data/wi/2020/ward-demographics.json",
+      "bytes": 442354,
+      "sha256": "ea77ada6a292fcd3c468c06a9ea2042c7d6dbe39fc05befc3613910202e8f575"
+    },
+    {
+      "path": "data/wi/2024/precinct-geometry-manifest.json",
+      "bytes": 58946,
+      "sha256": "c17f404fc99cf0500ca209df7763edd1a79ad93d5bb1cffe7d5d11b77598c35c"
+    },
+    {
+      "path": "data/wi/2024/precincts/55001.topo.json",
+      "bytes": 75650,
+      "sha256": "0eed970ff618102690e50d18e60a3863cb6c76f95a7bab76f26cfdd26c03afcc"
+    },
+    {
+      "path": "data/wi/2024/precincts/55003.topo.json",
+      "bytes": 138627,
+      "sha256": "2b9375313d7b3882552b670add3a9f3462d9c709fe7e0d618eb296e95ea6abbe"
+    },
+    {
+      "path": "data/wi/2024/precincts/55005.topo.json",
+      "bytes": 129959,
+      "sha256": "bddb466ec909c7cfc4681ce9e168730368b2b6e549f11a4445f36d00d417b701"
+    },
+    {
+      "path": "data/wi/2024/precincts/55007.topo.json",
+      "bytes": 477355,
+      "sha256": "2a3f1e833e1dc20cb43591e945639cb12653819d54c04bcdec1f092bd3767be3"
+    },
+    {
+      "path": "data/wi/2024/precincts/55009.topo.json",
+      "bytes": 315234,
+      "sha256": "adc6da4e44ed7ed936952b9f3ce90c26b57074991c49810fb081887e5c94ff44"
+    },
+    {
+      "path": "data/wi/2024/precincts/55011.topo.json",
+      "bytes": 35660,
+      "sha256": "f5b89d09c2e6be55c6618b5b7b82cd0fdea3a562a521720955d4656147d8c366"
+    },
+    {
+      "path": "data/wi/2024/precincts/55013.topo.json",
+      "bytes": 77726,
+      "sha256": "a8dec709cab624201af0d9677372a34b022f415245570728e5b72286b726e801"
+    },
+    {
+      "path": "data/wi/2024/precincts/55015.topo.json",
+      "bytes": 104846,
+      "sha256": "b6ec1dd1cb34a0027f4e25e5d61b129b32158022a260956c4100247a2a0f468b"
+    },
+    {
+      "path": "data/wi/2024/precincts/55017.topo.json",
+      "bytes": 103633,
+      "sha256": "d3d1bfe234e2dacd1c46845a80c57ee3ff28a70fb7dd17930a563b89096f7c34"
+    },
+    {
+      "path": "data/wi/2024/precincts/55019.topo.json",
+      "bytes": 116357,
+      "sha256": "ec8ff1b3347b2d2d858f204488095d1685c3a797b91728b0058da94874448e61"
+    },
+    {
+      "path": "data/wi/2024/precincts/55021.topo.json",
+      "bytes": 187451,
+      "sha256": "5d41e16c89ac65941b39f70ca12b4d2126a5c568af7b7a566be5fead85dce42a"
+    },
+    {
+      "path": "data/wi/2024/precincts/55023.topo.json",
+      "bytes": 145109,
+      "sha256": "738f394245abfeb1eafba794fdb10f810004f75bda8d0be56d786a8a82496053"
+    },
+    {
+      "path": "data/wi/2024/precincts/55025.topo.json",
+      "bytes": 1113585,
+      "sha256": "30954d0d534572b6daafe8a044434dfeda9539f2f543a1644046b97919d9d219"
+    },
+    {
+      "path": "data/wi/2024/precincts/55027.topo.json",
+      "bytes": 192988,
+      "sha256": "12267eaaa19d25f864387e620a84a676b4eb480bbadb6229f3d342036cafa805"
+    },
+    {
+      "path": "data/wi/2024/precincts/55029.topo.json",
+      "bytes": 659042,
+      "sha256": "d52b3b8341d220343b0a9065eb53915498a06e73f3d8df91712f347d05d39de5"
+    },
+    {
+      "path": "data/wi/2024/precincts/55031.topo.json",
+      "bytes": 96816,
+      "sha256": "d23558596c42271ccd1800a4bd815283bd5b8bdf20ecc5fb35494ebf55589a40"
+    },
+    {
+      "path": "data/wi/2024/precincts/55033.topo.json",
+      "bytes": 84253,
+      "sha256": "577c92526049113d60faebafc3fcd054a6e81ed4e9228747dd9ffe6a6cbad84d"
+    },
+    {
+      "path": "data/wi/2024/precincts/55035.topo.json",
+      "bytes": 259063,
+      "sha256": "9146e8e025753550d466863e7a9df45cfff93b96f2929f26eecaa107f65581f4"
+    },
+    {
+      "path": "data/wi/2024/precincts/55037.topo.json",
+      "bytes": 50404,
+      "sha256": "a3d3a3d3c264f9bb3c62c36cd838fb746d32f0bc754684070de8ab13fa1b5673"
+    },
+    {
+      "path": "data/wi/2024/precincts/55039.topo.json",
+      "bytes": 282553,
+      "sha256": "21c60ac968da24fe7920a7048f781ee681c26291c05c934059daf43cd8093bb9"
+    },
+    {
+      "path": "data/wi/2024/precincts/55041.topo.json",
+      "bytes": 68594,
+      "sha256": "06a7e9e30d918425626e6cc1d806978c8fdaf6e00a849c4747859886cdc25faf"
+    },
+    {
+      "path": "data/wi/2024/precincts/55043.topo.json",
+      "bytes": 151838,
+      "sha256": "7c4ca7c0bc4876187fbe063f7fa2136110eba1d576858291f812f0fc6520da55"
+    },
+    {
+      "path": "data/wi/2024/precincts/55045.topo.json",
+      "bytes": 71074,
+      "sha256": "be5e548f4916582e6a6ffeb613c64924e1dbd767acc690670253768a0f9d93a7"
+    },
+    {
+      "path": "data/wi/2024/precincts/55047.topo.json",
+      "bytes": 54142,
+      "sha256": "27951cf5cc81a4ffd0f3ea306e8dedd6a877f6271b9274169ffc3e985e3744ae"
+    },
+    {
+      "path": "data/wi/2024/precincts/55049.topo.json",
+      "bytes": 94759,
+      "sha256": "5c1aa116d30fd791a0e1c3623b3e207b8a401d76d64e20714d84605d5bde9f97"
+    },
+    {
+      "path": "data/wi/2024/precincts/55051.topo.json",
+      "bytes": 96461,
+      "sha256": "42d11e8ddc7daa9979b3216f26c2584dfc2b3efc28fba018bf7330dbf527a7da"
+    },
+    {
+      "path": "data/wi/2024/precincts/55053.topo.json",
+      "bytes": 107976,
+      "sha256": "48857c0580e3b4c380af25badb4cf96bbba60d7c28bdb5de27693803b037f6ca"
+    },
+    {
+      "path": "data/wi/2024/precincts/55055.topo.json",
+      "bytes": 192758,
+      "sha256": "ccfd4db239326c727f21f3555634271d6721ac89227df07617cf2eb55dcb472f"
+    },
+    {
+      "path": "data/wi/2024/precincts/55057.topo.json",
+      "bytes": 90193,
+      "sha256": "47c1010124594bc8864d954e3aa91726752150ea79c7808322e58bf51a54c85c"
+    },
+    {
+      "path": "data/wi/2024/precincts/55059.topo.json",
+      "bytes": 324153,
+      "sha256": "f635c6f0a9d118c412e13993fe95b5bd2b24cfb325e182904621d02ef6ac840f"
+    },
+    {
+      "path": "data/wi/2024/precincts/55061.topo.json",
+      "bytes": 56829,
+      "sha256": "dda30215be47f783e3f269b342d314956b5d65f99faffa8d1910d25735e6565c"
+    },
+    {
+      "path": "data/wi/2024/precincts/55063.topo.json",
+      "bytes": 176338,
+      "sha256": "adacc28b2df319901467021e9cde4d6ec20b1a18ce195a74e13148a1f8eaf407"
+    },
+    {
+      "path": "data/wi/2024/precincts/55065.topo.json",
+      "bytes": 87381,
+      "sha256": "d5398bb018d613d29e38594586bed993fd789d06bbf5cdb076c1eaaf817ca7de"
+    },
+    {
+      "path": "data/wi/2024/precincts/55067.topo.json",
+      "bytes": 48654,
+      "sha256": "6acf462b8c4c7d146755ab9de8eaf807c682d9c0cb33b7725dc04b94c57fd341"
+    },
+    {
+      "path": "data/wi/2024/precincts/55069.topo.json",
+      "bytes": 1716649,
+      "sha256": "37fadc52b282e80c0fc1377051e044860ba45fc94aee69b92b235e52288d2732"
+    },
+    {
+      "path": "data/wi/2024/precincts/55071.topo.json",
+      "bytes": 127897,
+      "sha256": "5cd57ee8ab3c7f8acd80cbe59471e6eddc781ebe7cd2ee341d84ff149ab37279"
+    },
+    {
+      "path": "data/wi/2024/precincts/55073.topo.json",
+      "bytes": 211930,
+      "sha256": "ee5f85bb156933fc5f9cb470825a65147a7cb1034171f2e25902b4e6da3c2655"
+    },
+    {
+      "path": "data/wi/2024/precincts/55075.topo.json",
+      "bytes": 136552,
+      "sha256": "7db79adec5f676652be161dc272afda2a43bf802909da9e79f0f6cc27be31ab2"
+    },
+    {
+      "path": "data/wi/2024/precincts/55077.topo.json",
+      "bytes": 106077,
+      "sha256": "cc4f6c74fd5819dd4fae3e219e41400e4ed1a57ddce59d25ea2cec06a9756b58"
+    },
+    {
+      "path": "data/wi/2024/precincts/55078.topo.json",
+      "bytes": 26804,
+      "sha256": "12a1f7671cfde19468fb8f3c1e4c44e7b7b1badeba7a2b1cea38c89559d4f692"
+    },
+    {
+      "path": "data/wi/2024/precincts/55079.topo.json",
+      "bytes": 647064,
+      "sha256": "19314f117a87a167112a7395b5a30eeff4372911db0ca9310c76dfc8768e8442"
+    },
+    {
+      "path": "data/wi/2024/precincts/55081.topo.json",
+      "bytes": 281755,
+      "sha256": "3ecbba191e0cd6a45f81b1b41d81e17df61c655a5f6d89af2f33bfaa2d91eae2"
+    },
+    {
+      "path": "data/wi/2024/precincts/55083.topo.json",
+      "bytes": 123443,
+      "sha256": "d135f8bb200004439a523b7d3f0a3bfaa0f7a5707f44d009e09dbf99a088544e"
+    },
+    {
+      "path": "data/wi/2024/precincts/55085.topo.json",
+      "bytes": 252264,
+      "sha256": "6034b225f55e56ece0f1affcfaa32aed3475ab22bd8ce221e92f029fc865f7cd"
+    },
+    {
+      "path": "data/wi/2024/precincts/55087.topo.json",
+      "bytes": 226844,
+      "sha256": "0447eebb7de563f855ed3f88fcfce28bc3720854c36ac0d574d79207c1a61fce"
+    },
+    {
+      "path": "data/wi/2024/precincts/55089.topo.json",
+      "bytes": 155765,
+      "sha256": "707a1de5c3825fe540dec75178811fbdd9f07a0527da62c5d914d1ff6f0ec316"
+    },
+    {
+      "path": "data/wi/2024/precincts/55091.topo.json",
+      "bytes": 35903,
+      "sha256": "460e4a86eda6d86a996ddc5a8159348fe1e9675eaa6e6457f31c5e357024fa77"
+    },
+    {
+      "path": "data/wi/2024/precincts/55093.topo.json",
+      "bytes": 89995,
+      "sha256": "04ece052ad8ba9221a0a06b06727e346cc27be2f311d171365bc89cde7ed4997"
+    },
+    {
+      "path": "data/wi/2024/precincts/55095.topo.json",
+      "bytes": 138774,
+      "sha256": "de525439914138da7683b1595437e725522c7d0e484e22bba43aa494fc6c9111"
+    },
+    {
+      "path": "data/wi/2024/precincts/55097.topo.json",
+      "bytes": 166459,
+      "sha256": "0d4ed0183c868d5fd2a5052c300d94a4a65bbe481072ea655332a17cbcfa8cfe"
+    },
+    {
+      "path": "data/wi/2024/precincts/55099.topo.json",
+      "bytes": 129235,
+      "sha256": "b75270783a849749c2767cd3df34e314bf0cf04615ac495a8d2cecb09f9e5327"
+    },
+    {
+      "path": "data/wi/2024/precincts/55101.topo.json",
+      "bytes": 203054,
+      "sha256": "da47e6767abe5bc5015f51b73b25d8f4e6f20482fb3fa5e00986289c9e988b21"
+    },
+    {
+      "path": "data/wi/2024/precincts/55103.topo.json",
+      "bytes": 62368,
+      "sha256": "b10de082442b88f2d67538c9293eca3e800ceabc510dbf8df6883846f1cb3dca"
+    },
+    {
+      "path": "data/wi/2024/precincts/55105.topo.json",
+      "bytes": 299086,
+      "sha256": "994ac34d745ab79e672273ad5a0902ba502976f7d8e65c3983754511bfe54bdb"
+    },
+    {
+      "path": "data/wi/2024/precincts/55107.topo.json",
+      "bytes": 100244,
+      "sha256": "38146c166d25f0e5e2a2f2ed749fc8aa4ff55cc55d34c577e00fa98a10d99d2e"
+    },
+    {
+      "path": "data/wi/2024/precincts/55109.topo.json",
+      "bytes": 215663,
+      "sha256": "4c837ad97504373a7f3a0fa88ccb88bf92de9f2cabad9f5f0bba95a849b39e1c"
+    },
+    {
+      "path": "data/wi/2024/precincts/55111.topo.json",
+      "bytes": 165192,
+      "sha256": "f45b6aaa54270f90e83a2ad54fcdbbe138809c1c687d2c711ee675f82989279c"
+    },
+    {
+      "path": "data/wi/2024/precincts/55113.topo.json",
+      "bytes": 79926,
+      "sha256": "bb95dc6fdffc4fa9c88741309d053e5c70506ff0cb5247a5bad37baf98da605d"
+    },
+    {
+      "path": "data/wi/2024/precincts/55115.topo.json",
+      "bytes": 182115,
+      "sha256": "b5d985a51997a99c043cc8d0397461ad6a64be10e06c1fe94bd62280d8f590ab"
+    },
+    {
+      "path": "data/wi/2024/precincts/55117.topo.json",
+      "bytes": 299562,
+      "sha256": "4e2d7c0d146c13af48d8188a774f261caadd12a884883b2975f3ca76a06fb6fe"
+    },
+    {
+      "path": "data/wi/2024/precincts/55119.topo.json",
+      "bytes": 51961,
+      "sha256": "19294b43b426b8bcb61de1a1b3fd2571e9ba38baaf4f5d623f32df5e1e7574d7"
+    },
+    {
+      "path": "data/wi/2024/precincts/55121.topo.json",
+      "bytes": 145424,
+      "sha256": "3edaa71e285bd9f30104ad8191da177a619f3b2a7ba8e0bb9d69c801ec1df044"
+    },
+    {
+      "path": "data/wi/2024/precincts/55123.topo.json",
+      "bytes": 99290,
+      "sha256": "f1a67704e8fe8060951d5fe9066cd76292c3246b3f8c23b525869f16b7fd3e58"
+    },
+    {
+      "path": "data/wi/2024/precincts/55125.topo.json",
+      "bytes": 212291,
+      "sha256": "291b83971bb49e6278c05dd4128e014049c5a478cdfa23b80258faff3bfbcdcd"
+    },
+    {
+      "path": "data/wi/2024/precincts/55127.topo.json",
+      "bytes": 241342,
+      "sha256": "187c59bf393f7488cf74c8bfd0a94fb9399f6391a6db539abfcf96d6e17865e7"
+    },
+    {
+      "path": "data/wi/2024/precincts/55129.topo.json",
+      "bytes": 68441,
+      "sha256": "767f18e136228b4430c174bdd8f3175b7517880ed6694f741e08bf56db37c6f9"
+    },
+    {
+      "path": "data/wi/2024/precincts/55131.topo.json",
+      "bytes": 223161,
+      "sha256": "e47c4c34def832b521dabbe74c4ed81a1699be662f91a27a132efe22867cb0b1"
+    },
+    {
+      "path": "data/wi/2024/precincts/55133.topo.json",
+      "bytes": 704636,
+      "sha256": "139559675b463f6962ba2ed31fd4dd826415266638dafddb66cc5cd2d0843e4d"
+    },
+    {
+      "path": "data/wi/2024/precincts/55135.topo.json",
+      "bytes": 165164,
+      "sha256": "a68e0a0bdbe6b00df06648811f09e300fcf8e14761563eddd0b492edbc84417f"
+    },
+    {
+      "path": "data/wi/2024/precincts/55137.topo.json",
+      "bytes": 76440,
+      "sha256": "de158c5d34dadf7ad0af4039fb7f43d05c88c07dcfe16769aafc1f8281a208f6"
+    },
+    {
+      "path": "data/wi/2024/precincts/55139.topo.json",
+      "bytes": 397245,
+      "sha256": "b4d903ce9f6479e9b44222ec6278185d67010a4e86544bc7409ba192aeb802c2"
+    },
+    {
+      "path": "data/wi/2024/precincts/55141.topo.json",
+      "bytes": 138429,
+      "sha256": "f903c79dc5e2c83f252959129930de1875127aa921270cb0bcc9c051b8859f00"
+    },
+    {
+      "path": "data/wi/2024/reporting-units.json",
+      "bytes": 3146492,
+      "sha256": "aca06fe4f4128d6c292e84ae0746f272df0bdb5fb1a7a178e4604984ace47130"
+    },
+    {
+      "path": "index.html",
+      "bytes": 744,
+      "sha256": "edead6f4205d0bae107cc88bf928213dc47780b205c6f648cd5553f61a8d9255"
+    },
+    {
+      "path": "methodology.html",
+      "bytes": 7807,
+      "sha256": "1b2b92681682b94e17fc0485ca14e8b2e95272d7e804858cc6d6bd85446a6f60"
+    }
+  ]
+}

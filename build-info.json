@@ -1,0 +1,12 @@
+{
+  "sourceCommit": "701318fbd0a44061c89e07835015de1d087df430",
+  "scope": "public-partner-review",
+  "applications": [
+    "Home",
+    "Swingometer",
+    "Election Night"
+  ],
+  "humanValidationComplete": false,
+  "sourceRightsQuestionsResolved": false,
+  "decision": "0066-partner-pages-review"
+}
