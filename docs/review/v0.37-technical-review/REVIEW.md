@@ -25,6 +25,8 @@ npm.cmd run preview -- --outDir outputs/0.30.0-rc.1/5250e5c7203b3168be988b89df21
 
 ## Findings and disposition
 
+Follow-up: R4–R7 are addressed in the [v0.38 interaction refinement](../v0.38-interaction-refinement/REVIEW.md). The table below preserves their status at the original review; use the follow-up for implementation and retest evidence.
+
 | ID | Severity / status | Reproduction, observation, and action |
 | --- | --- | --- |
 | R1 | P1 · fixed | Open PA, transfer 2.5 preference points toward Harris, then return to United States. The national readout said Actual R +1.7 / Scenario D +0.8, which were PA's margins. Its national shift already said +0.1 points. The result vector fell back to the active detailed state when no state was selected. Bind the national view to national actual/scenario aggregates. Retest shows R +1.5 → R +1.4, +0.1 points, while reopening PA retains D +0.8. Electoral College and model arithmetic were not changed. |

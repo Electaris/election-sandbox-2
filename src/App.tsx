@@ -30,6 +30,7 @@ import { EditorialNumber } from "./components/workspace/EditorialNumber";
 import { AtlasMarginLegend } from "./components/home/AtlasMarginLegend";
 import { GlobalHeader } from "./components/workspace/GlobalHeader";
 import { WorkspaceDock } from "./components/workspace/WorkspaceDock";
+import { TurnoutGroups } from "./components/workspace/TurnoutGroups";
 import { useWorkspaceDock } from "./components/workspace/useWorkspaceDock";
 import { GeographyInspector } from "./components/GeographyInspector.tsx";
 import {
@@ -1607,8 +1608,6 @@ function ScenarioApp() {
       ? "LTSB reconstructed wards"
       : "2024 precinct reporting units";
   const evidenceLedger = getStateEvidenceLedger(activeDetailedStateCode);
-  const mutationScopeName = selectedActualCounty?.name
-    ?? (selectedStateCode ? selectedActual.name : "United States");
 
   function applyStateRecipeSettings(settings: StateBehaviorRecipeSettings) {
     setTurnoutIncreasePoints(settings.turnoutIncreasePoints);
@@ -2966,12 +2965,12 @@ function ScenarioApp() {
           >
             <div className="drawer-toolbar">
               <div className="drawer-intent">
-                <span className="overline">Change {mutationScopeName}</span>
+                <span className="overline">{selectedStateCode ? `Statewide assumptions · ${activeDetailedStateManifest.name}` : "Election laboratory"}</span>
                 <strong>{laboratoryDrawerSnap === "collapsed"
                   ? selectedStateCode
                     ? "Turnout · Preference · Third party"
                     : "Choose Pennsylvania, Michigan, or Wisconsin to model voter behavior"
-                  : selectedGeographyName}</strong>
+                  : laboratoryDrawerTab === "behavior" ? "Participation & choice" : `${laboratoryDrawerTab[0].toUpperCase()}${laboratoryDrawerTab.slice(1)}`}</strong>
                 {(
                   <button onClick={() => openLaboratoryPanel("behavior")} type="button">Open controls</button>
                 )}
@@ -3055,7 +3054,7 @@ function ScenarioApp() {
               </div>
               <div className="editor-context">
               <div className="field-label">
-                <span>Geography</span>
+                <span>Statewide assumptions</span>
                 <strong>{activeDetailedStateManifest.name}</strong>
               </div>
               <div className="field-label">
@@ -3063,6 +3062,8 @@ function ScenarioApp() {
                 <strong>{activeOperationSemantics.populationBasis}</strong>
               </div>
               </div>
+
+              {selectedActualCounty && <p className="editor-scope-note">Inspecting {selectedGeographyName}. These controls apply across {activeDetailedStateManifest.name}, not only this selected geography.</p>}
 
               <div className={`coverage-strip ${demographicError ? "error" : ""}`}>
                 <span>{demographicError
@@ -3137,6 +3138,53 @@ function ScenarioApp() {
                   />
                   <div className="range-labels"><span>Actual</span><span>+0.8 pts</span><span>+1.5 pts model window</span></div>
 
+                  <div className="slider-header secondary-slider">
+                    <label htmlFor="pa-new-voter-share">Shared Harris share of added ballots</label>
+                    <strong>{addedVoterHarrisShare.toFixed(0)}%</strong>
+                  </div>
+                  <input
+                    disabled={!demographicFoundation}
+                    id="pa-new-voter-share"
+                    max="100"
+                    min="0"
+                    onChange={(event) => setAddedVoterHarrisShare(Number(event.currentTarget.value))}
+                    onInput={(event) => setAddedVoterHarrisShare(Number(event.currentTarget.value))}
+                    onKeyDown={(event) => {
+                      const movement = event.key === "ArrowRight" || event.key === "ArrowUp"
+                        ? 1
+                        : event.key === "ArrowLeft" || event.key === "ArrowDown"
+                          ? -1
+                          : null;
+                      if (movement == null && event.key !== "Home" && event.key !== "End") return;
+                      event.preventDefault();
+                      setAddedVoterHarrisShare((current) => {
+                        if (event.key === "Home") return 0;
+                        if (event.key === "End") return 100;
+                        return Math.min(100, Math.max(0, current + movement!));
+                      });
+                    }}
+                    step="1"
+                    type="range"
+                    value={addedVoterHarrisShare}
+                  />
+                  <div className="range-labels"><span>100% Trump</span><span>Inherited group default</span><span>100% Harris</span></div>
+
+                  <div className="effect-grid turnout-effects">
+                    <div><span>Added ballots</span><strong>{formatCompact(behaviorScenario?.turnout.addedVotes ?? 0)}</strong></div>
+                    <div><span>Group-added ballots</span><strong>{formatCompact(behaviorScenario?.demographicTurnout.addedVotes ?? 0)}</strong></div>
+                    <div><span>Added vote ledger</span><strong>H {formatCompact(behaviorScenario?.turnout.harrisVotes ?? 0)} · T {formatCompact(behaviorScenario?.turnout.trumpVotes ?? 0)} · S {formatCompact(behaviorScenario?.turnout.steinVotes ?? 0)} · O {formatCompact(behaviorScenario?.turnout.oliverVotes ?? 0)} · Other {formatCompact(behaviorScenario?.turnout.residualOtherVotes ?? 0)}</strong></div>
+                    <div><span>{activeDetailedStateCode} result</span><strong>{formatResultLead(detailedScenario)}</strong></div>
+                  </div>
+                  <p className="transfer-explainer"><strong>{formatNumber(behaviorScenario?.turnout.addedVotes ?? 0)} of {formatNumber(behaviorScenario?.turnout.requestedVotes ?? 0)} requested ballots added.</strong>{" "}{formatNumber(behaviorScenario?.turnout.capacity ?? 0)} ballots of documented local capacity are available before this operation.</p>
+                  <button className="reset-button" disabled={!activeScenarioChanged} onClick={resetScenario} type="button">
+                    Reset {activeDetailedStateCode} to exact baseline
+                  </button>
+                  <TurnoutGroups
+                    available={demographicGroupTurnoutAvailable}
+                    key={activeDetailedStateCode}
+                    initialOpen={demographicTurnoutActive || Object.values(demographicCandidateShares).some((shares) => shares !== null)}
+                    active={demographicTurnoutActive}
+                  >
                   <section className="demographic-turnout-editor" aria-labelledby="demographic-turnout-title">
                     <div className="demographic-turnout-heading">
                       <div>
@@ -3257,7 +3305,7 @@ function ScenarioApp() {
                           <p className="demographic-preference-boundary">This preference applies only to new ballots created by this group&apos;s turnout setting. Certified ballots are never assigned a demographic identity.</p>
                         </section>
                         <p className="demographic-turnout-boundary">
-                          Group additions run after the statewide setting and share the same local remaining capacity. Canonical group order resolves capacity competition. Groups without a custom vector inherit the shared split below.
+                          Group additions run after the statewide setting and share the same local remaining capacity. Canonical group order resolves capacity competition. Groups without a custom vector inherit the shared split above.
                         </p>
                       </>
                     ) : (
@@ -3268,44 +3316,6 @@ function ScenarioApp() {
                     )}
                   </section>
 
-                  <div className="slider-header secondary-slider">
-                    <label htmlFor="pa-new-voter-share">Shared Harris share of added ballots</label>
-                    <strong>{addedVoterHarrisShare.toFixed(0)}%</strong>
-                  </div>
-                  <input
-                    disabled={!demographicFoundation}
-                    id="pa-new-voter-share"
-                    max="100"
-                    min="0"
-                    onChange={(event) => setAddedVoterHarrisShare(Number(event.currentTarget.value))}
-                    onInput={(event) => setAddedVoterHarrisShare(Number(event.currentTarget.value))}
-                    onKeyDown={(event) => {
-                      const movement = event.key === "ArrowRight" || event.key === "ArrowUp"
-                        ? 1
-                        : event.key === "ArrowLeft" || event.key === "ArrowDown"
-                          ? -1
-                          : null;
-                      if (movement == null && event.key !== "Home" && event.key !== "End") return;
-                      event.preventDefault();
-                      setAddedVoterHarrisShare((current) => {
-                        if (event.key === "Home") return 0;
-                        if (event.key === "End") return 100;
-                        return Math.min(100, Math.max(0, current + movement!));
-                      });
-                    }}
-                    step="1"
-                    type="range"
-                    value={addedVoterHarrisShare}
-                  />
-                  <div className="range-labels"><span>100% Trump</span><span>Inherited group default</span><span>100% Harris</span></div>
-
-                  <div className="effect-grid turnout-effects">
-                    <div><span>Added ballots</span><strong>{formatCompact(behaviorScenario?.turnout.addedVotes ?? 0)}</strong></div>
-                    <div><span>Group-added ballots</span><strong>{formatCompact(behaviorScenario?.demographicTurnout.addedVotes ?? 0)}</strong></div>
-                    <div><span>Added vote ledger</span><strong>H {formatCompact(behaviorScenario?.turnout.harrisVotes ?? 0)} · T {formatCompact(behaviorScenario?.turnout.trumpVotes ?? 0)} · S {formatCompact(behaviorScenario?.turnout.steinVotes ?? 0)} · O {formatCompact(behaviorScenario?.turnout.oliverVotes ?? 0)} · Other {formatCompact(behaviorScenario?.turnout.residualOtherVotes ?? 0)}</strong></div>
-                    <div><span>{activeDetailedStateCode} result</span><strong>{formatResultLead(detailedScenario)}</strong></div>
-                  </div>
-                  <p className="transfer-explainer"><strong>{formatNumber(behaviorScenario?.turnout.addedVotes ?? 0)} of {formatNumber(behaviorScenario?.turnout.requestedVotes ?? 0)} requested ballots added.</strong>{" "}{formatNumber(behaviorScenario?.turnout.capacity ?? 0)} ballots of documented local capacity are available before this operation.</p>
                   {demographicGroupTurnoutAvailable && <section className="demographic-impact-panel" aria-label="Demographic contribution and sensitivity">
                     <div className="demographic-impact-heading">
                       <div><span className="overline">Exact contribution</span><strong>{demographicGroupLabels[selectedDemographicPreferenceGroup]}</strong></div>
@@ -3349,6 +3359,7 @@ function ScenarioApp() {
                     </div>
                     <p className="demographic-impact-sequence">This panel isolates the turnout operation at insertion time. Any statewide preference transfer or named third-party exchange runs afterward and may move those ballots again.</p>
                   </section>}
+                  </TurnoutGroups>
                 </>
               ) : behaviorEditorMode === "preference" ? (
                 <>
@@ -3523,9 +3534,9 @@ function ScenarioApp() {
                 </>
               )}
 
-              <button className="reset-button" disabled={!activeScenarioChanged} onClick={resetScenario} type="button">
+              {behaviorEditorMode !== "turnout" && <button className="reset-button" disabled={!activeScenarioChanged} onClick={resetScenario} type="button">
                 Reset {activeDetailedStateCode} to exact baseline
-              </button>
+              </button>}
             </div>
           </section>
               </div>

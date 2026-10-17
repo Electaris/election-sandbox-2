@@ -932,7 +932,7 @@ export function AtlasMapScene({
               </>
             ) : activeDetailedStateManifest ? (
               <>
-                <p>Color is presidential margin. Height is normalized named-candidate ballots. Click a county to open its voting-district terrain.</p>
+                <p>Color is presidential margin. Height is normalized named-candidate ballots. Click a county to open its {activeDetailedStateManifest.code === "WI" ? "reconstructed ward" : activeDetailedStateManifest.code === "PA" ? "voting-district" : reportingUnitLabel} terrain.</p>
                 <div className="atlas-height-switch" aria-label="County height mode">
                   <span>Height</span>
                   <button aria-pressed={heightMode === "ballots"} onClick={() => setHeightMode("ballots")} type="button">Ballots</button>

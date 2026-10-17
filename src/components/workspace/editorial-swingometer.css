@@ -175,6 +175,44 @@
   .editorial-swingometer .workspace-header .breadcrumb { font-size: 26px; }
   .premium-shell.application-shell.editorial-swingometer .workspace-layout .analysis-inspector { padding: 18px; }
 }
+
+.editorial-swingometer .editor-scope-note {
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.editorial-swingometer .turnout-groups-disclosure {
+  margin-top: 20px;
+  border-block: 1px solid var(--line);
+}
+.editorial-swingometer .turnout-groups-disclosure > summary {
+  display: list-item;
+  padding: 16px 4px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.editorial-swingometer .turnout-groups-disclosure > summary small {
+  display: block;
+  padding-left: 16px;
+  color: #586e76;
+  font-size: 12px;
+}
+.editorial-swingometer .turnout-groups-disclosure > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.editorial-swingometer .inspector-heading strong,
+.editorial-swingometer .inspector-heading small {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 @media (min-width: 801px) and (max-width: 1080px) {
   .editorial-swingometer .masthead[data-navigation-open="true"] .primary-nav { top: 82px; gap: 20px; padding: 10px 20px; border-radius: 3px; }
 }
@@ -182,6 +220,9 @@
   .premium-shell.application-shell.editorial-swingometer .workspace-layout { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 800px) {
+  .editorial-swingometer .inspector-heading { flex-direction: column; }
+  .editorial-swingometer .inspector-heading .inspector-actions { flex-wrap: wrap; }
+  .editorial-swingometer .workspace-dock .drawer-intent strong { font-size: 18px; }
   .premium-shell.application-shell.editorial-swingometer { grid-template-rows: 72px auto minmax(0, 1fr) var(--dock-collapsed); }
   .premium-shell.application-shell.editorial-swingometer .masthead { height: 72px; grid-template-columns: 1fr auto; padding: 0 16px; gap: 8px; }
   .editorial-swingometer .brand strong { font-size: 28px; }
@@ -189,7 +230,12 @@
   .editorial-swingometer .navigation-toggle { border-radius: 3px; }
   .editorial-swingometer .masthead[data-navigation-open="true"] .primary-nav { top: 72px; padding: 10px 20px; gap: 0; border-radius: 3px; }
   .premium-shell.application-shell.editorial-swingometer .workspace-header { padding: 14px 16px; gap: 10px; }
+  .premium-shell.application-shell.editorial-swingometer .workspace-header .map-toolbar { flex-wrap: wrap; }
+  .editorial-swingometer .workspace-header .map-toolbar > div:first-child { flex-basis: 100%; }
   .editorial-swingometer .workspace-header .breadcrumb { font-size: 23px; margin-top: 0; }
+  .editorial-swingometer .workspace-header .breadcrumb button { font-family: "Libre Franklin", sans-serif; font-size: 12px; min-height: 32px; }
+  .editorial-swingometer .workspace-header .breadcrumb > strong { flex-basis: 100%; }
+  .editorial-swingometer .workspace-header .breadcrumb > span:last-of-type { display: none; }
   .premium-shell.application-shell.editorial-swingometer .workspace-layout .map-column { padding: 8px 16px 0; }
   .premium-shell.application-shell.editorial-swingometer .workspace-layout .legend-row { font-size: 8px; padding-block: 6px; }
   .premium-shell.application-shell.editorial-swingometer .selected-readout { padding-block: 8px; }
